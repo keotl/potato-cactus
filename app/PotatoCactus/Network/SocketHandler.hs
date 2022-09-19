@@ -1,7 +1,14 @@
 module PotatoCactus.Network.SocketHandler where
 
-import Network.Socket
-import System.IO (hSetBuffering, hGetLine, hPutStrLn, BufferMode(..), Handle)
 import Control.Concurrent (forkIO)
+import Network.Socket
+import qualified Data.ByteString as S
+import Network.Socket.ByteString (recv, sendAll)
+import Control.Monad (unless, forever, void)
 
--- https://catonmat.net/simple-haskell-tcp-server
+socketMain :: Socket -> IO()
+socketMain sock = do
+  msg <- recv sock 1024
+  unless (S.null msg) $ do
+    sendAll sock msg
+    socketMain sock
