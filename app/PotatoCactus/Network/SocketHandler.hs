@@ -21,15 +21,19 @@ socketMain sock = do
   case runGet getWord8 msg of
     (Right val, _) -> dispatch val sock
     (Left val, _) -> return ()
+  socketMain sock
 
 dispatch :: B.Word8 -> Socket -> IO ()
-dispatch 14 = handleLogin -- actual login
-dispatch 48 = handleLogin -- '0'
+dispatch 14 =
+  \sock -> do
+  player <- handleLogin sock
+
+  return ()
+
+-- dispatch 48 = handleLogin -- '0' for easier testing
 dispatch op = \x -> do
   putStrLn $ "Unknown opcode: " ++ show op
   print x
-
--- todo how to actually print op??
 
 socketMain2 :: Socket -> IO ()
 socketMain2 sock = do

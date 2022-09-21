@@ -9,7 +9,7 @@ import Network.Socket.ByteString (recv, sendAll)
 -- import PotatoCactus.Dummy (dummyMessage)
 import PotatoCactus.Network.SocketHandler
 main :: IO ()
-main = runTCPServer Nothing "3000" socketMain
+main = runTCPServer Nothing "43594" socketMain
 
 runTCPServer :: Maybe HostName -> ServiceName -> (Socket -> IO a) -> IO a
 runTCPServer mhost port server = do
