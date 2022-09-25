@@ -25,13 +25,17 @@ executable potato-cactus
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    other-modules: PotatoCactus.Network.SocketHandler
+    other-modules: PotatoCactus.Boot.GameThreadMain
+                   PotatoCactus.Boot.GameChannel
+                   PotatoCactus.Network.SocketHandler
                    PotatoCactus.Network.PlayerHandler
                    PotatoCactus.Network.Packets.In.LoginPacket
-                   PotatoCactus.Network.Packets.Decoder
+                   PotatoCactus.Network.Packets.Reader
                    PotatoCactus.Login.LoginHandler
+                   PotatoCactus.Network.ClientHandle
                    PotatoCactus.Login.Models
                    PotatoCactus.Game.Player
+                   PotatoCactus.Game.World
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

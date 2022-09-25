@@ -11,6 +11,7 @@ import Network.Socket (Socket)
 import Network.Socket.ByteString (recv, sendAll)
 import PotatoCactus.Game.Player as P
 import PotatoCactus.Login.Models as L
+import PotatoCactus.Network.ClientHandle (ClientHandle (ClientHandle))
 
 handleLogin :: Socket -> IO (Maybe Player)
 handleLogin sock = do
@@ -49,14 +50,14 @@ handleLogin sock = do
   let (username, remaining) = readStr credentialBytes
   let (password, _) = readStr remaining
   putStrLn $ "Got login request with username=" ++ username ++ ", password=" ++ password
+
+  -- TODO let game loop handle sending the response
   sendAll sock $ pack [2] -- login success
   sendAll sock $ pack [0] -- account not flagged for botting
   sendAll sock $ pack [0] -- ignored?
 
   -- TODO check credentials
   return $ Just (Player username)
-
-
 
 toByte :: ByteString -> Word8
 toByte bytes =
