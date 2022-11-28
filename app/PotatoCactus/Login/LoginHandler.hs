@@ -2,16 +2,13 @@
 
 module PotatoCactus.Login.LoginHandler where
 
-import Data.Binary (Word16, Word32, Word8)
-import Data.Binary.Strict.Get (getWord16be, getWord32be, getWord32le, getWord8, runGet)
-import Data.ByteString (pack, tail)
+import Data.ByteString (pack)
 import Data.ByteString.UTF8 as BSU
-import Data.Char (ord)
 import Network.Socket (Socket)
 import Network.Socket.ByteString (recv, sendAll)
 import PotatoCactus.Game.Player as P
 import PotatoCactus.Login.Models as L
-import PotatoCactus.Network.ClientHandle (ClientHandle (ClientHandle))
+import PotatoCactus.Network.Binary (readStr, toByte, toInt, toShort)
 
 handleLogin :: Socket -> IO (Maybe Player)
 handleLogin sock = do
@@ -58,26 +55,3 @@ handleLogin sock = do
 
   -- TODO check credentials
   return $ Just (Player username)
-
-toByte :: ByteString -> Word8
-toByte bytes =
-  case runGet getWord8 bytes of
-    (Right val, _) -> val
-    (Left val, _) -> 0
-
-toShort :: ByteString -> Word16
-toShort bytes =
-  case runGet getWord16be bytes of
-    (Right val, _) -> val
-    (Left val, _) -> 0
-
-toInt :: ByteString -> Word32
-toInt bytes =
-  case runGet getWord32be bytes of
-    (Right val, _) -> val
-    (Left val, _) -> 0
-
-readStr :: ByteString -> (String, ByteString)
-readStr bytes =
-  let (h, r) = BSU.break (\x -> 10 == ord x) bytes
-   in (toString h, Data.ByteString.tail r)

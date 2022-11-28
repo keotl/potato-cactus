@@ -1,7 +1,10 @@
+{-# LANGUAGE BlockArguments #-}
 module PotatoCactus.Network.Packets.Reader where
 
 import Data.ByteString (ByteString, empty)
 import Network.Socket (Socket)
+import Network.Socket.ByteString (recv)
+import PotatoCactus.Network.Binary (toByte)
 
 data InboundPacket = InboundPacket
   { opcode :: Int,
@@ -10,4 +13,9 @@ data InboundPacket = InboundPacket
 
 readPacket :: Socket -> IO InboundPacket
 readPacket sock = do
-  return InboundPacket {opcode = 14, payload = empty}
+  opcode <- recv sock 1
+  
+  return case fromIntegral (toByte opcode) of
+    0 -> InboundPacket 0 empty -- idle
+    
+    _ -> InboundPacket (-1) empty -- unknown packet

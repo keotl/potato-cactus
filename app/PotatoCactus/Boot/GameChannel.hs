@@ -4,13 +4,16 @@ import Control.Concurrent (Chan, newChan)
 import Data.IORef (IORef)
 import GHC.IO (unsafePerformIO)
 import GHC.IORef (newIORef)
-import PotatoCactus.Network.ClientHandle (ClientHandle)
+import PotatoCactus.Game.World (ClientHandle (..))
 
-newtype RegisterClientMessage = RegisterClientMessage
-  { clientHandle :: ClientHandle
+newtype RegisterClientPayload = RegisterClientPayload
+  { -- name :: "registerClient",
+    clientHandle :: ClientHandle
   }
 
-type GameChannelMessage = RegisterClientMessage -- TODO create types
+data GameChannelMessage
+  = RegisterClientMessage RegisterClientPayload
+  | UpdateWorldMessage
 
 -- gameChannelRef :: IORef (Chan GameChannelMessage)
 -- gameChannelRef = unsafePerformIO $ newChan

@@ -1,9 +1,24 @@
 module PotatoCactus.Game.World where
 
+import Data.IORef (newIORef)
+import GHC.IO (unsafePerformIO)
 import PotatoCactus.Game.Player (Player)
+import Control.Concurrent (Chan)
 
-data World = World
-  { players :: [Player]
+type ClientHandleMessage = String -- TODO create types
+
+data ClientHandle = ClientHandle
+  { username :: String,
+    controlChannel :: Chan ClientHandleMessage
   }
 
-defaultWorldValue = World {players = []}
+data World = World
+  { tick :: Int,
+    players :: [Player],
+    clients :: [ClientHandle]
+  }
+
+defaultWorldValue = World {tick = 0, players = [], clients = []}
+
+worldInstance = unsafePerformIO $ newIORef defaultWorldValue
+{-# NOINLINE worldInstance #-}
