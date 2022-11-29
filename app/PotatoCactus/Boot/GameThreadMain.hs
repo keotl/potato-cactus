@@ -7,7 +7,7 @@ import GHC.Clock (getMonotonicTimeNSec)
 import PotatoCactus.Boot.GameChannel (GameChannelMessage (UpdateWorldMessage), gameChannel)
 import PotatoCactus.Config.Constants (tickInterval)
 import PotatoCactus.Game.Reducer (reduceWorld)
-import PotatoCactus.Game.World (World, defaultWorldValue, worldInstance)
+import PotatoCactus.Game.World (ClientHandle (controlChannel), ClientHandleMessage (WorldUpdatedMessage), World, defaultWorldValue, worldInstance)
 
 gameThreadMain :: IO ()
 gameThreadMain = do
@@ -20,19 +20,12 @@ gameThreadMain = do
 
 mainLoop :: IO ()
 mainLoop = do
-  -- TODO read non-blocking until it is time to go to next tick
-  -- https://hackage.haskell.org/package/synchronous-channels-0.2/docs/Control-Concurrent-Chan-Synchronous.html#v:writeList2Chan
-  -- tryReadChan
   startTime <- getMonotonicTimeNSec
   world <- readIORef worldInstance
   newWorld <- reduceUntilNextTick_ world gameChannel
-  print "going to next tick!"
-  -- message <- readChan gameChannel
+  -- print "going to next tick!"
 
-  -- print $ typeOf message
-  -- TODO increment tick
-  -- TODO - forEach connected client, send "worldUpdated notification"
-  -- asyncWriteChan
+  writeIORef worldInstance newWorld
   mainLoop
 
 worldTickThread_ :: Int -> Chan GameChannelMessage -> IO ()
@@ -44,10 +37,17 @@ worldTickThread_ tickInterval gameChannel = do
 reduceUntilNextTick_ :: World -> Chan GameChannelMessage -> IO World
 reduceUntilNextTick_ world gameChannel = do
   message <- readChan gameChannel
-  print $ typeOf message
   let next = reduceWorld world message
 
   ( case message of
       UpdateWorldMessage -> return world
       x -> reduceUntilNextTick_ next gameChannel
     )
+
+notifyClients_ :: [ClientHandle] -> IO ()
+notifyClients_ [] = do
+  return ()
+notifyClients_ clients = do
+  let c = head clients
+  writeChan (controlChannel c) WorldUpdatedMessage
+  notifyClients_ $ tail clients

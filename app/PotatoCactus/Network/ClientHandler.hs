@@ -32,7 +32,7 @@ clientHandlerMainLoop_ sock chan = do
   -- hardcoded load map packet
   let x = toStrict $ toLazyByteString $ mconcat [word8 73, word16BE 3093, word16BE 3244]
   sendAll sock x
-
+  print "sent all to sock"
   threadDelay $ 1000000 * 10
 
   clientHandlerMainLoop_ sock chan

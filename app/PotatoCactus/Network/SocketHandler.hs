@@ -16,14 +16,20 @@ import PotatoCactus.Boot.GameChannel (GameChannelMessage (RegisterClientMessage)
 import PotatoCactus.Game.Player (Player (username))
 import PotatoCactus.Game.World (ClientHandle (ClientHandle))
 import PotatoCactus.Login.LoginHandler (handleLogin)
+import PotatoCactus.Network.ClientHandler (clientHandlerMain)
 
 socketMain :: Socket -> IO ()
 socketMain sock = do
   msg <- recv sock 1
+  print "read from socket"
+
   case runGet getWord8 msg of
     (Right val, _) -> dispatch val sock
     (Left val, _) -> return ()
-  socketMain sock
+
+  case msg of
+    "" -> return ()
+    _ -> socketMain sock
 
 dispatch :: B.Word8 -> Socket -> IO ()
 dispatch 14 =
@@ -33,7 +39,9 @@ dispatch 14 =
       Nothing -> return ()
       (Just p) -> do
         chan <- newChan
-        writeChan gameChannel $ RegisterClientMessage (RegisterClientPayload $ ClientHandle (username p) chan)
+        let client = ClientHandle (username p) chan
+        writeChan gameChannel $ RegisterClientMessage (RegisterClientPayload client)
+        clientHandlerMain client sock
 
 -- return ()
 

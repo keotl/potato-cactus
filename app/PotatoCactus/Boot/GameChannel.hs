@@ -13,6 +13,7 @@ newtype RegisterClientPayload = RegisterClientPayload
 
 data GameChannelMessage
   = RegisterClientMessage RegisterClientPayload
+  | UnregisterClientMessage String
   | UpdateWorldMessage
 
 -- gameChannelRef :: IORef (Chan GameChannelMessage)

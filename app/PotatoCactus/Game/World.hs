@@ -5,7 +5,7 @@ import GHC.IO (unsafePerformIO)
 import PotatoCactus.Game.Player (Player)
 import Control.Concurrent (Chan)
 
-type ClientHandleMessage = String -- TODO create types
+data ClientHandleMessage = WorldUpdatedMessage
 
 data ClientHandle = ClientHandle
   { username :: String,
