@@ -28,6 +28,7 @@ executable potato-cactus
     other-modules: PotatoCactus.Boot.GameThreadMain
                    PotatoCactus.Boot.GameChannel
                    PotatoCactus.Network.SocketHandler
+                   PotatoCactus.Network.InboundPacketMapper
                    PotatoCactus.Network.Packets.In.LoginPacket
                    PotatoCactus.Network.Packets.Reader
                    PotatoCactus.Network.Packets.Opcodes

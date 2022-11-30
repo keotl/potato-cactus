@@ -7,7 +7,7 @@ import GHC.Clock (getMonotonicTimeNSec)
 import PotatoCactus.Boot.GameChannel (GameChannelMessage (UpdateWorldMessage), gameChannel)
 import PotatoCactus.Config.Constants (tickInterval)
 import PotatoCactus.Game.Reducer (reduceWorld)
-import PotatoCactus.Game.World (ClientHandle (controlChannel), ClientHandleMessage (WorldUpdatedMessage), World, defaultWorldValue, worldInstance)
+import PotatoCactus.Game.World (ClientHandle (controlChannel, username), ClientHandleMessage (WorldUpdatedMessage), World (clients), defaultWorldValue, worldInstance)
 
 gameThreadMain :: IO ()
 gameThreadMain = do
@@ -38,7 +38,12 @@ reduceUntilNextTick_ :: World -> Chan GameChannelMessage -> IO World
 reduceUntilNextTick_ world gameChannel = do
   message <- readChan gameChannel
   let next = reduceWorld world message
-
+  -- TODO - remove this dummy print  - keotl 2022-11-30
+  print "connected clients:"
+  let x = clients next
+  case x of
+    [] -> print "[]"
+    c -> print (username $ head c)
   ( case message of
       UpdateWorldMessage -> return world
       x -> reduceUntilNextTick_ next gameChannel

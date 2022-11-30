@@ -8,9 +8,11 @@ import Data.ByteString.Lazy (toStrict)
 import Data.IORef (readIORef)
 import Network.Socket (Socket)
 import Network.Socket.ByteString (recv, sendAll)
-import PotatoCactus.Game.World (worldInstance, ClientHandleMessage, ClientHandle (controlChannel))
-import PotatoCactus.Network.Packets.Reader (InboundPacket, readPacket)
-
+import PotatoCactus.Boot.GameChannel (gameChannel)
+import PotatoCactus.Game.World (ClientHandle (controlChannel, username), ClientHandleMessage, worldInstance)
+import PotatoCactus.Network.InboundPacketMapper (mapPacket)
+import PotatoCactus.Network.Packets.Opcodes
+import PotatoCactus.Network.Packets.Reader (InboundPacket (opcode), readPacket)
 
 type InternalQueueMessage_ = Either ClientHandleMessage InboundPacket
 
@@ -21,26 +23,29 @@ clientHandlerMain handle sock = do
   controlChannelPollerThreadId <- forkFinally (controlChannelPoller_ (controlChannel handle) internalQueue) (\x -> print "control Channel poller exited")
   socketPollerThreadId <- forkFinally (socketPoller_ sock internalQueue) (\x -> print "socket poller exited")
 
-  -- TODO poll both socket and control channel without blocking??
-  clientHandlerMainLoop_ sock internalQueue
+  clientHandlerMainLoop_ handle sock internalQueue
 
-clientHandlerMainLoop_ :: Socket -> Chan InternalQueueMessage_ -> IO ()
-clientHandlerMainLoop_ sock chan = do
-  -- todo read chan
+clientHandlerMainLoop_ :: ClientHandle -> Socket -> Chan InternalQueueMessage_ -> IO ()
+clientHandlerMainLoop_ client sock chan = do
   message <- readChan chan
   case message of
-    Left clientHandleMessage -> return ()
-    Right clientPacket -> mapPacket
+    Left clientHandleMessage -> return () -- TODO - handle game thread messages, e.g. worldUpdated  - keotl 2022-11-30
+    Right clientPacket -> do
+      case mapPacket (username client) clientPacket of
+        Just downstreamMessage -> do
+          writeChan gameChannel downstreamMessage
+          if opcode clientPacket == socketClosedOpcode
+            then return ()
+            else clientHandlerMainLoop_ client sock chan
+        _ -> return ()
 
-  world <- readIORef worldInstance
+-- world <- readIORef worldInstance
 
-  -- hardcoded load map packet
-  let x = toStrict $ toLazyByteString $ mconcat [word8 73, word16BE 3093, word16BE 3244]
-  sendAll sock x
-  print "sent all to sock"
-  threadDelay $ 1000000 * 10
-
-  clientHandlerMainLoop_ sock chan
+-- hardcoded load map packet
+-- let x = toStrict $ toLazyByteString $ mconcat [word8 73, word16BE 3093, word16BE 3244]
+-- sendAll sock x
+-- print "sent all to sock"
+-- threadDelay $ 1000000 * 10
 
 controlChannelPoller_ :: Chan ClientHandleMessage -> Chan InternalQueueMessage_ -> IO ()
 controlChannelPoller_ input output = do

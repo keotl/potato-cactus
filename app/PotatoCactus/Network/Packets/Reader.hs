@@ -7,9 +7,8 @@ import Data.ByteString (ByteString, empty)
 import Network.Socket (Socket)
 import Network.Socket.ByteString (recv)
 import PotatoCactus.Network.Binary (toByte, toShort)
+import PotatoCactus.Network.Packets.Opcodes (socketClosedOpcode)
 import PotatoCactus.Network.Packets.PacketLengths (packetSizes)
-
-socketClosedOpcode = -2
 
 data InboundPacket = InboundPacket
   { opcode :: Int,
