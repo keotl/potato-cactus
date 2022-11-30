@@ -27,6 +27,11 @@ clientHandlerMain handle sock = do
 clientHandlerMainLoop_ :: Socket -> Chan InternalQueueMessage_ -> IO ()
 clientHandlerMainLoop_ sock chan = do
   -- todo read chan
+  message <- readChan chan
+  case message of
+    Left clientHandleMessage -> return ()
+    Right clientPacket -> mapPacket
+
   world <- readIORef worldInstance
 
   -- hardcoded load map packet

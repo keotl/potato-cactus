@@ -30,6 +30,8 @@ executable potato-cactus
                    PotatoCactus.Network.SocketHandler
                    PotatoCactus.Network.Packets.In.LoginPacket
                    PotatoCactus.Network.Packets.Reader
+                   PotatoCactus.Network.Packets.Opcodes
+                   PotatoCactus.Network.Packets.PacketLengths
                    PotatoCactus.Network.ClientHandler
                    PotatoCactus.Network.Binary
                    PotatoCactus.Login.LoginHandler
