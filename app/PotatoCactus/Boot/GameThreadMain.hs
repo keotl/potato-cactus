@@ -26,6 +26,7 @@ mainLoop = do
   -- print "going to next tick!"
 
   writeIORef worldInstance newWorld
+  notifyClients_ $ clients newWorld
   mainLoop
 
 worldTickThread_ :: Int -> Chan GameChannelMessage -> IO ()

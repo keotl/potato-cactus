@@ -8,7 +8,7 @@ import Network.Socket (Socket)
 import Network.Socket.ByteString (recv)
 import PotatoCactus.Network.Binary (toByte, toShort)
 import PotatoCactus.Network.Packets.Opcodes (socketClosedOpcode)
-import PotatoCactus.Network.Packets.PacketLengths (packetSizes)
+import PotatoCactus.Network.Packets.PacketLengths (clientPacketSizes)
 
 data InboundPacket = InboundPacket
   { opcode :: Int,
@@ -22,7 +22,7 @@ readPacket sock = do
     then return (InboundPacket socketClosedOpcode empty)
     else do
       let decodedOpcode = fromIntegral (toByte opcode)
-      let predefinedSize = packetSizes !! decodedOpcode
+      let predefinedSize = clientPacketSizes !! decodedOpcode
       payload <- readDynamicPayload_ sock predefinedSize
       return $ InboundPacket decodedOpcode payload
 

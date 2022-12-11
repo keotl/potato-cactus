@@ -9,6 +9,7 @@ import Data.IORef (readIORef)
 import Network.Socket (Socket)
 import Network.Socket.ByteString (recv, sendAll)
 import PotatoCactus.Boot.GameChannel (gameChannel)
+import PotatoCactus.Client.ClientUpdate (updateClient)
 import PotatoCactus.Game.World (ClientHandle (controlChannel, username), ClientHandleMessage, worldInstance)
 import PotatoCactus.Network.InboundPacketMapper (mapPacket)
 import PotatoCactus.Network.Packets.Opcodes
@@ -29,7 +30,7 @@ clientHandlerMainLoop_ :: ClientHandle -> Socket -> Chan InternalQueueMessage_ -
 clientHandlerMainLoop_ client sock chan = do
   message <- readChan chan
   case message of
-    Left clientHandleMessage -> return () -- TODO - handle game thread messages, e.g. worldUpdated  - keotl 2022-11-30
+    Left clientHandleMessage -> updateClient sock client clientHandleMessage
     Right clientPacket -> do
       case mapPacket (username client) clientPacket of
         Just downstreamMessage -> do
