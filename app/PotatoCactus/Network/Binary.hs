@@ -1,11 +1,12 @@
 module PotatoCactus.Network.Binary where
 
-import Data.Binary (Word16, Word32, Word8)
+import Data.Binary (Word16, Word32, Word64, Word8)
 import Data.Binary.Strict.Get (getWord16be, getWord32be, getWord32le, getWord8, runGet)
-import Data.ByteString (pack, tail)
+import Data.ByteString (length, pack, tail)
 import Data.ByteString.Builder (Builder, word16BE)
 import Data.ByteString.UTF8 as BSU
 import Data.Char (ord)
+import GHC.Char (chr)
 
 toByte :: ByteString -> Word8
 toByte bytes =
@@ -32,3 +33,28 @@ readStr bytes =
 
 putShort :: Word16 -> Builder
 putShort = word16BE
+
+encodeToBase37 :: [Char] -> Word64
+encodeToBase37 [] =
+  0
+encodeToBase37 (x : xs) =
+  fromIntegral (toBase37Char_ x * (37 ^ Prelude.length xs)) + encodeToBase37 xs
+
+toBase37Char_ :: Char -> Int
+toBase37Char_ c
+  | ord c >= ord 'A' && ord c <= ord 'Z' = ord c - ord 'A' + 1
+  | ord c >= ord 'a' && ord c <= ord 'z' = ord c - ord 'a' + 1
+  | ord c >= ord '0' && ord c <= ord '9' = ord c - ord '0' + 27
+  | otherwise = 0
+
+decodeFromBase37 :: Word64 -> String
+decodeFromBase37 0 = ""
+decodeFromBase37 x =
+  let c = x `mod` 37
+   in decodeFromBase37 (x `div` 37) ++ [fromBase37Char_ (fromIntegral c)]
+
+fromBase37Char_ :: Int -> Char
+fromBase37Char_ c
+  | c >= 1 && c <= 26 = chr $ c + ord 'a' - 1
+  | c >= 27 && c <= 37 = chr $ c + ord '0' - 27
+  | otherwise = 'a'
