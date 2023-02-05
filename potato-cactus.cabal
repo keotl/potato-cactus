@@ -36,6 +36,8 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Reader
                    PotatoCactus.Network.Packets.Opcodes
                    PotatoCactus.Network.Packets.PacketLengths
+                   PotatoCactus.Network.Packets.Out.UpdateItemContainerPacket
+                   PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket
                    PotatoCactus.Network.Packets.Out.PlayerInteractionPacket
                    PotatoCactus.Network.Packets.Out.TabInterfacePacket
                    PotatoCactus.Network.ClientHandler
@@ -44,6 +46,8 @@ executable potato-cactus
                    PotatoCactus.Login.Models
                    PotatoCactus.Game.Interface.GameTabs
                    PotatoCactus.Game.Interface.PlayerInteraction
+                   PotatoCactus.Game.Item
+                   PotatoCactus.Game.ItemContainer
                    PotatoCactus.Game.Player
                    PotatoCactus.Game.World
                    PotatoCactus.Game.Reducer

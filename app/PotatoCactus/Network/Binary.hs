@@ -3,6 +3,7 @@ module PotatoCactus.Network.Binary where
 import Data.Binary (Word16, Word32, Word64, Word8)
 import Data.Binary.BitPut (BitPut, putByteString, putNBits, runBitPut)
 import Data.Binary.Strict.Get (getWord16be, getWord32be, getWord32le, getWord8, runGet)
+import Data.Bits (Bits (rotateL))
 import Data.ByteString (length, pack, tail)
 import Data.ByteString.Builder (Builder, word16BE)
 import Data.ByteString.Lazy (toStrict)
@@ -66,6 +67,10 @@ toWord_ = fromIntegral
 
 toShort_ :: Int -> Word16
 toShort_ = fromIntegral
+
+toShortLE_ :: Int -> Word16
+toShortLE_ x =
+  rotateL (toShort_ x) 8
 
 encodeStr :: String -> ByteString
 encodeStr input =
