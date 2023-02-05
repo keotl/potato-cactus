@@ -1,6 +1,7 @@
 module PotatoCactus.Network.ClientHandler where
 
 import Control.Concurrent (Chan, forkFinally, newChan, readChan, threadDelay, writeChan)
+import Data.Binary.BitPut (runBitPut)
 import Data.ByteString (pack)
 import Data.ByteString.Builder (toLazyByteString, word16BE, word8)
 import Data.ByteString.Builder.Extra (runBuilder)
@@ -10,9 +11,11 @@ import Network.Socket (Socket)
 import Network.Socket.ByteString (recv, sendAll)
 import PotatoCactus.Boot.GameChannel (gameChannel)
 import PotatoCactus.Client.ClientUpdate (updateClient)
+import PotatoCactus.Client.PlayerInit (playerInit)
 import PotatoCactus.Game.World (ClientHandle (controlChannel, username), ClientHandleMessage, worldInstance)
 import PotatoCactus.Network.InboundPacketMapper (mapPacket)
 import PotatoCactus.Network.Packets.Opcodes
+import PotatoCactus.Network.Packets.Out.InitializePlayerPacket (initializePlayerPacket)
 import PotatoCactus.Network.Packets.Reader (InboundPacket (opcode), readPacket)
 
 type InternalQueueMessage_ = Either ClientHandleMessage InboundPacket
@@ -23,7 +26,7 @@ clientHandlerMain handle sock = do
   internalQueue <- newChan
   controlChannelPollerThreadId <- forkFinally (controlChannelPoller_ (controlChannel handle) internalQueue) (\x -> print "control Channel poller exited")
   socketPollerThreadId <- forkFinally (socketPoller_ sock internalQueue) (\x -> print "socket poller exited")
-
+  sendAll sock $ toStrict $ runBitPut $ playerInit handle
   clientHandlerMainLoop_ handle sock internalQueue
 
 clientHandlerMainLoop_ :: ClientHandle -> Socket -> Chan InternalQueueMessage_ -> IO ()

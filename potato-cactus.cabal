@@ -33,6 +33,7 @@ executable potato-cactus
                    PotatoCactus.Network.SocketHandler
                    PotatoCactus.Network.InboundPacketMapper
                    PotatoCactus.Network.Packets.In.LoginPacket
+                   PotatoCactus.Network.Packets.Packet
                    PotatoCactus.Network.Packets.Reader
                    PotatoCactus.Network.Packets.Opcodes
                    PotatoCactus.Network.Packets.PacketLengths

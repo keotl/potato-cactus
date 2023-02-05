@@ -2,10 +2,13 @@
 
 module BinaryTest where
 
+import Data.Binary.BitPut (putNBits, runBitPut)
 import Data.Bits
+import Data.ByteString as BS
 import Data.ByteString.Builder
+import Data.ByteString.Lazy (toStrict)
 import Data.Word
-import PotatoCactus.Network.Binary (toShortLE_, toShort_, toWord_, toIntME_)
+import PotatoCactus.Network.Binary (toIntME_, toShortLE_, toShort_, toWord_)
 import Test.HUnit
 
 unpackShort :: Word16 -> [Word16]
@@ -37,23 +40,17 @@ testByte =
       TestCase (assertEqual "toWord ADD" 138 (toWord_ (10 + 128))),
       TestCase (assertEqual "toWord ADD" (-118) (toWord_ (10 + 128)))
     ]
+
 testIntME :: Test
 testIntME =
-  TestList [
-  TestCase (assertEqual "toIntME" [0xCD,0x15,0x07,0x5B] (unpackInt $ toIntME_ 123456789)),
-  TestCase (assertEqual "toIntME" [127, 177, 5, 57] (unpackInt $ toIntME_ 87654321))
-           ]
--- testEncode :: Test
--- testEncode =
---   TestList
---     [ TestCase (assertEqual "auie" 79740 (encodeToBase37 "auie")),
---       TestCase (assertEqual "eiua" 266364 (encodeToBase37 "eiua")),
---       TestCase (assertEqual "AbC1234" 2711495932 (encodeToBase37 "AbC1234")),
---       TestCase (assertEqual "AbC12349" 100325349520 (encodeToBase37 "AbC12349"))
---     ]
+  TestList
+    [ TestCase (assertEqual "toIntME" [0xCD, 0x15, 0x07, 0x5B] (unpackInt $ toIntME_ 123456789)),
+      TestCase (assertEqual "toIntME" [127, 177, 5, 57] (unpackInt $ toIntME_ 87654321))
+    ]
 
--- testDecode :: Test
--- testDecode =
---   TestList
---     [ TestCase (assertEqual "abc1234" "abc1234" (decodeFromBase37 2711495932))
---     ]
+testByteNegate :: Test
+testByteNegate =
+  TestList
+    [ TestCase (assertEqual "putByte negate" 253 (toWord_ (- 3))),
+      TestCase (assertEqual "putByte negate through bitput" 253 (BS.index (toStrict $ runBitPut $ putNBits 8 $ toWord_ (- 3)) 0))
+    ]

@@ -1,4 +1,5 @@
 module PotatoCactus.Game.Interface.PlayerInteraction where
+import Data.Binary (Word8)
 
 data PlayerInteractionDefinition = PlayerInteractionDefinition
   { index :: Int,

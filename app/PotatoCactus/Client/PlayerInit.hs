@@ -23,8 +23,8 @@ import PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket (updateRunEnergyPa
 import PotatoCactus.Network.Packets.Out.UpdateSkillPacket (updateSkillPacket)
 import Prelude hiding (id)
 
-playerInit :: ClientHandle -> World -> BitPut
-playerInit client world = do
+playerInit :: ClientHandle -> BitPut
+playerInit client = do
   -- reset tabs (opcode 71)
   mapM_ resetTab_ allTabs
 
