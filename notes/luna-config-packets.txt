@@ -1,0 +1,20 @@
+writing config 166 -- brightness level
+sending game packet 36
+writing config 170 -- mouse type value
+sending game packet 36
+writing config 171 -- show chat effect
+sending game packet 36
+writing config 287 -- split private chat
+sending game packet 36
+writing config 427 -- accept aid
+sending game packet 36
+writing config 168 -- music volume
+sending game packet 36
+writing config 169 -- effects volume
+sending game packet 36
+writing config 173 -- is running
+sending game packet 36
+writing config 172 -- auto-retaliate
+sending game packet 36
+writing config 491 -- tiara altar config (might be skippable)
+sending game packet 36

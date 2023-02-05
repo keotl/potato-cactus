@@ -72,6 +72,11 @@ toShortLE_ :: Int -> Word16
 toShortLE_ x =
   rotateL (toShort_ x) 8
 
+-- toInt Middle-Endian
+toIntME_ :: Int -> Word32
+toIntME_ x =
+  rotateL (fromIntegral x) 16
+
 encodeStr :: String -> ByteString
 encodeStr input =
   toStrict $
