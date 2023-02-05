@@ -1,9 +1,11 @@
 module PotatoCactus.Network.Binary where
 
 import Data.Binary (Word16, Word32, Word64, Word8)
+import Data.Binary.BitPut (BitPut, putByteString, putNBits, runBitPut)
 import Data.Binary.Strict.Get (getWord16be, getWord32be, getWord32le, getWord8, runGet)
 import Data.ByteString (length, pack, tail)
 import Data.ByteString.Builder (Builder, word16BE)
+import Data.ByteString.Lazy (toStrict)
 import Data.ByteString.UTF8 as BSU
 import Data.Char (ord)
 import GHC.Char (chr)
@@ -58,3 +60,21 @@ fromBase37Char_ c
   | c >= 1 && c <= 26 = chr $ c + ord 'a' - 1
   | c >= 27 && c <= 37 = chr $ c + ord '0' - 27
   | otherwise = 'a'
+
+toWord_ :: Int -> Word8
+toWord_ = fromIntegral
+
+toShort_ :: Int -> Word16
+toShort_ = fromIntegral
+
+encodeStr :: String -> ByteString
+encodeStr input =
+  toStrict $
+    runBitPut
+      ( do
+          mapM_ mapChar_ input
+          putNBits 8 $ toWord_ 10
+      )
+
+mapChar_ :: Char -> BitPut
+mapChar_ c = putNBits 8 $ toWord_ (ord c)

@@ -16,6 +16,7 @@ updateClient :: Socket -> ClientHandle -> ClientHandleMessage -> IO ()
 updateClient sock client WorldUpdatedMessage = do
   world <- readIORef worldInstance
   putStrLn $ "world updated for client " ++ username client
+  -- TODO region update
   -- Local Player Update (Opcode 81)
   sendAll sock $ toStrict $ runBitPut $ playerUpdate client world
   -- NPC Update

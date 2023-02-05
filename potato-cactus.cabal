@@ -29,16 +29,21 @@ executable potato-cactus
                    PotatoCactus.Boot.GameChannel
                    PotatoCactus.Client.ClientUpdate
                    PotatoCactus.Client.PlayerUpdate
+                   PotatoCactus.Client.PlayerInit
                    PotatoCactus.Network.SocketHandler
                    PotatoCactus.Network.InboundPacketMapper
                    PotatoCactus.Network.Packets.In.LoginPacket
                    PotatoCactus.Network.Packets.Reader
                    PotatoCactus.Network.Packets.Opcodes
                    PotatoCactus.Network.Packets.PacketLengths
+                   PotatoCactus.Network.Packets.Out.PlayerInteractionPacket
+                   PotatoCactus.Network.Packets.Out.TabInterfacePacket
                    PotatoCactus.Network.ClientHandler
                    PotatoCactus.Network.Binary
                    PotatoCactus.Login.LoginHandler
                    PotatoCactus.Login.Models
+                   PotatoCactus.Game.Interface.GameTabs
+                   PotatoCactus.Game.Interface.PlayerInteraction
                    PotatoCactus.Game.Player
                    PotatoCactus.Game.World
                    PotatoCactus.Game.Reducer
