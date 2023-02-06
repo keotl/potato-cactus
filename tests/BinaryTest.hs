@@ -1,13 +1,16 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -Wno-overflowed-literals #-}
 
 module BinaryTest where
 
-import Data.Binary.BitPut (putNBits, runBitPut)
+import Data.Binary.BitPut (putByteString, putNBits, runBitPut)
 import Data.Bits
 import Data.ByteString as BS
 import Data.ByteString.Builder
-import Data.ByteString.Lazy (toStrict)
+import Data.ByteString.Lazy (ByteString, toStrict)
+import Data.Char (chr, ord)
 import Data.Word
+import GHC.Exception (prettyCallStack)
 import PotatoCactus.Network.Binary (toIntME_, toShortLE_, toShort_, toWord_)
 import Test.HUnit
 
@@ -54,3 +57,58 @@ testByteNegate =
     [ TestCase (assertEqual "putByte negate" 253 (toWord_ (- 3))),
       TestCase (assertEqual "putByte negate through bitput" 253 (BS.index (toStrict $ runBitPut $ putNBits 8 $ toWord_ (- 3)) 0))
     ]
+
+testMixedBitMode :: Test
+testMixedBitMode =
+  TestList
+    [ TestCase (assertEqual "mixed bits" (pack [66, 255, 224]) mixedBits),
+      TestCase (assertEqual "mixed bits, pretty" (prettyPrint_ $ pack [66, 255, 224]) (prettyPrint_ mixedBits))
+      -- TestCase (assertEqual "mixed bits, pretty" (prettyPrint_ $ pack [255, 224]) (prettyPrint_ mixedBits))
+    ]
+
+testPack :: Test
+testPack =
+  TestList
+    [ TestCase (assertEqual "pack word8" "ab" (pack [toWord_ $ ord 'a', toWord_ (ord 'b')])),
+      TestCase (assertEqual "pack word8" "ab" (pack [97, 98])),
+      TestCase
+        ( assertEqual
+            "builder word8"
+            "ab"
+            ( toStrict $
+                toLazyByteString
+                  ( mconcat
+                      [ word8 97,
+                        word8 98
+                      ]
+                  )
+            )
+        ),
+      TestCase
+        ( assertEqual
+            "builder word16"
+            "\NULab"
+            ( toStrict $
+                toLazyByteString
+                  ( mconcat
+                      [ word16BE 97,
+                        word8 98
+                      ]
+                  )
+            )
+        )
+    ]
+
+mixedBits :: BS.ByteString
+mixedBits =
+  toStrict $
+    runBitPut
+      ( do
+          putNBits 8 $ toWord_ 66
+          putNBits 11 $ toShort_ 2047
+          -- putNBits 5 $ toWord_ 0 -- either have to manually realign to continue putting
+          -- putNBits 8 $ toWord_ 66 -- or convert to ByteString will force a realignment
+      )
+
+prettyPrint_ :: BS.ByteString -> Data.ByteString.Lazy.ByteString
+prettyPrint_ = toLazyByteString . byteStringHex
