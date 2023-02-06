@@ -6,6 +6,8 @@ module PotatoCactus.Client.PlayerUpdate where
 import Data.Binary (Word16, Word8)
 import Data.Binary.BitPut (BitPut, putBit, putBits, putByteString, putNBits, runBitPut)
 -- import Data.ByteString
+
+import Data.ByteString (ByteString)
 import qualified Data.ByteString.Internal as BSI
 import Data.ByteString.Lazy (toStrict)
 import qualified Data.ByteString.Lazy as Data.Binary
@@ -17,13 +19,16 @@ import PotatoCactus.Game.World as W
     World (players),
   )
 import PotatoCactus.Network.Binary (encodeToBase37, toByte)
+import PotatoCactus.Network.Packets.Packet (varShortPacket)
 
-playerUpdate :: ClientHandle -> World -> BitPut
-playerUpdate client world = do
-  putNBits 8 (toWord_ 81)
-  let blockMsg = runBitPut $ blockMsg_ client world in do
-    putNBits 11 $ toShort_ 2047
-    putByteString $ toStrict blockMsg
+playerUpdate :: ClientHandle -> World -> ByteString
+playerUpdate client world =
+  varShortPacket
+    81
+    let blockMsg = runBitPut $ blockMsg_ client world
+     in do
+          putNBits 11 $ toShort_ 2047
+          putByteString $ toStrict blockMsg
 
 blockMsg_ :: ClientHandle -> World -> BitPut
 blockMsg_ client world = do
@@ -34,7 +39,7 @@ blockMsg_ client world = do
        in do
             putNBits 8 $ toWord_ $ fromIntegral (- Data.Binary.length playerBlockMsg)
             putByteString $ toStrict playerBlockMsg
-            -- todo deal with other players
+    -- todo deal with other players
     Nothing -> putNBits 0 $ toWord_ 0
 
 playerMovement_ :: Player -> BitPut

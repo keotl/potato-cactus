@@ -4,12 +4,12 @@ import Data.Binary.BitPut (putByteString, putNBits, runBitPut)
 import Data.ByteString (ByteString)
 import Data.ByteString.Lazy (toStrict)
 import PotatoCactus.Network.Binary (encodeStr, toWord_)
+import PotatoCactus.Network.Packets.Packet (varPacket)
 
 chatboxMessagePacket :: String -> ByteString
 chatboxMessagePacket message =
-  toStrict $
-    runBitPut
-      ( do
-          putNBits 8 $ toWord_ 253
-          putByteString $ encodeStr message
-      )
+  varPacket
+    253
+    ( do
+        putByteString $ encodeStr message
+    )

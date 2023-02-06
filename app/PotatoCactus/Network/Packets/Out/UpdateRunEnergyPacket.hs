@@ -4,9 +4,12 @@ import Data.Binary.BitPut (putNBits, runBitPut)
 import Data.ByteString (ByteString)
 import Data.ByteString.Lazy (toStrict)
 import PotatoCactus.Network.Binary (toWord_)
+import PotatoCactus.Network.Packets.Packet (fixedPacket)
 
 updateRunEnergyPacket :: Int -> ByteString
 updateRunEnergyPacket level =
-  toStrict $
-    runBitPut $ do
-      putNBits 8 $ toWord_ level
+  fixedPacket
+    110
+    ( do
+        putNBits 8 $ toWord_ level
+    )

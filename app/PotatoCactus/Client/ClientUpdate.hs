@@ -18,6 +18,6 @@ updateClient sock client WorldUpdatedMessage = do
   putStrLn $ "world updated for client " ++ username client
   -- TODO region update
   -- Local Player Update (Opcode 81)
-  sendAll sock $ toStrict $ runBitPut $ playerUpdate client world
+  -- sendAll sock (playerUpdate client world)
   -- NPC Update
   return ()

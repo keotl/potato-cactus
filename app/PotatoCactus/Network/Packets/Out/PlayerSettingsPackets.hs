@@ -6,6 +6,7 @@ import Data.ByteString (ByteString)
 import Data.ByteString.Lazy (toStrict)
 import PotatoCactus.Game.Interface.PlayerSettings (BrightnessLevel (Brightness0, Brightness1, Brightness2, Brightness3, Brightness4), MouseType (None, OneButton, TwoButtons), PlayerSettings (acceptAid, autoRetaliate, brightnessLevel, chatEffects, effectsVolume, mouseType, musicVolume, running, splitPrivateChat), VolumeLevel (Volume1, Volume2, Volume3, Volume4, VolumeOff))
 import PotatoCactus.Network.Binary (toShortLE_)
+import PotatoCactus.Network.Packets.Packet (fixedPacket)
 
 allPlayerSettingsPackets :: PlayerSettings -> ByteString
 allPlayerSettingsPackets settings =
@@ -33,7 +34,7 @@ setBrightnessSettingPacket level =
             Brightness3 -> 3
             Brightness4 -> 4
         )
-   in shortConfigPacket 166 brightnessValue
+   in byteConfigPacket 166 brightnessValue
 
 setMouseTypePacket :: MouseType -> ByteString
 setMouseTypePacket mouseType =
@@ -43,35 +44,35 @@ setMouseTypePacket mouseType =
             OneButton -> 1
             TwoButtons -> 2
         )
-   in shortConfigPacket 170 value
+   in byteConfigPacket 170 value
 
 setShowChatEffectsPacket :: Bool -> ByteString
 setShowChatEffectsPacket value =
-  shortConfigPacket 171 $ mapBool_ (not value)
+  byteConfigPacket 171 $ mapBool_ (not value)
 
 setShowSplitPrivateChatPacket :: Bool -> ByteString
 setShowSplitPrivateChatPacket value =
-  shortConfigPacket 287 (mapBool_ value)
+  byteConfigPacket 287 (mapBool_ value)
 
 setAcceptAidPacket :: Bool -> ByteString
 setAcceptAidPacket value =
-  shortConfigPacket 427 (mapBool_ value)
+  byteConfigPacket 427 (mapBool_ value)
 
 setMusicVolumePacket :: VolumeLevel -> ByteString
 setMusicVolumePacket level =
-  shortConfigPacket 168 (mapVolumeLevel_ level)
+  byteConfigPacket 168 (mapVolumeLevel_ level)
 
 setEffectsVolumePacket :: VolumeLevel -> ByteString
 setEffectsVolumePacket level =
-  shortConfigPacket 169 (mapVolumeLevel_ level)
+  byteConfigPacket 169 (mapVolumeLevel_ level)
 
 setRunningPacket :: Bool -> ByteString
 setRunningPacket value =
-  shortConfigPacket 173 (mapBool_ value)
+  byteConfigPacket 173 (mapBool_ value)
 
 setAutoRetaliatePacket :: Bool -> ByteString
 setAutoRetaliatePacket value =
-  shortConfigPacket 172 $ mapBool_ (not value)
+  byteConfigPacket 172 $ mapBool_ (not value)
 
 mapBool_ :: Bool -> Word8
 mapBool_ True = 1
@@ -84,11 +85,11 @@ mapVolumeLevel_ Volume2 = 2
 mapVolumeLevel_ Volume3 = 1
 mapVolumeLevel_ Volume4 = 0
 
-shortConfigPacket :: Int -> Word8 -> ByteString
-shortConfigPacket configId value =
-  toStrict $
-    runBitPut
-      ( do
-          putNBits 16 $ toShortLE_ configId
-          putNBits 8 value
-      )
+byteConfigPacket :: Int -> Word8 -> ByteString
+byteConfigPacket configId value =
+  fixedPacket
+    36
+    ( do
+        putNBits 16 $ toShortLE_ configId
+        putNBits 8 value
+    )

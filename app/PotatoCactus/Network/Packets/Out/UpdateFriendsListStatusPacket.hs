@@ -6,15 +6,15 @@ import Data.ByteString (ByteString)
 import Data.ByteString.Lazy (toStrict)
 import PotatoCactus.Game.Interface.FriendsList (FriendsListStatus (Connecting, Loaded, Loading))
 import PotatoCactus.Network.Binary (toWord_)
+import PotatoCactus.Network.Packets.Packet (fixedPacket)
 
 updateFriendsListStatusPacket :: FriendsListStatus -> ByteString
 updateFriendsListStatusPacket status =
-  toStrict $
-    runBitPut
-      ( do
-          putNBits 8 $ toWord_ 221
-          putNBits 8 $ mapStatus_ status
-      )
+  fixedPacket
+    221
+    ( do
+        putNBits 8 $ mapStatus_ status
+    )
 
 mapStatus_ :: FriendsListStatus -> Word8
 mapStatus_ Loading = 0
