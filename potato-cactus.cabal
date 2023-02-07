@@ -39,11 +39,13 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.PacketLengths
                    PotatoCactus.Network.Packets.Out.ChatboxMessagePacket
                    PotatoCactus.Network.Packets.Out.InitializePlayerPacket
+                   PotatoCactus.Network.Packets.Out.LoadMapRegionPacket
                    PotatoCactus.Network.Packets.Out.UpdateFriendsListStatusPacket
                    PotatoCactus.Network.Packets.Out.UpdateItemContainerPacket
                    PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket
                    PotatoCactus.Network.Packets.Out.UpdateSkillPacket
                    PotatoCactus.Network.Packets.Out.PlayerInteractionPacket
+                   PotatoCactus.Network.Packets.Out.PlayerUpdatePacket
                    PotatoCactus.Network.Packets.Out.PlayerSettingsPackets
                    PotatoCactus.Network.Packets.Out.TabInterfacePacket
                    PotatoCactus.Network.ClientHandler
@@ -57,6 +59,7 @@ executable potato-cactus
                    PotatoCactus.Game.Item
                    PotatoCactus.Game.ItemContainer
                    PotatoCactus.Game.Player
+                   PotatoCactus.Game.Position
                    PotatoCactus.Game.Skills
                    PotatoCactus.Game.World
                    PotatoCactus.Game.Reducer

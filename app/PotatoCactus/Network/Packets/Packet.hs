@@ -4,7 +4,7 @@ import Data.Binary (Word8)
 import Data.Binary.BitPut (BitPut, putByteString, putNBits, runBitPut)
 import Data.ByteString (ByteString, length)
 import Data.ByteString.Lazy (toStrict)
-import PotatoCactus.Network.Binary (toShort_)
+import PotatoCactus.Network.Binary (toShort_, toShortLE_)
 
 fixedPacket :: Word8 -> BitPut -> ByteString
 fixedPacket opcode payload =

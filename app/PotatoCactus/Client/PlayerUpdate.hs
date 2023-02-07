@@ -5,8 +5,6 @@ module PotatoCactus.Client.PlayerUpdate where
 
 import Data.Binary (Word16, Word8)
 import Data.Binary.BitPut (BitPut, putBit, putBits, putByteString, putNBits, runBitPut)
--- import Data.ByteString
-
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.Internal as BSI
 import Data.ByteString.Lazy (toStrict)
@@ -18,49 +16,57 @@ import PotatoCactus.Game.World as W
   ( ClientHandle (username),
     World (players),
   )
-import PotatoCactus.Network.Binary (encodeToBase37, toByte)
+import PotatoCactus.Network.Binary (encodeToBase37, toByte, toShort_, toWord_)
 import PotatoCactus.Network.Packets.Packet (varShortPacket)
 
-playerUpdate :: ClientHandle -> World -> ByteString
-playerUpdate client world =
+playerUpdate :: Player -> World -> ByteString
+playerUpdate player world =
   varShortPacket
     81
-    let blockMsg = runBitPut $ blockMsg_ client world
-     in do
-          putNBits 11 $ toShort_ 2047
-          putByteString $ toStrict blockMsg
-
-blockMsg_ :: ClientHandle -> World -> BitPut
-blockMsg_ client world = do
-  case find (\x -> P.username x == W.username client) (W.players world) of
-    Just p -> do
-      playerMovement_ p
-      let playerBlockMsg = runBitPut $ playerBlockSet_ p world
+    do
+      putByteString $ beforeBlockMsg_ player
+      let blockMsg = runBitPut $ blockMsg_ player world
        in do
-            putNBits 8 $ toWord_ $ fromIntegral (- Data.Binary.length playerBlockMsg)
-            putByteString $ toStrict playerBlockMsg
-    -- todo deal with other players
-    Nothing -> putNBits 0 $ toWord_ 0
+            putByteString $ toStrict blockMsg
+
+beforeBlockMsg_ :: Player -> ByteString
+beforeBlockMsg_ player =
+  toStrict $
+    runBitPut
+      ( do
+          playerMovement_ player
+          putNBits 8 $ toWord_ 0 -- localplayers list length
+          putNBits 11 $ toShort_ 2047 -- should only put 2047 when blockMsg contains something
+      )
+
+blockMsg_ :: Player -> World -> BitPut
+blockMsg_ p world = do
+  let playerBlockMsg = runBitPut $ playerBlockSet_ p world
+   in do
+        putNBits 8 $ toWord_ 16 -- 16 = only player appearance update mask
+        putNBits 8 $ toWord_ $ fromIntegral (- Data.Binary.length playerBlockMsg)
+        putByteString $ toStrict playerBlockMsg
+
+-- todo deal with other players
 
 playerMovement_ :: Player -> BitPut
-playerMovement_ player = do
-  putBit True -- needs updating, direction = None
-  putNBits 2 (toWord_ 0)
-
-toWord_ :: Int -> Word8
-toWord_ = fromIntegral
-
-toShort_ :: Int -> Word16
-toShort_ = fromIntegral
+playerMovement_ player =
+  do
+    putBit True -- isTeleporting
+    putNBits 2 (toWord_ 3)
+    putNBits 2 (toWord_ 0) -- position.z
+    putBit False -- region has changed
+    putBit True -- needs update
+    putNBits 7 $ toWord_ 53 * 8 -- local Y
+    putNBits 7 $ toWord_ 52 * 8 -- local X
 
 playerBlockSet_ :: Player -> World -> BitPut
 playerBlockSet_ player world = do
   -- todo PlayerUpdateBlockSet
   -- only appearance block is flagged on first connection
 
-  putNBits 8 $ toWord_ 16 -- 16 = player appearance update mask
   putNBits 8 $ toWord_ 0 -- gender
-  putNBits 8 $ toWord_ (-1) -- prayer
+  -- putNBits 8 $ toWord_ (-1) -- prayer
   putNBits 8 $ toWord_ (-1) -- skull icon
   -- no player transformId
 

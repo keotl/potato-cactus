@@ -6,7 +6,6 @@ import Control.Monad (forever, unless, void)
 import qualified Data.ByteString as S
 import Network.Socket
 import Network.Socket.ByteString (recv, sendAll)
--- import PotatoCactus.Dummy (dummyMessage)
 
 import PotatoCactus.Boot.GameThreadMain (gameThreadMain)
 import PotatoCactus.Network.SocketHandler
