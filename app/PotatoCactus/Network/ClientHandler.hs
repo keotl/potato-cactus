@@ -33,15 +33,20 @@ clientHandlerMainLoop_ :: ClientHandle -> Socket -> Chan InternalQueueMessage_ -
 clientHandlerMainLoop_ client sock chan = do
   message <- readChan chan
   case message of
-    Left clientHandleMessage -> updateClient sock client clientHandleMessage
+    Left clientHandleMessage -> do
+      updateClient sock client clientHandleMessage
+      clientHandlerMainLoop_ client sock chan
     Right clientPacket -> do
       case mapPacket (username client) clientPacket of
         Just downstreamMessage -> do
           writeChan gameChannel downstreamMessage
           if opcode clientPacket == socketClosedOpcode
-            then return ()
+            then return () -- TODO - disconnect player  - keotl 2023-02-07
             else clientHandlerMainLoop_ client sock chan
-        _ -> return ()
+        _ -> clientHandlerMainLoop_ client sock chan
+
+  putStrLn "got out!"
+  return ()
 
 -- world <- readIORef worldInstance
 

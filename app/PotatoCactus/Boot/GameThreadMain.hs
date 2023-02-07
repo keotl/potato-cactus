@@ -25,6 +25,13 @@ mainLoop = do
   newWorld <- reduceUntilNextTick_ world gameChannel
   -- print "going to next tick!"
 
+  -- TODO - remove this dummy print  - keotl 2022-11-30
+  putStr "connected clients:"
+  let x = clients newWorld
+  case x of
+    [] -> print "[]"
+    c -> print (username $ head c)
+
   writeIORef worldInstance newWorld
   notifyClients_ $ clients newWorld
   mainLoop
@@ -38,16 +45,10 @@ worldTickThread_ tickInterval gameChannel = do
 reduceUntilNextTick_ :: World -> Chan GameChannelMessage -> IO World
 reduceUntilNextTick_ world gameChannel = do
   message <- readChan gameChannel
-  let next = reduceWorld world message
-  -- TODO - remove this dummy print  - keotl 2022-11-30
-  print "connected clients:"
-  let x = clients next
-  case x of
-    [] -> print "[]"
-    c -> print (username $ head c)
+  
   ( case message of
       UpdateWorldMessage -> return world
-      x -> reduceUntilNextTick_ next gameChannel
+      x -> reduceUntilNextTick_ (reduceWorld world x) gameChannel
     )
 
 notifyClients_ :: [ClientHandle] -> IO ()

@@ -11,6 +11,6 @@ loadMapRegionPacket playerPos =
   fixedPacket
     73
     ( do
-        putNBits 16 $ toShort_ $ chunkX playerPos + 6 + 128
+        putNBits 16 $ toShort_ $ chunkX playerPos + 6 - 128
         putNBits 16 $ toShort_ $ chunkY playerPos + 6
     )
