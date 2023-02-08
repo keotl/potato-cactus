@@ -1,12 +1,12 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module PotatoCactus.Login.LoginHandler where
 
 import Data.ByteString (pack)
 import Data.ByteString.UTF8 as BSU
 import Network.Socket (Socket)
 import Network.Socket.ByteString (recv, sendAll)
+import PotatoCactus.Game.Movement.MovementEntity (playerWalkMovement)
 import PotatoCactus.Game.Player as P
+import qualified PotatoCactus.Game.Position as Pos
 import PotatoCactus.Login.Models as L
 import PotatoCactus.Network.Binary (readStr, toByte, toInt, toShort)
 
@@ -54,4 +54,7 @@ handleLogin sock = do
   sendAll sock $ pack [0] -- ignored?
 
   -- TODO check credentials
-  return $ Just (Player username)
+  return $ Just (Player username (playerWalkMovement mockPosition_))
+
+mockPosition_ :: Pos.Position
+mockPosition_ = Pos.Position 3093 3244 0

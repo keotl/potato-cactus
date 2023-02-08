@@ -41,7 +41,7 @@ dispatch 14 =
         chan <- newChan
         let client = ClientHandle (username p) chan
         writeChan gameChannel $ RegisterClientMessage (RegisterClientPayload {clientHandle = client, player = p})
-        clientHandlerMain client sock
+        clientHandlerMain client p sock
 
 -- return ()
 

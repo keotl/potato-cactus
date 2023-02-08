@@ -58,9 +58,13 @@ executable potato-cactus
                    PotatoCactus.Game.Interface.PlayerSettings
                    PotatoCactus.Game.Item
                    PotatoCactus.Game.ItemContainer
+                   PotatoCactus.Game.Movement.MovementEntity
+                   PotatoCactus.Game.Movement.PlayerWalkMovement
+                   PotatoCactus.Game.Movement.StaticMovement
                    PotatoCactus.Game.Player
                    PotatoCactus.Game.Position
                    PotatoCactus.Game.Skills
+                   PotatoCactus.Game.Typing
                    PotatoCactus.Game.World
                    PotatoCactus.Game.Reducer
                    PotatoCactus.Config.Constants

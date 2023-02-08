@@ -9,7 +9,7 @@ import PotatoCactus.Game.Interface.PlayerInteraction (followInteraction, tradeIn
 import PotatoCactus.Game.Interface.PlayerSettings (BrightnessLevel (Brightness4), MouseType (TwoButtons), PlayerSettings (PlayerSettings), VolumeLevel (Volume4))
 import PotatoCactus.Game.ItemContainer (playerEquipment, playerInventory)
 import PotatoCactus.Game.Player (Player)
-import PotatoCactus.Game.Position (Position (Position))
+import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
 import qualified PotatoCactus.Game.Skills as SK
 import PotatoCactus.Game.World
 import PotatoCactus.Network.Packets.Out.ChatboxMessagePacket (chatboxMessagePacket)
@@ -24,8 +24,8 @@ import PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket (updateRunEnergyPa
 import PotatoCactus.Network.Packets.Out.UpdateSkillPacket (updateSkillPacket)
 import Prelude hiding (id)
 
-playerInit :: ClientHandle -> BitPut
-playerInit client = do
+playerInit :: ClientHandle -> Player -> BitPut
+playerInit client player = do
   -- reset tabs (opcode 71)
   mapM_ resetTab_ allTabs
 
@@ -59,7 +59,7 @@ playerInit client = do
   putByteString $ allPlayerSettingsPackets mockSettings_
 
   -- load initial map region (opcode 73) (could move to main loop)
-  putByteString $ loadMapRegionPacket mockPosition_
+  putByteString $ loadMapRegionPacket $ getPosition player
 
 resetTab_ :: TabDefinition -> BitPut
 resetTab_ tab =
@@ -78,6 +78,3 @@ sendSkill_ skill = putByteString $ updateSkillPacket skill
 
 mockSettings_ :: PlayerSettings
 mockSettings_ = PlayerSettings Brightness4 TwoButtons True True True Volume4 Volume4 False True
-
-mockPosition_ :: Position
-mockPosition_ = Position 3093 3244 0

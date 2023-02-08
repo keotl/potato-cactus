@@ -3,6 +3,7 @@ module PotatoCactus.Game.Reducer where
 import PotatoCactus.Boot.GameChannel (GameChannelMessage (RegisterClientMessage, UnregisterClientMessage, UpdateWorldMessage), RegisterClientPayload (clientHandle))
 import qualified PotatoCactus.Boot.GameChannel as C
 import qualified PotatoCactus.Game.Player as P
+import PotatoCactus.Game.Typing (advance)
 import PotatoCactus.Game.World (ClientHandle (username), World (World, clients, players, tick))
 
 reduceWorld :: World -> GameChannelMessage -> World
@@ -12,7 +13,7 @@ reduceWorld world (UnregisterClientMessage clientIdentifier) =
   let newClients = filter (unregisterClientPredicate_ clientIdentifier) $ clients world
    in World (tick world) (unregisterPlayer_ clientIdentifier $ players world) newClients
 reduceWorld world UpdateWorldMessage =
-  World (tick world + 1) (players world) (clients world)
+  advance world
 reduceWorld state _ = state
 
 unregisterClientPredicate_ :: String -> ClientHandle -> Bool

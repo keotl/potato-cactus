@@ -17,11 +17,12 @@ import PotatoCactus.Network.InboundPacketMapper (mapPacket)
 import PotatoCactus.Network.Packets.Opcodes
 import PotatoCactus.Network.Packets.Out.InitializePlayerPacket (initializePlayerPacket)
 import PotatoCactus.Network.Packets.Reader (InboundPacket (opcode), readPacket)
+import PotatoCactus.Game.Player (Player)
 
 type InternalQueueMessage_ = Either ClientHandleMessage InboundPacket
 
-clientHandlerMain :: ClientHandle -> Socket -> IO ()
-clientHandlerMain handle sock = do
+clientHandlerMain :: ClientHandle -> Player -> Socket -> IO ()
+clientHandlerMain handle player sock = do
   putStrLn "started client handler main"
   internalQueue <- newChan
   controlChannelPollerThreadId <- forkFinally (controlChannelPoller_ (controlChannel handle) internalQueue) (\x -> print "control Channel poller exited")
@@ -30,7 +31,7 @@ clientHandlerMain handle sock = do
       (socketPoller_ sock internalQueue)
       ( \x -> writeChan gameChannel $ UnregisterClientMessage (username handle)
       )
-  sendAll sock $ toStrict $ runBitPut $ playerInit handle
+  sendAll sock $ toStrict $ runBitPut $ playerInit handle player
   clientHandlerMainLoop_ handle sock internalQueue
 
 clientHandlerMainLoop_ :: ClientHandle -> Socket -> Chan InternalQueueMessage_ -> IO ()
