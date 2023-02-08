@@ -12,7 +12,7 @@ import Data.ByteString.UTF8 as BSU
 import Data.Either
 import Network.Socket
 import Network.Socket.ByteString (recv, sendAll)
-import PotatoCactus.Boot.GameChannel (GameChannelMessage (RegisterClientMessage), RegisterClientPayload (RegisterClientPayload), gameChannel)
+import PotatoCactus.Boot.GameChannel (GameChannelMessage (RegisterClientMessage), RegisterClientPayload (RegisterClientPayload, clientHandle, player), gameChannel)
 import PotatoCactus.Game.Player (Player (username))
 import PotatoCactus.Game.World (ClientHandle (ClientHandle))
 import PotatoCactus.Login.LoginHandler (handleLogin)
@@ -40,7 +40,7 @@ dispatch 14 =
       (Just p) -> do
         chan <- newChan
         let client = ClientHandle (username p) chan
-        writeChan gameChannel $ RegisterClientMessage (RegisterClientPayload client)
+        writeChan gameChannel $ RegisterClientMessage (RegisterClientPayload {clientHandle = client, player = p})
         clientHandlerMain client sock
 
 -- return ()

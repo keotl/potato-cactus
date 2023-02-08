@@ -31,7 +31,7 @@ handleLogin sock = do
   crcs <- recv sock (9 * 4)
 
   expectedSize <- recv sock 1
-  putStrLn $ "expectedSize: " ++ show (toByte expectedSize)
+  -- putStrLn $ "expectedSize: " ++ show (toByte expectedSize)
   -- rsaBytes <- recv sock $ fromIntegral $ toByte expectedSize -- python: stream L:33
   _ <- recv sock 1 -- hardcoded 10 generate_keys_stream
   seed1 <- recv sock 4

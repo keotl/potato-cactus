@@ -4,11 +4,13 @@ import Control.Concurrent (Chan, newChan)
 import Data.IORef (IORef)
 import GHC.IO (unsafePerformIO)
 import GHC.IORef (newIORef)
+import PotatoCactus.Game.Player (Player)
 import PotatoCactus.Game.World (ClientHandle (..))
 
-newtype RegisterClientPayload = RegisterClientPayload
+data RegisterClientPayload = RegisterClientPayload
   { -- name :: "registerClient",
-    clientHandle :: ClientHandle
+    clientHandle :: ClientHandle,
+    player :: Player
   }
 
 data GameChannelMessage

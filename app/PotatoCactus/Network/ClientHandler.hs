@@ -9,10 +9,10 @@ import Data.ByteString.Lazy (toStrict)
 import Data.IORef (readIORef)
 import Network.Socket (Socket)
 import Network.Socket.ByteString (recv, sendAll)
-import PotatoCactus.Boot.GameChannel (gameChannel)
+import PotatoCactus.Boot.GameChannel (GameChannelMessage (UnregisterClientMessage), gameChannel)
 import PotatoCactus.Client.ClientUpdate (updateClient)
 import PotatoCactus.Client.PlayerInit (playerInit)
-import PotatoCactus.Game.World (ClientHandle (controlChannel, username), ClientHandleMessage, worldInstance)
+import PotatoCactus.Game.World (ClientHandle (controlChannel, username), ClientHandleMessage (CloseClientConnectionMessage), worldInstance)
 import PotatoCactus.Network.InboundPacketMapper (mapPacket)
 import PotatoCactus.Network.Packets.Opcodes
 import PotatoCactus.Network.Packets.Out.InitializePlayerPacket (initializePlayerPacket)
@@ -25,7 +25,11 @@ clientHandlerMain handle sock = do
   putStrLn "started client handler main"
   internalQueue <- newChan
   controlChannelPollerThreadId <- forkFinally (controlChannelPoller_ (controlChannel handle) internalQueue) (\x -> print "control Channel poller exited")
-  socketPollerThreadId <- forkFinally (socketPoller_ sock internalQueue) (\x -> print "socket poller exited")
+  socketPollerThreadId <-
+    forkFinally
+      (socketPoller_ sock internalQueue)
+      ( \x -> writeChan gameChannel $ UnregisterClientMessage (username handle)
+      )
   sendAll sock $ toStrict $ runBitPut $ playerInit handle
   clientHandlerMainLoop_ handle sock internalQueue
 
@@ -35,7 +39,9 @@ clientHandlerMainLoop_ client sock chan = do
   case message of
     Left clientHandleMessage -> do
       updateClient sock client clientHandleMessage
-      clientHandlerMainLoop_ client sock chan
+      case clientHandleMessage of
+        CloseClientConnectionMessage -> return ()
+        _ -> clientHandlerMainLoop_ client sock chan
     Right clientPacket -> do
       case mapPacket (username client) clientPacket of
         Just downstreamMessage -> do
@@ -45,16 +51,8 @@ clientHandlerMainLoop_ client sock chan = do
             else clientHandlerMainLoop_ client sock chan
         _ -> clientHandlerMainLoop_ client sock chan
 
-  putStrLn "got out!"
-  return ()
-
--- world <- readIORef worldInstance
-
--- hardcoded load map packet
--- let x = toStrict $ toLazyByteString $ mconcat [word8 73, word16BE 3093, word16BE 3244]
--- sendAll sock x
--- print "sent all to sock"
--- threadDelay $ 1000000 * 10
+-- putStrLn "got out!"
+-- return ()
 
 controlChannelPoller_ :: Chan ClientHandleMessage -> Chan InternalQueueMessage_ -> IO ()
 controlChannelPoller_ input output = do
