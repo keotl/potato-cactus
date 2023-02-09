@@ -9,6 +9,7 @@ import PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.Position as Pos
 import PotatoCactus.Login.Models as L
 import PotatoCactus.Network.Binary (readStr, toByte, toInt, toShort)
+import PotatoCactus.Persistence.PlayerRepository (retrievePlayer)
 
 handleLogin :: Socket -> IO (Maybe Player)
 handleLogin sock = do
@@ -54,7 +55,4 @@ handleLogin sock = do
   sendAll sock $ pack [0] -- ignored?
 
   -- TODO check credentials
-  return $ Just (Player username (playerWalkMovement mockPosition_))
-
-mockPosition_ :: Pos.Position
-mockPosition_ = Pos.Position 3093 3244 0
+  retrievePlayer username

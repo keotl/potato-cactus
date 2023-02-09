@@ -2,6 +2,7 @@ module PotatoCactus.Game.Player where
 
 import PotatoCactus.Game.Movement.MovementEntity (MovementEntity)
 import PotatoCactus.Game.Position (GetPosition (getPosition))
+import PotatoCactus.Game.Typing (Advance (advance))
 
 data Player = Player
   { username :: String,
@@ -13,3 +14,6 @@ data Player = Player
 
 instance GetPosition Player where
   getPosition = getPosition . movement
+
+instance Advance Player where
+  advance p = p {movement = advance (movement p)}

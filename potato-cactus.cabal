@@ -46,6 +46,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Out.UpdateSkillPacket
                    PotatoCactus.Network.Packets.Out.PlayerInteractionPacket
                    PotatoCactus.Network.Packets.Out.PlayerUpdatePacket
+                   PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodePlayerMovement
                    PotatoCactus.Network.Packets.Out.PlayerSettingsPackets
                    PotatoCactus.Network.Packets.Out.TabInterfacePacket
                    PotatoCactus.Network.ClientHandler
@@ -58,8 +59,10 @@ executable potato-cactus
                    PotatoCactus.Game.Interface.PlayerSettings
                    PotatoCactus.Game.Item
                    PotatoCactus.Game.ItemContainer
+                   PotatoCactus.Game.Movement.Direction
                    PotatoCactus.Game.Movement.MovementEntity
                    PotatoCactus.Game.Movement.PlayerWalkMovement
+                   PotatoCactus.Game.Movement.PositionXY
                    PotatoCactus.Game.Movement.StaticMovement
                    PotatoCactus.Game.Player
                    PotatoCactus.Game.Position
@@ -68,6 +71,7 @@ executable potato-cactus
                    PotatoCactus.Game.World
                    PotatoCactus.Game.Reducer
                    PotatoCactus.Config.Constants
+                   PotatoCactus.Persistence.PlayerRepository
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

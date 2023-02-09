@@ -17,6 +17,7 @@ import PotatoCactus.Game.World as W
     World (players),
   )
 import PotatoCactus.Network.Binary (encodeToBase37, toByte, toShort_, toWord_)
+import PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodePlayerMovement (encodePlayerMovement)
 import PotatoCactus.Network.Packets.Packet (varShortPacket)
 
 playerUpdate :: Player -> World -> ByteString
@@ -34,7 +35,7 @@ beforeBlockMsg_ player =
   toStrict $
     runBitPut
       ( do
-          playerMovement_ player
+          encodePlayerMovement player
           putNBits 8 $ toWord_ 0 -- localplayers list length
           putNBits 11 $ toShort_ 2047 -- should only put 2047 when blockMsg contains something
       )
@@ -46,19 +47,6 @@ blockMsg_ p world = do
         putNBits 8 $ toWord_ 16 -- 16 = only player appearance update mask
         putNBits 8 $ toWord_ $ fromIntegral (- Data.Binary.length playerBlockMsg)
         putByteString $ toStrict playerBlockMsg
-
--- todo deal with other players
-
-playerMovement_ :: Player -> BitPut
-playerMovement_ player =
-  do
-    putBit True -- isTeleporting
-    putNBits 2 (toWord_ 3)
-    putNBits 2 (toWord_ 0) -- position.z
-    putBit False -- region has changed
-    putBit True -- needs update
-    putNBits 7 $ toWord_ 53 * 8 -- local Y
-    putNBits 7 $ toWord_ 52 * 8 -- local X
 
 playerBlockSet_ :: Player -> World -> BitPut
 playerBlockSet_ player world = do

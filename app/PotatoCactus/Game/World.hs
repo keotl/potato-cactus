@@ -23,10 +23,10 @@ data World = World
   }
   deriving (Show)
 
+instance Advance World where
+  advance w = World (tick w + 1) (map advance (players w)) (clients w)
+
 defaultWorldValue = World {tick = 0, players = [], clients = []}
 
 worldInstance = unsafePerformIO $ newIORef defaultWorldValue
 {-# NOINLINE worldInstance #-}
-
-instance Advance World where
-  advance w = World (tick w + 1) (players w) (clients w)
