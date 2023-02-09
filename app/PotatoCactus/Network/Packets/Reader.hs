@@ -22,6 +22,8 @@ readPacket sock = do
     then return (InboundPacket socketClosedOpcode empty)
     else do
       let decodedOpcode = fromIntegral (toByte opcode)
+      -- putStr "got opcode "
+      -- print decodedOpcode
       let predefinedSize = clientPacketSizes !! decodedOpcode
       payload <- readDynamicPayload_ sock predefinedSize
       return $ InboundPacket decodedOpcode payload

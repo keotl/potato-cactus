@@ -4,7 +4,7 @@ import Data.Binary (Word8)
 import Data.Binary.BitPut (putByteString, putNBits, runBitPut)
 import Data.ByteString (ByteString)
 import Data.ByteString.Lazy (toStrict)
-import PotatoCactus.Game.Interface.PlayerSettings (BrightnessLevel (Brightness0, Brightness1, Brightness2, Brightness3, Brightness4), MouseType (None, OneButton, TwoButtons), PlayerSettings (acceptAid, autoRetaliate, brightnessLevel, chatEffects, effectsVolume, mouseType, musicVolume, running, splitPrivateChat), VolumeLevel (Volume1, Volume2, Volume3, Volume4, VolumeOff))
+import PotatoCactus.Game.Interface.PlayerSettings (BrightnessLevel (Brightness0, Brightness1, Brightness2, Brightness3, Brightness4), MouseType (OneButton, TwoButtons), PlayerSettings (acceptAid, autoRetaliate, brightnessLevel, chatEffects, effectsVolume, mouseType, musicVolume, running, splitPrivateChat), VolumeLevel (Volume1, Volume2, Volume3, Volume4, VolumeOff))
 import PotatoCactus.Network.Binary (toShortLE_)
 import PotatoCactus.Network.Packets.Packet (fixedPacket)
 
@@ -40,9 +40,8 @@ setMouseTypePacket :: MouseType -> ByteString
 setMouseTypePacket mouseType =
   let value =
         ( case mouseType of
-            None -> 0
+            TwoButtons -> 0
             OneButton -> 1
-            TwoButtons -> 2
         )
    in byteConfigPacket 170 value
 

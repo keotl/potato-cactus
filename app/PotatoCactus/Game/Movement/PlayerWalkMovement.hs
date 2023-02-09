@@ -8,11 +8,12 @@ import PotatoCactus.Game.Typing (Advance (advance))
 data PlayerWalkMovement = PlayerWalkMovement
   { position_ :: Position,
     queue_ :: [Position],
-    isTeleporting :: Bool, -- set on new connection
+    isTeleporting :: Bool,
     isRunning :: Bool,
     runEnergy :: Int,
     walkingDirection :: Direction,
-    runningDirection :: Direction
+    runningDirection :: Direction,
+    skipUpdate_ :: Bool -- to make sure that a new player does not immediately transitions to isTeleporting = False
   }
   deriving (Show)
 
@@ -22,9 +23,10 @@ instance GetPosition PlayerWalkMovement where
 -- Running does two steps
 instance Advance PlayerWalkMovement where
   advance m =
-    case (queue_ m, isRunning m) of
-      ([], _) -> m {walkingDirection = None, runningDirection = None, isTeleporting = False}
-      (x : xs, False) ->
+    case (skipUpdate_ m, queue_ m, isRunning m) of
+      (True, _, _) -> m {skipUpdate_ = False}
+      (_, [], _) -> m {walkingDirection = None, runningDirection = None, isTeleporting = False}
+      (_, x : xs, False) ->
         m
           { position_ = x,
             queue_ = xs,
@@ -32,7 +34,7 @@ instance Advance PlayerWalkMovement where
             walkingDirection = directionBetween (toXY (position_ m)) (toXY x),
             runningDirection = None
           }
-      (x : xs, True) -> m {position_ = x, queue_ = xs} -- TODO - Implement running  - keotl 2023-02-09
+      (_, x : xs, True) -> m {position_ = x, queue_ = xs} -- TODO - Implement running  - keotl 2023-02-09
 
 create :: Position -> PlayerWalkMovement
 create pos =
@@ -43,5 +45,6 @@ create pos =
       isTeleporting = True,
       runEnergy = 100,
       walkingDirection = None,
-      runningDirection = None
+      runningDirection = None,
+      skipUpdate_ = True
     }

@@ -12,12 +12,12 @@ import Network.Socket.ByteString (recv, sendAll)
 import PotatoCactus.Boot.GameChannel (GameChannelMessage (UnregisterClientMessage), gameChannel)
 import PotatoCactus.Client.ClientUpdate (updateClient)
 import PotatoCactus.Client.PlayerInit (playerInit)
+import PotatoCactus.Game.Player (Player)
 import PotatoCactus.Game.World (ClientHandle (controlChannel, username), ClientHandleMessage (CloseClientConnectionMessage), worldInstance)
 import PotatoCactus.Network.InboundPacketMapper (mapPacket)
 import PotatoCactus.Network.Packets.Opcodes
 import PotatoCactus.Network.Packets.Out.InitializePlayerPacket (initializePlayerPacket)
 import PotatoCactus.Network.Packets.Reader (InboundPacket (opcode), readPacket)
-import PotatoCactus.Game.Player (Player)
 
 type InternalQueueMessage_ = Either ClientHandleMessage InboundPacket
 
@@ -48,12 +48,9 @@ clientHandlerMainLoop_ client sock chan = do
         Just downstreamMessage -> do
           writeChan gameChannel downstreamMessage
           if opcode clientPacket == socketClosedOpcode
-            then return () -- TODO - disconnect player  - keotl 2023-02-07
+            then return ()
             else clientHandlerMainLoop_ client sock chan
         _ -> clientHandlerMainLoop_ client sock chan
-
--- putStrLn "got out!"
--- return ()
 
 controlChannelPoller_ :: Chan ClientHandleMessage -> Chan InternalQueueMessage_ -> IO ()
 controlChannelPoller_ input output = do

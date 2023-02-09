@@ -12,7 +12,7 @@ data PlayerSettings = PlayerSettings
     autoRetaliate :: Bool
   }
 
-data MouseType = None | TwoButtons | OneButton
+data MouseType = TwoButtons | OneButton
 
 data VolumeLevel = VolumeOff | Volume1 | Volume2 | Volume3 | Volume4
 
