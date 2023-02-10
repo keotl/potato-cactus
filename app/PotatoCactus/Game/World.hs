@@ -2,9 +2,11 @@ module PotatoCactus.Game.World where
 
 import Control.Concurrent (Chan)
 import Data.IORef (newIORef)
+import Data.List (find)
 import GHC.IO (unsafePerformIO)
-import PotatoCactus.Game.Player (Player)
+import qualified PotatoCactus.Game.Player as P (Player, username)
 import PotatoCactus.Game.Typing (Advance (advance))
+import PotatoCactus.Utils.Iterable (replace)
 
 data ClientHandleMessage = WorldUpdatedMessage | CloseClientConnectionMessage
 
@@ -18,7 +20,7 @@ instance Show ClientHandle where
 
 data World = World
   { tick :: Int,
-    players :: [Player],
+    players :: [P.Player],
     clients :: [ClientHandle]
   }
   deriving (Show)
@@ -30,3 +32,16 @@ defaultWorldValue = World {tick = 0, players = [], clients = []}
 
 worldInstance = unsafePerformIO $ newIORef defaultWorldValue
 {-# NOINLINE worldInstance #-}
+
+updatePlayer :: World -> String -> (P.Player -> P.Player) -> World
+updatePlayer world playerName update =
+  case find (\x -> P.username x == playerName) (players world) of
+    Just player ->
+      world
+        { players =
+            replace
+              (\x -> P.username x == playerName)
+              (update player)
+              (players world)
+        }
+    Nothing -> world

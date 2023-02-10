@@ -1,12 +1,14 @@
 module PotatoCactus.Game.Player where
 
-import PotatoCactus.Game.Movement.MovementEntity (MovementEntity)
+import qualified PotatoCactus.Game.Movement.MovementEntity as M (MovementEntity, issueWalkCommand)
+import PotatoCactus.Game.Movement.PositionXY (PositionXY)
+import PotatoCactus.Game.Movement.WalkingStep (WalkingStep)
 import PotatoCactus.Game.Position (GetPosition (getPosition))
 import PotatoCactus.Game.Typing (Advance (advance))
 
 data Player = Player
   { username :: String,
-    movement :: MovementEntity
+    movement :: M.MovementEntity
   }
   deriving (Show)
 
@@ -17,3 +19,7 @@ instance GetPosition Player where
 
 instance Advance Player where
   advance p = p {movement = advance (movement p)}
+
+issueWalkCommand :: (PositionXY, Bool, [WalkingStep]) -> Player -> Player
+issueWalkCommand (startPos, isRunning, steps) p =
+  p {movement = M.issueWalkCommand (movement p) startPos steps}

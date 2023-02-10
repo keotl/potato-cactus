@@ -33,6 +33,7 @@ executable potato-cactus
                    PotatoCactus.Network.SocketHandler
                    PotatoCactus.Network.InboundPacketMapper
                    PotatoCactus.Network.Packets.In.LoginPacket
+                   PotatoCactus.Network.Packets.In.PlayerWalkPacket
                    PotatoCactus.Network.Packets.Packet
                    PotatoCactus.Network.Packets.Reader
                    PotatoCactus.Network.Packets.Opcodes
@@ -64,6 +65,7 @@ executable potato-cactus
                    PotatoCactus.Game.Movement.PlayerWalkMovement
                    PotatoCactus.Game.Movement.PositionXY
                    PotatoCactus.Game.Movement.StaticMovement
+                   PotatoCactus.Game.Movement.WalkingStep
                    PotatoCactus.Game.Player
                    PotatoCactus.Game.Position
                    PotatoCactus.Game.Skills
@@ -72,6 +74,7 @@ executable potato-cactus
                    PotatoCactus.Game.Reducer
                    PotatoCactus.Config.Constants
                    PotatoCactus.Persistence.PlayerRepository
+                   PotatoCactus.Utils.Iterable
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

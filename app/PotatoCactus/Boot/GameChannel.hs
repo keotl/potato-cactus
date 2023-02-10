@@ -6,6 +6,8 @@ import GHC.IO (unsafePerformIO)
 import GHC.IORef (newIORef)
 import PotatoCactus.Game.Player (Player)
 import PotatoCactus.Game.World (ClientHandle (..))
+import PotatoCactus.Game.Movement.WalkingStep (WalkingStep)
+import PotatoCactus.Game.Movement.PositionXY (PositionXY)
 
 data RegisterClientPayload = RegisterClientPayload
   { -- name :: "registerClient",
@@ -16,6 +18,7 @@ data RegisterClientPayload = RegisterClientPayload
 data GameChannelMessage
   = RegisterClientMessage RegisterClientPayload
   | UnregisterClientMessage String
+  | PlayerWalkMessage String PositionXY Bool [WalkingStep]
   | UpdateWorldMessage
 
 -- gameChannelRef :: IORef (Chan GameChannelMessage)

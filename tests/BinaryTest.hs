@@ -112,3 +112,4 @@ mixedBits =
 
 prettyPrint_ :: BS.ByteString -> Data.ByteString.Lazy.ByteString
 prettyPrint_ = toLazyByteString . byteStringHex
+

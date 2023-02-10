@@ -2,7 +2,9 @@ module PotatoCactus.Game.Movement.MovementEntity where
 
 import PotatoCactus.Game.Movement.PlayerWalkMovement
 import qualified PotatoCactus.Game.Movement.PlayerWalkMovement as PlayerWalkMovement
+import PotatoCactus.Game.Movement.PositionXY (PositionXY)
 import PotatoCactus.Game.Movement.StaticMovement (StaticMovement)
+import PotatoCactus.Game.Movement.WalkingStep (WalkingStep)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position)
 import PotatoCactus.Game.Typing (Advance (advance))
 
@@ -20,3 +22,8 @@ instance Advance MovementEntity where
 
 playerWalkMovement :: Position -> MovementEntity
 playerWalkMovement = PlayerWalkMovement_ . PlayerWalkMovement.create
+
+issueWalkCommand :: MovementEntity -> PositionXY -> [WalkingStep] -> MovementEntity
+issueWalkCommand (PlayerWalkMovement_ m) startPos steps =
+  PlayerWalkMovement_ (queueWalk m startPos steps)
+issueWalkCommand m _ _ = m

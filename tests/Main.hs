@@ -1,7 +1,8 @@
 module Main where
 
 import Base37Test (testDecode, testEncode)
-import BinaryTest (testByte, testByteNegate, testIntME, testMixedBitMode, testShortBE, testShortLE, testPack)
+import BinaryTest (testByte, testByteNegate, testIntME, testMixedBitMode, testPack, testShortBE, testShortLE)
+import GetMonadTests (getTests)
 import Test.HUnit
 
 tests =
@@ -14,7 +15,8 @@ tests =
       testIntME,
       testByteNegate,
       testMixedBitMode,
-      testPack
+      testPack,
+      getTests
     ]
 
 main :: IO ()
