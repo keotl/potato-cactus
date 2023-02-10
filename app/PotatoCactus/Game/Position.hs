@@ -5,7 +5,7 @@ data Position = Position
     y :: Int,
     z :: Int
   }
-  deriving (Show)
+  deriving (Show, Eq)
 
 -- Bottom-left coordinate of chunk
 chunkX :: Position -> Int

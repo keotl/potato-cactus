@@ -6,6 +6,7 @@ data PositionXY = PositionXY
   { x :: Int,
     y :: Int
   }
+  deriving (Show, Eq)
 
 toXY :: Position.Position -> PositionXY
 toXY pos =

@@ -4,7 +4,7 @@ import PotatoCactus.Game.Movement.PositionXY (PositionXY (PositionXY))
 import qualified PotatoCactus.Game.Movement.PositionXY as PositionXY
 import PotatoCactus.Game.Position (Position (x, y))
 
-data WalkingStep = WalkingStep Int Int
+data WalkingStep = WalkingStep Int Int deriving (Show)
 
 toPosition :: Position -> WalkingStep -> Position
 toPosition reference (WalkingStep dx dy) =

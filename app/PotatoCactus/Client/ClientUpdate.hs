@@ -10,8 +10,11 @@ import GHC.IORef (readIORef)
 import Network.Socket
 import Network.Socket.ByteString (recv, send, sendAll)
 import PotatoCactus.Client.PlayerUpdate (playerUpdate)
-import PotatoCactus.Game.Player (Player (Player, username))
+import PotatoCactus.Game.Movement.MovementEntity (hasChangedRegion)
+import PotatoCactus.Game.Player (Player (Player, movement, username))
+import PotatoCactus.Game.Position (GetPosition (getPosition))
 import qualified PotatoCactus.Game.World as W (ClientHandle, ClientHandleMessage (CloseClientConnectionMessage, WorldUpdatedMessage), World (players, tick), username, worldInstance)
+import PotatoCactus.Network.Packets.Out.LoadMapRegionPacket (loadMapRegionPacket)
 import PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket (updateRunEnergyPacket)
 import Type.Reflection (typeOf)
 
@@ -22,11 +25,13 @@ updateClient sock client W.WorldUpdatedMessage = do
   let player = find (\x -> username x == W.username client) (W.players world)
   case player of
     Just p -> do
-      -- TODO region update
+      if hasChangedRegion (movement p)
+        then do
+          sendAll sock (loadMapRegionPacket (getPosition p))
+        else pure ()
+
       sendAll sock (playerUpdate p world)
       sendAll sock (updateRunEnergyPacket 66)
     -- TODO - NPC update - keotl 2023-02-08
     Nothing -> putStrLn $ "could not find player " ++ W.username client
-
-
 updateClient _ _ W.CloseClientConnectionMessage = return ()

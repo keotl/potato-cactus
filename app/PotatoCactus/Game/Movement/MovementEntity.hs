@@ -27,3 +27,7 @@ issueWalkCommand :: MovementEntity -> PositionXY -> [WalkingStep] -> MovementEnt
 issueWalkCommand (PlayerWalkMovement_ m) startPos steps =
   PlayerWalkMovement_ (queueWalk m startPos steps)
 issueWalkCommand m _ _ = m
+
+hasChangedRegion :: MovementEntity -> Bool
+hasChangedRegion (PlayerWalkMovement_ m) = hasCrossedChunkBoundary m -- TODO - check loaded chunk region to reduce stuttering  - keotl 2023-02-10
+hasChangedRegion _ = False

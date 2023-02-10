@@ -23,3 +23,4 @@ instance Advance Player where
 issueWalkCommand :: (PositionXY, Bool, [WalkingStep]) -> Player -> Player
 issueWalkCommand (startPos, isRunning, steps) p =
   p {movement = M.issueWalkCommand (movement p) startPos steps}
+

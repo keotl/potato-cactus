@@ -4,7 +4,7 @@ import Control.Concurrent (Chan, forkFinally, readChan, threadDelay, writeChan)
 import Data.IORef
 import Data.Typeable (typeOf)
 import GHC.Clock (getMonotonicTimeNSec)
-import PotatoCactus.Boot.GameChannel (GameChannelMessage (UpdateWorldMessage), gameChannel)
+import PotatoCactus.Boot.GameChannel (GameChannelMessage (PlayerWalkMessage, UpdateWorldMessage), gameChannel)
 import PotatoCactus.Config.Constants (tickInterval)
 import PotatoCactus.Game.Reducer (reduceWorld)
 import PotatoCactus.Game.World (ClientHandle (controlChannel, username), ClientHandleMessage (CloseClientConnectionMessage, WorldUpdatedMessage), World (clients), defaultWorldValue, worldInstance)
@@ -40,7 +40,6 @@ worldTickThread_ tickInterval gameChannel = do
 reduceUntilNextTick_ :: World -> Chan GameChannelMessage -> IO World
 reduceUntilNextTick_ world gameChannel = do
   message <- readChan gameChannel
-
   ( case message of
       UpdateWorldMessage -> return (reduceWorld world message)
       x -> reduceUntilNextTick_ (reduceWorld world x) gameChannel

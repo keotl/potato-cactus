@@ -61,6 +61,7 @@ executable potato-cactus
                    PotatoCactus.Game.Item
                    PotatoCactus.Game.ItemContainer
                    PotatoCactus.Game.Movement.Direction
+                   PotatoCactus.Game.Movement.InterpolatePath
                    PotatoCactus.Game.Movement.MovementEntity
                    PotatoCactus.Game.Movement.PlayerWalkMovement
                    PotatoCactus.Game.Movement.PositionXY

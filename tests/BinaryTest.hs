@@ -4,10 +4,11 @@
 module BinaryTest where
 
 import Data.Binary.BitPut (putByteString, putNBits, runBitPut)
+import Data.Binary.Get (getWord16le, runGet)
 import Data.Bits
 import Data.ByteString as BS
 import Data.ByteString.Builder
-import Data.ByteString.Lazy (ByteString, toStrict)
+import Data.ByteString.Lazy (ByteString, fromStrict, toStrict)
 import Data.Char (chr, ord)
 import Data.Word
 import GHC.Exception (prettyCallStack)
@@ -56,6 +57,35 @@ testByteNegate =
   TestList
     [ TestCase (assertEqual "putByte negate" 253 (toWord_ (- 3))),
       TestCase (assertEqual "putByte negate through bitput" 253 (BS.index (toStrict $ runBitPut $ putNBits 8 $ toWord_ (- 3)) 0))
+    ]
+
+testShortAdd :: Test
+testShortAdd =
+  TestList
+    [ TestCase
+        ( assertEqual
+            "read short type.ADD"
+            3208
+            ( runGet
+                ( do
+                    x <- getWord16le
+                    return (x `xor` 128)
+                )
+                (fromStrict $ pack [8, 12])
+            )
+        ),
+      TestCase
+        ( assertEqual
+            "read short type.ADD"
+            3198
+            ( runGet
+                ( do
+                    x <- getWord16le
+                    return (x `xor` 128)
+                )
+                (fromStrict $ pack [254, 12])
+            )
+        )
     ]
 
 testMixedBitMode :: Test
@@ -112,4 +142,3 @@ mixedBits =
 
 prettyPrint_ :: BS.ByteString -> Data.ByteString.Lazy.ByteString
 prettyPrint_ = toLazyByteString . byteStringHex
-

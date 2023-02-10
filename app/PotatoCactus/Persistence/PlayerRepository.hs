@@ -13,4 +13,5 @@ mockPlayer_ username =
   Player username (playerWalkMovement mockPosition_)
 
 mockPosition_ :: Position
-mockPosition_ = Position 3093 3244 0
+mockPosition_ = Position 3198 3253 0
+-- mockPosition_ = Position 3093 3244 0

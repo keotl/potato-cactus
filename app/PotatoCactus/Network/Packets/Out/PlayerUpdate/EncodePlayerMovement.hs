@@ -3,9 +3,9 @@ module PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodePlayerMovement where
 import Data.Binary.BitPut (BitPut, putBit, putNBits)
 import qualified PotatoCactus.Game.Movement.Direction as Direction
 import PotatoCactus.Game.Movement.MovementEntity (MovementEntity (PlayerWalkMovement_, StaticMovement_))
-import PotatoCactus.Game.Movement.PlayerWalkMovement (PlayerWalkMovement (isTeleporting, runningDirection, walkingDirection))
+import PotatoCactus.Game.Movement.PlayerWalkMovement (PlayerWalkMovement (hasCrossedChunkBoundary, isTeleporting, runningDirection, walkingDirection))
 import PotatoCactus.Game.Player (Player (movement))
-import PotatoCactus.Game.Position (GetPosition (getPosition), Position (z), localY, localX)
+import PotatoCactus.Game.Position (GetPosition (getPosition), Position (z), localX, localY)
 import PotatoCactus.Network.Binary (toWord_)
 
 encodePlayerMovement :: Player -> BitPut
@@ -28,7 +28,7 @@ encode_ (PlayerWalkMovement_ m) needsUpdate =
       putBit True -- isTeleporting
       putNBits 2 $ toWord_ 3
       putNBits 2 $ toWord_ (z (getPosition m)) -- position.z
-      putBit False -- region has changed
+      putBit $ not $ hasCrossedChunkBoundary m -- region has changed
       putBit True -- needs update
       putNBits 7 $ toWord_ (localY (getPosition m)) -- local Y
       putNBits 7 $ toWord_ (localX (getPosition m)) -- local X
