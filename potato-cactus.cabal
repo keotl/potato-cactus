@@ -32,6 +32,7 @@ executable potato-cactus
                    PotatoCactus.Client.PlayerInit
                    PotatoCactus.Network.SocketHandler
                    PotatoCactus.Network.InboundPacketMapper
+                   PotatoCactus.Network.Packets.In.ButtonClickPacket
                    PotatoCactus.Network.Packets.In.LoginPacket
                    PotatoCactus.Network.Packets.In.PlayerWalkPacket
                    PotatoCactus.Network.Packets.Packet
@@ -56,6 +57,7 @@ executable potato-cactus
                    PotatoCactus.Login.Models
                    PotatoCactus.Game.Interface.FriendsList
                    PotatoCactus.Game.Interface.GameTabs
+                   PotatoCactus.Game.Interface.InterfaceButtonDispatch
                    PotatoCactus.Game.Interface.PlayerInteraction
                    PotatoCactus.Game.Interface.PlayerSettings
                    PotatoCactus.Game.Item

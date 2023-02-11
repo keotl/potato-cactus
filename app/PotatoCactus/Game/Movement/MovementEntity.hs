@@ -31,3 +31,8 @@ issueWalkCommand m _ _ = m
 hasChangedRegion :: MovementEntity -> Bool
 hasChangedRegion (PlayerWalkMovement_ m) = shouldUpdateRegion m
 hasChangedRegion _ = False
+
+setRunning :: MovementEntity -> Bool -> MovementEntity
+setRunning (PlayerWalkMovement_ m) running =
+  PlayerWalkMovement_ m {isRunning = running}
+setRunning m _ = m

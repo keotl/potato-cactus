@@ -19,6 +19,7 @@ data GameChannelMessage
   = RegisterClientMessage RegisterClientPayload
   | UnregisterClientMessage String
   | PlayerWalkMessage String PositionXY Bool [WalkingStep]
+  | InterfaceButtonClickMessage String Int
   | UpdateWorldMessage
 
 -- gameChannelRef :: IORef (Chan GameChannelMessage)

@@ -40,7 +40,22 @@ instance Advance PlayerWalkMovement where
             shouldUpdateRegion = shouldUpdateRegion_ (lastRegionUpdate_ m) x,
             lastRegionUpdate_ = if shouldUpdateRegion_ (lastRegionUpdate_ m) x then x else lastRegionUpdate_ m
           }
-      (_, x : xs, True) -> m {position_ = x, queue_ = xs} -- TODO - Implement running  - keotl 2023-02-09
+      (_, x : xs, True) ->
+        m
+          { position_ = case xs of
+              [] -> x
+              (y : ys) -> y,
+            queue_ = case xs of
+              [] -> []
+              (y : ys) -> ys,
+            isTeleporting = False,
+            walkingDirection = directionBetween (toXY (position_ m)) (toXY x),
+            runningDirection = case xs of
+              [] -> None
+              (y : ys) -> directionBetween (toXY x) (toXY y),
+            shouldUpdateRegion = shouldUpdateRegion_ (lastRegionUpdate_ m) x,
+            lastRegionUpdate_ = if shouldUpdateRegion_ (lastRegionUpdate_ m) x then x else lastRegionUpdate_ m
+          }
 
 queueWalk :: PlayerWalkMovement -> PositionXY -> [WalkingStep] -> PlayerWalkMovement
 queueWalk current (PositionXY startX startY) steps =
