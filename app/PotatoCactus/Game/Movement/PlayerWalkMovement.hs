@@ -13,10 +13,11 @@ data PlayerWalkMovement = PlayerWalkMovement
     isTeleporting :: Bool,
     isRunning :: Bool,
     runEnergy :: Int,
-    hasCrossedChunkBoundary :: Bool,
     walkingDirection :: Direction,
     runningDirection :: Direction,
-    skipUpdate_ :: Bool -- to make sure that a new player does not immediately transitions to isTeleporting = False
+    skipUpdate_ :: Bool, -- to make sure that a new player does not immediately transitions to isTeleporting = False
+    shouldUpdateRegion :: Bool,
+    lastRegionUpdate_ :: Position
   }
   deriving (Show)
 
@@ -28,7 +29,7 @@ instance Advance PlayerWalkMovement where
   advance m =
     case (skipUpdate_ m, queue_ m, isRunning m) of
       (True, _, _) -> m {skipUpdate_ = False}
-      (_, [], _) -> m {walkingDirection = None, runningDirection = None, isTeleporting = False}
+      (_, [], _) -> m {walkingDirection = None, runningDirection = None, isTeleporting = False, shouldUpdateRegion = False}
       (_, x : xs, False) ->
         m
           { position_ = x,
@@ -36,7 +37,8 @@ instance Advance PlayerWalkMovement where
             isTeleporting = False,
             walkingDirection = directionBetween (toXY (position_ m)) (toXY x),
             runningDirection = None,
-            hasCrossedChunkBoundary = (chunkX x /= chunkX (position_ m)) || (chunkY x /= chunkY (position_ m))
+            shouldUpdateRegion = shouldUpdateRegion_ (lastRegionUpdate_ m) x,
+            lastRegionUpdate_ = if shouldUpdateRegion_ (lastRegionUpdate_ m) x then x else lastRegionUpdate_ m
           }
       (_, x : xs, True) -> m {position_ = x, queue_ = xs} -- TODO - Implement running  - keotl 2023-02-09
 
@@ -53,8 +55,14 @@ create pos =
       isRunning = False,
       isTeleporting = True,
       runEnergy = 100,
-      hasCrossedChunkBoundary = False,
+      shouldUpdateRegion = True,
       walkingDirection = None,
       runningDirection = None,
-      skipUpdate_ = True
+      skipUpdate_ = True,
+      lastRegionUpdate_ = pos
     }
+
+shouldUpdateRegion_ :: Position -> Position -> Bool
+shouldUpdateRegion_ lastUpdate currentPos =
+  let (deltaX, deltaY) = (x currentPos - chunkX lastUpdate * 8, y currentPos - chunkY lastUpdate * 8)
+   in deltaX < 16 || deltaX >= 88 || deltaY < 16 || deltaY > 88
