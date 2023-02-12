@@ -28,11 +28,11 @@ executable potato-cactus
     other-modules: PotatoCactus.Boot.GameThreadMain
                    PotatoCactus.Boot.GameChannel
                    PotatoCactus.Client.ClientUpdate
-                   PotatoCactus.Client.PlayerUpdate
                    PotatoCactus.Client.PlayerInit
                    PotatoCactus.Network.SocketHandler
                    PotatoCactus.Network.InboundPacketMapper
                    PotatoCactus.Network.Packets.In.ButtonClickPacket
+                   PotatoCactus.Network.Packets.In.ChatMessagePacket
                    PotatoCactus.Network.Packets.In.LoginPacket
                    PotatoCactus.Network.Packets.In.PlayerWalkPacket
                    PotatoCactus.Network.Packets.Packet
@@ -47,8 +47,10 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket
                    PotatoCactus.Network.Packets.Out.UpdateSkillPacket
                    PotatoCactus.Network.Packets.Out.PlayerInteractionPacket
-                   PotatoCactus.Network.Packets.Out.PlayerUpdatePacket
+                   PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeBlock
+                   PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeChatUpdate
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodePlayerMovement
+                   PotatoCactus.Network.Packets.Out.PlayerUpdate.PlayerUpdatePacket
                    PotatoCactus.Network.Packets.Out.PlayerSettingsPackets
                    PotatoCactus.Network.Packets.Out.TabInterfacePacket
                    PotatoCactus.Network.ClientHandler
@@ -70,6 +72,11 @@ executable potato-cactus
                    PotatoCactus.Game.Movement.StaticMovement
                    PotatoCactus.Game.Movement.WalkingStep
                    PotatoCactus.Game.Player
+                   PotatoCactus.Game.PlayerUpdate.AdvancePlayer
+                   PotatoCactus.Game.PlayerUpdate.ChatMessage
+                   PotatoCactus.Game.PlayerUpdate.UpdateMask
+                   PotatoCactus.Game.PlayerUpdate.PlayerUpdate
+                   PotatoCactus.Game.PlayerUpdate.ProcessPlayerUpdate
                    PotatoCactus.Game.Position
                    PotatoCactus.Game.Skills
                    PotatoCactus.Game.Typing

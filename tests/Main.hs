@@ -5,6 +5,7 @@ import BinaryTest (testByte, testByteNegate, testIntME, testMixedBitMode, testPa
 import GetMonadTests (getTests)
 import Test.HUnit
 import Game.InterpolatePathTests (interpolatePathTests)
+import DecodeChatTests (decodeChatTests, testNibbles)
 
 tests =
   TestList
@@ -19,7 +20,9 @@ tests =
       testMixedBitMode,
       testPack,
       getTests,
-      interpolatePathTests
+      interpolatePathTests,
+      decodeChatTests,
+      testNibbles
     ]
 
 main :: IO ()

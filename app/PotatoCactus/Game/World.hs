@@ -5,6 +5,7 @@ import Data.IORef (newIORef)
 import Data.List (find)
 import GHC.IO (unsafePerformIO)
 import qualified PotatoCactus.Game.Player as P (Player, username)
+import PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer)
 import PotatoCactus.Game.Typing (Advance (advance))
 import PotatoCactus.Utils.Iterable (replace)
 
@@ -26,7 +27,7 @@ data World = World
   deriving (Show)
 
 instance Advance World where
-  advance w = World (tick w + 1) (map advance (players w)) (clients w)
+  advance w = World (tick w + 1) (map advancePlayer (players w)) (clients w)
 
 defaultWorldValue = World {tick = 0, players = [], clients = []}
 

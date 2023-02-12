@@ -1,7 +1,7 @@
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module PotatoCactus.Client.PlayerUpdate where
+module PotatoCactus.Network.Packets.Out.PlayerUpdate.PlayerUpdatePacket where
 
 import Data.Binary (Word16, Word8)
 import Data.Binary.BitPut (BitPut, putBit, putBits, putByteString, putNBits, runBitPut)
@@ -20,8 +20,8 @@ import PotatoCactus.Network.Binary (encodeToBase37, toByte, toShort_, toWord_)
 import PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodePlayerMovement (encodePlayerMovement)
 import PotatoCactus.Network.Packets.Packet (varShortPacket)
 
-playerUpdate :: Player -> World -> ByteString
-playerUpdate player world =
+playerUpdatePacket :: Player -> World -> ByteString
+playerUpdatePacket player world =
   varShortPacket
     81
     do

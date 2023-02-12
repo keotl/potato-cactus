@@ -1,4 +1,4 @@
-module PotatoCactus.Network.Packets.In.PlayerWalkPacket where
+module PotatoCactus.Network.Packets.In.PlayerWalkPacket (playerWalkMessage, playerMapWalk) where
 
 import Control.Monad (replicateM)
 import Data.Binary (Word8)

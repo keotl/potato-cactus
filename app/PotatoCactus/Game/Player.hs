@@ -1,26 +1,42 @@
 module PotatoCactus.Game.Player where
 
+import Data.Foldable (fold)
+import PotatoCactus.Game.Movement.MovementEntity (playerWalkMovement)
 import qualified PotatoCactus.Game.Movement.MovementEntity as M (MovementEntity, issueWalkCommand)
 import PotatoCactus.Game.Movement.PositionXY (PositionXY)
 import PotatoCactus.Game.Movement.WalkingStep (WalkingStep)
-import PotatoCactus.Game.Position (GetPosition (getPosition))
-import PotatoCactus.Game.Typing (Advance (advance))
+import PotatoCactus.Game.PlayerUpdate.ChatMessage (ChatMessage)
+import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate)
+import PotatoCactus.Game.PlayerUpdate.UpdateMask (PlayerUpdateMask, appearanceFlag)
+import qualified PotatoCactus.Game.PlayerUpdate.UpdateMask as Mask
+import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
 
 data Player = Player
   { username :: String,
-    movement :: M.MovementEntity
+    movement :: M.MovementEntity,
+    updateMask :: PlayerUpdateMask,
+    pendingUpdates :: [PlayerUpdate],
+    chatMessage :: Maybe ChatMessage
   }
   deriving (Show)
 
--- e = Player {username = "foo", movement = StaticMovement {position_ = }}
-
 instance GetPosition Player where
   getPosition = getPosition . movement
-
-instance Advance Player where
-  advance p = p {movement = advance (movement p)}
 
 issueWalkCommand :: (PositionXY, Bool, [WalkingStep]) -> Player -> Player
 issueWalkCommand (startPos, isRunning, steps) p =
   p {movement = M.issueWalkCommand (movement p) startPos steps}
 
+create :: String -> Position -> Player
+create username position =
+  Player
+    { username = username,
+      movement = playerWalkMovement position,
+      updateMask = fromIntegral appearanceFlag,
+      pendingUpdates = [],
+      chatMessage = Nothing
+    }
+
+queueUpdate :: Player -> PlayerUpdate -> Player
+queueUpdate p update =
+  p {pendingUpdates = update : pendingUpdates p}
