@@ -1,15 +1,16 @@
-module PotatoCactus.Network.Packets.In.ChatMessagePacket (playerChatMessage, nibbles, decodeChatText) where
+module PotatoCactus.Network.Packets.In.ChatMessagePacket (playerChatMessage, decodeChatText) where
 
 import Control.Monad (replicateM)
 import Data.Binary (Get, getWord8)
 import Data.Binary.Get (runGet, skip)
 import Data.Binary.Strict.BitGet (BitGet, getLeftByteString)
-import Data.Bits (Bits (shiftL, (.&.)), shiftR)
-import Data.ByteString (ByteString, drop, length, pack)
+import Data.Bits (Bits (shiftL, xor, (.&.)), shiftR)
+import Data.ByteString (ByteString, drop, length, pack, reverse)
 import Data.ByteString.Lazy (fromStrict)
 import Data.Word (Word8)
 import PotatoCactus.Boot.GameChannel
 import PotatoCactus.Game.PlayerUpdate.ChatMessage (ChatMessage (ChatMessage))
+import PotatoCactus.Network.Binary (nibbles)
 import PotatoCactus.Network.Packets.Reader (InboundPacket (payload))
 
 playerChatMessage :: String -> InboundPacket -> GameChannelMessage
@@ -21,7 +22,7 @@ playerChatMessage username packet =
    in PlayerChatMessage
         username
         ( ChatMessage
-            (decodeChatText $ nibbles (Data.ByteString.drop 2 (payload packet)))
+            (decodeChatText $ nibbles $ readBytes_ (Data.ByteString.reverse (Data.ByteString.drop 2 (payload packet))))
             (fromIntegral colour)
             (fromIntegral effect)
         )
@@ -39,22 +40,35 @@ readPayload_ = do
   colour <- getWord8
   return [effect, colour]
 
+readBytes_ :: ByteString -> [Word8]
+readBytes_ input =
+  runGet
+    ( replicateM
+        (Data.ByteString.length input)
+        ( do
+            a <- getWord8
+            return (a `xor` 128)
+        )
+    )
+    (fromStrict input)
+
 -- message <- replicateM messageLength getWord8
 -- let decoded = concatMap readChar_ message
 --  in return (ChatMessage decoded (fromIntegral (128 - colour)) (fromIntegral (128 - effect)))
 
-nibbles :: ByteString -> [Word8]
-nibbles input =
-  concat (runGet (getNibbles_ (Data.ByteString.length input)) (fromStrict input))
+-- nibbles :: [Word8] -> [Word8]
+-- nibbles input =
+--   concat (runGet (getNibbles_ (Data.ByteString.length input)) (fromStrict input))
 
-getNibbles_ :: Int -> Get [[Word8]]
-getNibbles_ size = do
-  replicateM
-    size
-    ( do
-        a <- getWord8
-        return [a `shiftR` 4, a .&. 0xF]
-    )
+-- getNibbles_ :: Int -> Get [[Word8]]
+-- getNibbles_ size = do
+--   replicateM
+--     size
+--     ( do
+--         a <- getWord8
+--         return [(a) `shiftR` 4, (a) .&. 0xF]
+--         -- return [(a `xor` 128) `shiftR` 4, (a `xor` 128) .&. 0xF]
+--     )
 
 -- size
 -- ( do

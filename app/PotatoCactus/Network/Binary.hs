@@ -99,3 +99,5 @@ encodeStrNonTerminated input =
 mapChar_ :: Char -> BitPut
 mapChar_ c = putNBits 8 $ toWord_ (ord c)
 
+nibbles :: [Word8] -> [Word8]
+nibbles = Prelude.foldr (\x -> (++) [x `shiftR` 4, x .&. 0xf]) []
