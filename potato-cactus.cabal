@@ -29,6 +29,7 @@ executable potato-cactus
                    PotatoCactus.Boot.GameChannel
                    PotatoCactus.Client.ClientUpdate
                    PotatoCactus.Client.PlayerInit
+                   PotatoCactus.Network.Encoding.ChatMessageEncoding
                    PotatoCactus.Network.SocketHandler
                    PotatoCactus.Network.InboundPacketMapper
                    PotatoCactus.Network.Packets.In.ButtonClickPacket

@@ -88,14 +88,6 @@ encodeStr input =
           putNBits 8 $ toWord_ 10
       )
 
-encodeStrNonTerminated :: String -> ByteString
-encodeStrNonTerminated input =
-  toStrict $
-    runBitPut
-      ( do
-          mapM_ mapChar_ input
-      )
-
 mapChar_ :: Char -> BitPut
 mapChar_ c = putNBits 8 $ toWord_ (ord c)
 

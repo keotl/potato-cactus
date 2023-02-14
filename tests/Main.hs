@@ -5,7 +5,7 @@ import BinaryTest (testByte, testByteNegate, testIntME, testMixedBitMode, testPa
 import GetMonadTests (getTests)
 import Test.HUnit
 import Game.InterpolatePathTests (interpolatePathTests)
-import DecodeChatTests (decodeChatTests, testNibbles)
+import DecodeChatTests (decodeChatTests, testNibbles, encodeChatTests)
 
 tests =
   TestList
@@ -22,6 +22,7 @@ tests =
       getTests,
       interpolatePathTests,
       decodeChatTests,
+      encodeChatTests,
       testNibbles
     ]
 
