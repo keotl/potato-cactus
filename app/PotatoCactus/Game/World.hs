@@ -4,10 +4,11 @@ import Control.Concurrent (Chan)
 import Data.IORef (newIORef)
 import Data.List (find)
 import GHC.IO (unsafePerformIO)
-import qualified PotatoCactus.Game.Player as P (Player, username)
+import qualified PotatoCactus.Game.Player as P (Player, username, create)
 import PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer)
 import PotatoCactus.Game.Typing (Advance (advance))
 import PotatoCactus.Utils.Iterable (replace)
+import PotatoCactus.Game.Position (Position(Position))
 
 data ClientHandleMessage = WorldUpdatedMessage | CloseClientConnectionMessage
 
@@ -29,7 +30,7 @@ data World = World
 instance Advance World where
   advance w = World (tick w + 1) (map advancePlayer (players w)) (clients w)
 
-defaultWorldValue = World {tick = 0, players = [], clients = []}
+defaultWorldValue = World {tick = 0, players = [mockPlayer_], clients = []}
 
 worldInstance = unsafePerformIO $ newIORef defaultWorldValue
 {-# NOINLINE worldInstance #-}
@@ -46,3 +47,6 @@ updatePlayer world playerName update =
               (players world)
         }
     Nothing -> world
+
+mockPlayer_ :: P.Player
+mockPlayer_ = P.create "the doctor" (Position 3093 3254 0)
