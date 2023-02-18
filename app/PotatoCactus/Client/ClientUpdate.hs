@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module PotatoCactus.Client.ClientUpdate where
+module PotatoCactus.Client.ClientUpdate (updateClient, defaultState, ClientLocalState_) where
 
 import Data.Binary.BitPut (runBitPut)
 import Data.ByteString (pack)
@@ -18,8 +18,14 @@ import PotatoCactus.Network.Packets.Out.PlayerUpdate.PlayerUpdatePacket (playerU
 import PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket (updateRunEnergyPacket)
 import Type.Reflection (typeOf)
 
-updateClient :: Socket -> W.ClientHandle -> W.ClientHandleMessage -> IO ()
-updateClient sock client W.WorldUpdatedMessage = do
+data ClientLocalState_ = ClientLocalState_
+  { localPlayers :: [Player]
+  }
+
+defaultState = ClientLocalState_ {localPlayers = []}
+
+updateClient :: Socket -> W.ClientHandle -> ClientLocalState_ -> W.ClientHandleMessage -> IO ClientLocalState_
+updateClient sock client localState W.WorldUpdatedMessage = do
   world <- readIORef W.worldInstance
 
   let player = find (\x -> username x == W.username client) (W.players world)
@@ -34,4 +40,7 @@ updateClient sock client W.WorldUpdatedMessage = do
       sendAll sock (updateRunEnergyPacket 66)
     -- TODO - NPC update - keotl 2023-02-08
     Nothing -> putStrLn $ "could not find player " ++ W.username client
-updateClient _ _ W.CloseClientConnectionMessage = return ()
+
+  return localState
+updateClient _ _ _ W.CloseClientConnectionMessage = return defaultState
+

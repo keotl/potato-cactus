@@ -28,6 +28,7 @@ executable potato-cactus
     other-modules: PotatoCactus.Boot.GameThreadMain
                    PotatoCactus.Boot.GameChannel
                    PotatoCactus.Client.ClientUpdate
+                   PotatoCactus.Client.LocalPlayerList
                    PotatoCactus.Client.PlayerInit
                    PotatoCactus.Network.Encoding.ChatMessageEncoding
                    PotatoCactus.Network.SocketHandler
@@ -82,6 +83,7 @@ executable potato-cactus
                    PotatoCactus.Game.Skills
                    PotatoCactus.Game.Typing
                    PotatoCactus.Game.World
+                   PotatoCactus.Game.World.MobList
                    PotatoCactus.Game.World.Selectors
                    PotatoCactus.Game.Reducer
                    PotatoCactus.Config.Constants

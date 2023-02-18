@@ -2,3 +2,9 @@ module PotatoCactus.Config.Constants where
 
 tickInterval :: Int
 tickInterval = 600 * 1000
+
+entityViewingDistance :: Int
+entityViewingDistance = 15
+
+maxPlayers :: Int
+maxPlayers = 2000

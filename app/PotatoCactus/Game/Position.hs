@@ -26,3 +26,10 @@ localY pos =
 
 class GetPosition t where
   getPosition :: t -> Position
+
+isWithin :: Int -> Position -> Position -> Bool
+isWithin distance a b =
+  z a == z b
+    && ( let (deltaX, deltaY) = (x a - x b, y a - y b)
+          in (abs deltaX <= distance) && (abs deltaY <= distance)
+       )

@@ -4,11 +4,13 @@ import Control.Concurrent (Chan)
 import Data.IORef (newIORef)
 import Data.List (find)
 import GHC.IO (unsafePerformIO)
-import qualified PotatoCactus.Game.Player as P (Player, username, create)
+import PotatoCactus.Config.Constants (maxPlayers)
+import qualified PotatoCactus.Game.Player as P (Player, create, username)
 import PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer)
+import PotatoCactus.Game.Position (Position (Position))
 import PotatoCactus.Game.Typing (Advance (advance))
+import PotatoCactus.Game.World.MobList (MobList, add, create, updateAll, updateByPredicate)
 import PotatoCactus.Utils.Iterable (replace)
-import PotatoCactus.Game.Position (Position(Position))
 
 data ClientHandleMessage = WorldUpdatedMessage | CloseClientConnectionMessage
 
@@ -22,31 +24,40 @@ instance Show ClientHandle where
 
 data World = World
   { tick :: Int,
-    players :: [P.Player],
+    players :: MobList P.Player,
     clients :: [ClientHandle]
   }
   deriving (Show)
 
 instance Advance World where
-  advance w = World (tick w + 1) (map advancePlayer (players w)) (clients w)
+  advance w =
+    w
+      { tick = tick w + 1,
+        players = updateAll (players w) advancePlayer
+      }
 
-defaultWorldValue = World {tick = 0, players = [mockPlayer_], clients = []}
+defaultWorldValue =
+  World
+    { tick = 0,
+      players =
+        case add (create maxPlayers) mockPlayer_ of -- TODO - replace with simply (create maxPlayers)  - keotl 2023-02-18
+          Left (a, _) -> a
+          Right _ -> create maxPlayers,
+      clients = []
+    }
 
 worldInstance = unsafePerformIO $ newIORef defaultWorldValue
 {-# NOINLINE worldInstance #-}
 
 updatePlayer :: World -> String -> (P.Player -> P.Player) -> World
 updatePlayer world playerName update =
-  case find (\x -> P.username x == playerName) (players world) of
-    Just player ->
-      world
-        { players =
-            replace
-              (\x -> P.username x == playerName)
-              (update player)
-              (players world)
-        }
-    Nothing -> world
+  world
+    { players =
+        updateByPredicate
+          (players world)
+          (\x -> P.username x == playerName)
+          update
+    }
 
 mockPlayer_ :: P.Player
 mockPlayer_ = P.create "the doctor" (Position 3093 3254 0)

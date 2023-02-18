@@ -6,6 +6,8 @@ import GetMonadTests (getTests)
 import Test.HUnit
 import Game.InterpolatePathTests (interpolatePathTests)
 import DecodeChatTests (decodeChatTests, testNibbles, encodeChatTests)
+import IterableTests (testReplaceAt)
+import MobListTests (testMobList)
 
 tests =
   TestList
@@ -23,7 +25,9 @@ tests =
       interpolatePathTests,
       decodeChatTests,
       encodeChatTests,
-      testNibbles
+      testNibbles,
+      testReplaceAt,
+      testMobList
     ]
 
 main :: IO ()

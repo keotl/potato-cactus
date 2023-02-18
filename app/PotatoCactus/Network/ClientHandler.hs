@@ -10,7 +10,7 @@ import Data.IORef (readIORef)
 import Network.Socket (Socket)
 import Network.Socket.ByteString (recv, sendAll)
 import PotatoCactus.Boot.GameChannel (GameChannelMessage (UnregisterClientMessage), gameChannel)
-import PotatoCactus.Client.ClientUpdate (updateClient)
+import PotatoCactus.Client.ClientUpdate (ClientLocalState_, defaultState, updateClient)
 import PotatoCactus.Client.PlayerInit (playerInit)
 import PotatoCactus.Game.Player (Player)
 import PotatoCactus.Game.World (ClientHandle (controlChannel, username), ClientHandleMessage (CloseClientConnectionMessage), worldInstance)
@@ -32,25 +32,25 @@ clientHandlerMain handle player sock = do
       ( \x -> writeChan gameChannel $ UnregisterClientMessage (username handle)
       )
   sendAll sock $ toStrict $ runBitPut $ playerInit handle player
-  clientHandlerMainLoop_ handle sock internalQueue
+  clientHandlerMainLoop_ handle defaultState sock internalQueue
 
-clientHandlerMainLoop_ :: ClientHandle -> Socket -> Chan InternalQueueMessage_ -> IO ()
-clientHandlerMainLoop_ client sock chan = do
+clientHandlerMainLoop_ :: ClientHandle -> ClientLocalState_ -> Socket -> Chan InternalQueueMessage_ -> IO ()
+clientHandlerMainLoop_ client clientState sock chan = do
   message <- readChan chan
   case message of
     Left clientHandleMessage -> do
-      updateClient sock client clientHandleMessage
+      updatedState <- updateClient sock client clientState clientHandleMessage
       case clientHandleMessage of
         CloseClientConnectionMessage -> return ()
-        _ -> clientHandlerMainLoop_ client sock chan
+        _ -> clientHandlerMainLoop_ client updatedState sock chan
     Right clientPacket -> do
       case mapPacket (username client) clientPacket of
         Just downstreamMessage -> do
           writeChan gameChannel downstreamMessage
           if opcode clientPacket == socketClosedOpcode
             then return ()
-            else clientHandlerMainLoop_ client sock chan
-        _ -> clientHandlerMainLoop_ client sock chan
+            else clientHandlerMainLoop_ client clientState sock chan
+        _ -> clientHandlerMainLoop_ client clientState sock chan
 
 controlChannelPoller_ :: Chan ClientHandleMessage -> Chan InternalQueueMessage_ -> IO ()
 controlChannelPoller_ input output = do
