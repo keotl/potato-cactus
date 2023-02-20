@@ -23,7 +23,7 @@ import PotatoCactus.Game.World as W
 import PotatoCactus.Network.Binary (encodeToBase37, toByte, toShortLE_, toShort_, toWord_)
 import PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeBlock (addBlockIfRequired)
 import PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeChatUpdate (encodeChatUpdateBlock)
-import PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodePlayerMovement (encodePlayerMovement)
+import PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodePlayerMovement (MovementUpdateType (UpdateOther, UpdateSelf), encodePlayerMovement)
 import PotatoCactus.Network.Packets.Packet (varShortPacket)
 
 playerUpdatePacket :: Player -> LocalPlayerList -> World -> ByteString
@@ -48,7 +48,7 @@ beforeBlockMsg_ player localPlayers world hasUpdateBlocks =
   toStrict $
     runBitPut
       ( do
-          encodePlayerMovement player
+          encodePlayerMovement player UpdateSelf
           putNBits 8 $ toWord_ (clientKnownPlayers_ localPlayers) -- localplayers list length
           otherExistingPlayerMovement_ localPlayers
           addOtherNewPlayers_ player localPlayers
@@ -74,7 +74,7 @@ mapOtherPlayerMovementUpdate_ (LocalPlayer _ Added) = putNBits 0 $ toWord_ 0
 mapOtherPlayerMovementUpdate_ (LocalPlayer _ Removed) = do
   putBit True
   putNBits 2 $ toWord_ 3
-mapOtherPlayerMovementUpdate_ (LocalPlayer p Retained) = encodePlayerMovement p
+mapOtherPlayerMovementUpdate_ (LocalPlayer p Retained) = encodePlayerMovement p UpdateOther
 
 addOtherNewPlayers_ :: Player -> LocalPlayerList -> BitPut
 addOtherNewPlayers_ refPlayer = mapM_ (mapAddOtherNewPlayer_ refPlayer)

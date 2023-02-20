@@ -37,13 +37,11 @@ instance Advance World where
       }
 
 defaultWorldValue =
-  addPlayer
-    World
-      { tick = 0,
-        players = create maxPlayers,
-        clients = []
-      }
-    mockPlayer_
+  World
+    { tick = 0,
+      players = create maxPlayers,
+      clients = []
+    }
 
 worldInstance = unsafePerformIO $ newIORef defaultWorldValue
 {-# NOINLINE worldInstance #-}

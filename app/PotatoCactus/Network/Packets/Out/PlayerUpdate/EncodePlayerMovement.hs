@@ -8,12 +8,14 @@ import PotatoCactus.Game.Player (Player (movement))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (z), localX, localY)
 import PotatoCactus.Network.Binary (toWord_)
 
-encodePlayerMovement :: Player -> BitPut
-encodePlayerMovement player =
-  encode_ (movement player) True
+data MovementUpdateType = UpdateSelf | UpdateOther
 
-encode_ :: MovementEntity -> Bool -> BitPut
-encode_ (StaticMovement_ m) needsUpdate =
+encodePlayerMovement :: Player -> MovementUpdateType -> BitPut
+encodePlayerMovement player updateType =
+  encode_ (movement player) updateType True
+
+encode_ :: MovementEntity -> MovementUpdateType -> Bool -> BitPut
+encode_ (StaticMovement_ m) _ needsUpdate =
   do
     putBit True -- isTeleporting
     putNBits 2 (toWord_ 3)
@@ -22,16 +24,23 @@ encode_ (StaticMovement_ m) needsUpdate =
     putBit True -- needs update
     putNBits 7 $ toWord_ 53 * 8 -- local Y
     putNBits 7 $ toWord_ 52 * 8 -- local X
-encode_ (PlayerWalkMovement_ m) needsUpdate =
+encode_ (PlayerWalkMovement_ m) updateType needsUpdate =
   if isTeleporting m
     then do
-      putBit True -- isTeleporting
-      putNBits 2 $ toWord_ 3
-      putNBits 2 $ toWord_ (z (getPosition m)) -- position.z
-      putBit $ not (shouldUpdateRegion m)
-      putBit True -- needs update
-      putNBits 7 $ toWord_ (localY (getPosition m)) -- local Y
-      putNBits 7 $ toWord_ (localX (getPosition m)) -- local X
+      case updateType of
+        UpdateSelf -> do
+          putBit True -- isTeleporting
+          putNBits 2 $ toWord_ 3
+          putNBits 2 $ toWord_ (z (getPosition m)) -- position.z
+          putBit $ not (shouldUpdateRegion m)
+          putBit True -- needs update
+          putNBits 7 $ toWord_ (localY (getPosition m)) -- local Y
+          putNBits 7 $ toWord_ (localX (getPosition m)) -- local X
+        UpdateOther -> do
+          putBit False
+          -- if needsUpdate
+          --   then putNBits 2 $ toWord_ 3
+          --   else putNBits 0 $ toWord_ 0
     else do
       case (walkingDirection m, runningDirection m) of
         (Direction.None, _) -> do
