@@ -15,7 +15,6 @@ data PlayerWalkMovement = PlayerWalkMovement
     runEnergy :: Int,
     walkingDirection :: Direction,
     runningDirection :: Direction,
-    skipUpdate_ :: Bool, -- to make sure that a new player does not immediately transitions to isTeleporting = False
     shouldUpdateRegion :: Bool,
     lastRegionUpdate_ :: Position
   }
@@ -27,10 +26,9 @@ instance GetPosition PlayerWalkMovement where
 -- Running does two steps
 instance Advance PlayerWalkMovement where
   advance m =
-    case (skipUpdate_ m, queue_ m, isRunning m) of
-      (True, _, _) -> m {skipUpdate_ = False}
-      (_, [], _) -> m {walkingDirection = None, runningDirection = None, isTeleporting = False, shouldUpdateRegion = False}
-      (_, x : xs, False) ->
+    case (queue_ m, isRunning m) of
+      ([], _) -> m {walkingDirection = None, runningDirection = None, isTeleporting = False, shouldUpdateRegion = False}
+      (x : xs, False) ->
         m
           { position_ = x,
             queue_ = xs,
@@ -40,7 +38,7 @@ instance Advance PlayerWalkMovement where
             shouldUpdateRegion = shouldUpdateRegion_ (lastRegionUpdate_ m) x,
             lastRegionUpdate_ = if shouldUpdateRegion_ (lastRegionUpdate_ m) x then x else lastRegionUpdate_ m
           }
-      (_, x : xs, True) ->
+      (x : xs, True) ->
         m
           { position_ = case xs of
               [] -> x
@@ -73,7 +71,6 @@ create pos =
       shouldUpdateRegion = True,
       walkingDirection = None,
       runningDirection = None,
-      skipUpdate_ = True,
       lastRegionUpdate_ = pos
     }
 

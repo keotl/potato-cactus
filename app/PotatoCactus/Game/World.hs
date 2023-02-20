@@ -5,11 +5,11 @@ import Data.IORef (newIORef)
 import Data.List (find)
 import GHC.IO (unsafePerformIO)
 import PotatoCactus.Config.Constants (maxPlayers)
-import qualified PotatoCactus.Game.Player as P (Player, create, username)
+import qualified PotatoCactus.Game.Player as P (Player (serverIndex), create, username)
 import PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer)
 import PotatoCactus.Game.Position (Position (Position))
 import PotatoCactus.Game.Typing (Advance (advance))
-import PotatoCactus.Game.World.MobList (MobList, add, create, updateAll, updateByPredicate)
+import PotatoCactus.Game.World.MobList (MobList, add, create, findByPredicate, remove, updateAll, updateAtIndex, updateByPredicate)
 import PotatoCactus.Utils.Iterable (replace)
 
 data ClientHandleMessage = WorldUpdatedMessage | CloseClientConnectionMessage
@@ -37,14 +37,13 @@ instance Advance World where
       }
 
 defaultWorldValue =
-  World
-    { tick = 0,
-      players =
-        case add (create maxPlayers) mockPlayer_ of -- TODO - replace with simply (create maxPlayers)  - keotl 2023-02-18
-          Left (a, _) -> a
-          Right _ -> create maxPlayers,
-      clients = []
-    }
+  addPlayer
+    World
+      { tick = 0,
+        players = create maxPlayers,
+        clients = []
+      }
+    mockPlayer_
 
 worldInstance = unsafePerformIO $ newIORef defaultWorldValue
 {-# NOINLINE worldInstance #-}
@@ -60,4 +59,17 @@ updatePlayer world playerName update =
     }
 
 mockPlayer_ :: P.Player
-mockPlayer_ = P.create "the doctor" (Position 3093 3254 0)
+mockPlayer_ = P.create "the doctor" (Position 3093 3244 0)
+
+addPlayer :: World -> P.Player -> World
+addPlayer world player =
+  case add (players world) player of
+    Left (newPlayers, index) ->
+      world {players = updateAtIndex newPlayers index (\p -> p {P.serverIndex = index})}
+    Right _ -> world
+
+removePlayerByUsername :: World -> String -> World
+removePlayerByUsername world username =
+  case findByPredicate (players world) (\p -> P.username p == username) of
+    Just p -> world {players = remove (players world) (P.serverIndex p)}
+    Nothing -> world

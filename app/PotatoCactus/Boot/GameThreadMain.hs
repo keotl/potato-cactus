@@ -25,7 +25,7 @@ mainLoop = do
   world <- readIORef worldInstance
   newWorld <- reduceUntilNextTick_ world gameChannel
 
-  -- print newWorld
+  print newWorld
 
   writeIORef worldInstance newWorld
   notifyClients_ WorldUpdatedMessage (clients newWorld)

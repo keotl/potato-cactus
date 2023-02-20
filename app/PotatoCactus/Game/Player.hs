@@ -12,11 +12,13 @@ import qualified PotatoCactus.Game.PlayerUpdate.UpdateMask as Mask
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
 
 data Player = Player
-  { username :: String,
+  { serverIndex :: Int,
+    username :: String,
     movement :: M.MovementEntity,
     updateMask :: PlayerUpdateMask,
     pendingUpdates :: [PlayerUpdate],
-    chatMessage :: Maybe ChatMessage
+    chatMessage :: Maybe ChatMessage,
+    skipUpdate_ :: Bool
   }
   deriving (Show)
 
@@ -30,11 +32,13 @@ issueWalkCommand (startPos, isRunning, steps) p =
 create :: String -> Position -> Player
 create username position =
   Player
-    { username = username,
+    { serverIndex = -1,
+      username = username,
       movement = playerWalkMovement position,
-      updateMask = fromIntegral appearanceFlag,
+      updateMask = appearanceFlag,
       pendingUpdates = [],
-      chatMessage = Nothing
+      chatMessage = Nothing,
+      skipUpdate_ = True
     }
 
 queueUpdate :: Player -> PlayerUpdate -> Player

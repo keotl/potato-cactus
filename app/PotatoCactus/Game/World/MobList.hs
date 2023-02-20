@@ -1,7 +1,9 @@
-module PotatoCactus.Game.World.MobList (MobList (mobs), create, add, remove, updateAll, updateAtIndex, findByIndex, findIndexByPredicate, findByPredicate, updateByPredicate) where
+{-# LANGUAGE LambdaCase #-}
+
+module PotatoCactus.Game.World.MobList (MobList (mobs), create, add, remove, updateAll, updateAtIndex, findByIndex, findIndexByPredicate, findByPredicate, updateByPredicate, findAllByPredicate) where
 
 import Data.List (find, findIndex)
-import Data.Maybe (fromMaybe, isJust, isNothing)
+import Data.Maybe (fromMaybe, isJust, isNothing, mapMaybe)
 import PotatoCactus.Utils.Iterable (replaceAtIndex)
 
 data MobList a = MobList
@@ -42,6 +44,15 @@ findIndexByPredicate list predicate =
 findByPredicate :: MobList a -> (a -> Bool) -> Maybe a
 findByPredicate list predicate =
   fromMaybe Nothing (find (maybe False predicate) (mobs list))
+
+findAllByPredicate :: MobList a -> (a -> Bool) -> [a]
+findAllByPredicate list predicate =
+  mapMaybe
+    ( \case
+        Nothing -> Nothing
+        Just m -> if predicate m then Just m else Nothing
+    )
+    (mobs list)
 
 data AddError = Full
 

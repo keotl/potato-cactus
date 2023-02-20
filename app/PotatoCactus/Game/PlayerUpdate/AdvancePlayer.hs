@@ -6,14 +6,18 @@ import PotatoCactus.Game.Typing (Advance (advance))
 
 advancePlayer :: Player -> Player
 advancePlayer p =
-  ( foldl
-      processPlayerUpdate
-      (clearTransientProperties_ p)
-      (pendingUpdates p)
-  )
-    { movement = advance (movement p),
-      pendingUpdates = []
-    }
+  if skipUpdate_ p
+    then p {skipUpdate_ = False}
+    else
+      ( ( foldl
+            processPlayerUpdate
+            (clearTransientProperties_ p)
+            (pendingUpdates p)
+        )
+          { movement = advance (movement p),
+            pendingUpdates = []
+          }
+      )
 
 clearTransientProperties_ :: Player -> Player
 clearTransientProperties_ p =

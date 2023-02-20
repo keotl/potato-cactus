@@ -9,38 +9,57 @@ import Data.List
 import GHC.IORef (readIORef)
 import Network.Socket
 import Network.Socket.ByteString (recv, send, sendAll)
+import PotatoCactus.Client.LocalPlayerList (LocalPlayerList, updateLocalPlayers)
 import PotatoCactus.Game.Movement.MovementEntity (hasChangedRegion)
-import PotatoCactus.Game.Player (Player (Player, movement, username))
+import PotatoCactus.Game.Player (Player (Player, movement, serverIndex, username))
 import PotatoCactus.Game.Position (GetPosition (getPosition))
 import qualified PotatoCactus.Game.World as W (ClientHandle, ClientHandleMessage (CloseClientConnectionMessage, WorldUpdatedMessage), World (players, tick), username, worldInstance)
+import PotatoCactus.Game.World.MobList (findByIndex, findByPredicate)
+import qualified PotatoCactus.Game.World.Selectors as WS
 import PotatoCactus.Network.Packets.Out.LoadMapRegionPacket (loadMapRegionPacket)
 import PotatoCactus.Network.Packets.Out.PlayerUpdate.PlayerUpdatePacket (playerUpdatePacket)
 import PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket (updateRunEnergyPacket)
 import Type.Reflection (typeOf)
 
 data ClientLocalState_ = ClientLocalState_
-  { localPlayers :: [Player]
+  { localPlayers :: LocalPlayerList,
+    localPlayerIndex :: Int
   }
 
-defaultState = ClientLocalState_ {localPlayers = []}
+defaultState = ClientLocalState_ {localPlayers = [], localPlayerIndex = -1}
 
 updateClient :: Socket -> W.ClientHandle -> ClientLocalState_ -> W.ClientHandleMessage -> IO ClientLocalState_
 updateClient sock client localState W.WorldUpdatedMessage = do
   world <- readIORef W.worldInstance
-
-  let player = find (\x -> username x == W.username client) (W.players world)
-  case player of
+  case findPlayer_ world (localPlayerIndex localState) (W.username client) of
     Just p -> do
       if hasChangedRegion (movement p)
         then do
           sendAll sock (loadMapRegionPacket (getPosition p))
         else pure ()
 
-      sendAll sock (playerUpdatePacket p world)
-      sendAll sock (updateRunEnergyPacket 66)
-    -- TODO - NPC update - keotl 2023-02-08
-    Nothing -> putStrLn $ "could not find player " ++ W.username client
+      let newLocalPlayers =
+            updateLocalPlayers
+              (localPlayers localState)
+              (WS.localPlayers world p)
+       in do
+            print newLocalPlayers
+            sendAll sock (playerUpdatePacket p newLocalPlayers world)
+            sendAll sock (updateRunEnergyPacket 66)
 
-  return localState
+            return
+              ClientLocalState_
+                { localPlayers = newLocalPlayers,
+                  localPlayerIndex = serverIndex p
+                }
+    -- TODO - NPC update - keotl 2023-02-08
+    Nothing -> do
+      putStrLn $ "could not find player " ++ W.username client
+      return localState
 updateClient _ _ _ W.CloseClientConnectionMessage = return defaultState
 
+findPlayer_ :: W.World -> Int -> String -> Maybe Player
+findPlayer_ world index playerName =
+  if index /= -1
+    then findByIndex (W.players world) index
+    else findByPredicate (W.players world) (\p -> username p == playerName)
