@@ -44,7 +44,7 @@ updateClient sock client localState W.WorldUpdatedMessage = do
               (WS.localPlayers world p)
        in do
             sendAll sock (playerUpdatePacket p newLocalPlayers world)
-            sendAll sock (updateRunEnergyPacket 66)
+            sendAll sock (updateRunEnergyPacket 100)
 
             return
               ClientLocalState_

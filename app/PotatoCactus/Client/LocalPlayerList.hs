@@ -17,8 +17,8 @@ updateLocalPlayers :: LocalPlayerList -> [Player] -> LocalPlayerList
 updateLocalPlayers localPlayers worldPlayers =
   -- Cleanup leftovers and mark Added as retained (removed in previous message)
   let cleaned = mapMaybe advanceLocalPlayer_ localPlayers
-   in -- process removed for this message
-      let withRemoved = map (processRemoval_ worldPlayers) cleaned
+   in -- process removed for this message and refresh references for current tick
+      let withRemoved = map (processRemovalAndRefresh_ worldPlayers) cleaned
        in -- process added, up to 15 new players per message
           let withAdded = processAddition_ withRemoved worldPlayers
            in withAdded
@@ -31,8 +31,8 @@ advanceLocalPlayer_ (LocalPlayer _ Removed) =
 advanceLocalPlayer_ (LocalPlayer p Retained) =
   Just (LocalPlayer p Retained)
 
-processRemoval_ :: [Player] -> LocalPlayer -> LocalPlayer
-processRemoval_ worldPlayers local =
+processRemovalAndRefresh_ :: [Player] -> LocalPlayer -> LocalPlayer
+processRemovalAndRefresh_ worldPlayers local =
   let (LocalPlayer p status) = local in
     case newReference_  local worldPlayers of
       Nothing -> LocalPlayer p Removed

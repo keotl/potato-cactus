@@ -18,7 +18,7 @@ defenceSkill = SkillDefinition {id = 1, name = "Defence"}
 
 strengthSkill = SkillDefinition {id = 2, name = "Strength"}
 
-constitutionSkill = SkillDefinition {id = 3, name = "Constitution"}
+hitpointsSkill = SkillDefinition {id = 3, name = "Hitpoints"}
 
 rangedSkill = SkillDefinition {id = 4, name = "Ranged"}
 
@@ -58,7 +58,7 @@ allSkills =
   [ attackSkill,
     defenceSkill,
     strengthSkill,
-    constitutionSkill,
+    hitpointsSkill,
     rangedSkill,
     prayerSkill,
     magicSkill,

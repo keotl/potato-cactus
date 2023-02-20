@@ -50,6 +50,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Out.UpdateSkillPacket
                    PotatoCactus.Network.Packets.Out.PlayerInteractionPacket
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeBlock
+                   PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeAppearanceBlock
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeChatUpdate
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodePlayerMovement
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.PlayerUpdatePacket
