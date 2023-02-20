@@ -9,14 +9,18 @@ import PotatoCactus.Config.Constants (tickInterval)
 import PotatoCactus.Game.Reducer (reduceWorld)
 import PotatoCactus.Game.World (ClientHandle (controlChannel, username), ClientHandleMessage (CloseClientConnectionMessage, WorldUpdatedMessage), World (clients), defaultWorldValue, worldInstance)
 import qualified PotatoCactus.Game.World as W
+import PotatoCactus.Utils.Logging (LogLevel (Debug, Info, Warning), logger)
 
 gameThreadMain :: IO ()
 gameThreadMain = do
-  putStrLn "Started game thread."
+  logger_ Info "Started game thread."
 
-  worldTickThreadId <- forkFinally (worldTickThread_ tickInterval gameChannel) (\x -> print "worldTick thread exited")
+  worldTickThreadId <-
+    forkFinally
+      (worldTickThread_ tickInterval gameChannel)
+      (\x -> logger_ Warning "WorldTick thread exited.")
+
   mainLoop
-
   return ()
 
 mainLoop :: IO ()
@@ -25,7 +29,7 @@ mainLoop = do
   world <- readIORef worldInstance
   newWorld <- reduceUntilNextTick_ world gameChannel
 
-  print newWorld
+  logger_ Debug $ show newWorld
 
   writeIORef worldInstance newWorld
   notifyClients_ WorldUpdatedMessage (clients newWorld)
@@ -61,3 +65,5 @@ notifyClients_ message clients = do
   let c = head clients
   writeChan (controlChannel c) message
   notifyClients_ message (tail clients)
+
+logger_ = logger "GameThread"

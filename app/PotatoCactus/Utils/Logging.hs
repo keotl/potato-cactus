@@ -9,7 +9,7 @@ import GHC.IORef (readIORef)
 
 data LogLevel = Debug | Info | Warning | Error | Fatal
 
-logger :: LogLevel -> String -> String -> IO ()
+logger :: String -> LogLevel -> String -> IO ()
 
 data LoggerConfigRule = LoggerConfigRule
   { prefix :: String,
@@ -24,12 +24,12 @@ data LoggerConfig = LoggerConfig
 stdoutLogger :: String -> String -> IO ()
 stdoutLogger prefix text = do
   timestamp <- getZonedTime
-  putStrLn $ show timestamp ++ "[" ++ prefix ++ "]" ++ text
+  putStrLn $ formatTime defaultTimeLocale "%F %T" timestamp ++ " [" ++ prefix ++ "] " ++ text
 
 loggerConfig_ = unsafePerformIO $ newIORef $ LoggerConfig [LoggerConfigRule "" Info] stdoutLogger
 {-# NOINLINE loggerConfig_ #-}
 
-logger l prefix text = do
+logger prefix l text = do
   config <- readIORef loggerConfig_
   let rule = findMostSpecificRule_ (rules config) prefix
   when (shouldLog_ (level rule) l) (consumer config prefix text)

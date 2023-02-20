@@ -21,8 +21,6 @@ import PotatoCactus.Network.ClientHandler (clientHandlerMain)
 socketMain :: Socket -> IO ()
 socketMain sock = do
   msg <- recv sock 1
-  print "read from socket"
-
   case runGet getWord8 msg of
     (Right val, _) -> dispatch val sock
     (Left val, _) -> return ()
@@ -43,9 +41,6 @@ dispatch 14 =
         writeChan gameChannel $ RegisterClientMessage (RegisterClientPayload {clientHandle = client, player = p})
         clientHandlerMain client p sock
 
--- return ()
-
--- dispatch 48 = handleLogin -- '0' for easier testing
 dispatch op = \x -> do
   putStrLn $ "Unknown opcode: " ++ show op
   print x

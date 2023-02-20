@@ -18,14 +18,20 @@ import PotatoCactus.Network.InboundPacketMapper (mapPacket)
 import PotatoCactus.Network.Packets.Opcodes
 import PotatoCactus.Network.Packets.Out.InitializePlayerPacket (initializePlayerPacket)
 import PotatoCactus.Network.Packets.Reader (InboundPacket (opcode), readPacket)
+import PotatoCactus.Utils.Logging (LogLevel (Debug, Info), logger)
 
 type InternalQueueMessage_ = Either ClientHandleMessage InboundPacket
 
 clientHandlerMain :: ClientHandle -> Player -> Socket -> IO ()
 clientHandlerMain handle player sock = do
-  putStrLn "started client handler main"
+  logger_ Debug $ "Started client handler for " ++ username handle ++ "."
   internalQueue <- newChan
-  controlChannelPollerThreadId <- forkFinally (controlChannelPoller_ (controlChannel handle) internalQueue) (\x -> print "control Channel poller exited")
+  controlChannelPollerThreadId <-
+    forkFinally
+      (controlChannelPoller_ (controlChannel handle) internalQueue)
+      ( \x ->
+          logger_ Debug "control Channel poller exited."
+      )
   socketPollerThreadId <-
     forkFinally
       (socketPoller_ sock internalQueue)
@@ -41,14 +47,14 @@ clientHandlerMainLoop_ client clientState sock chan = do
     Left clientHandleMessage -> do
       updatedState <- updateClient sock client clientState clientHandleMessage
       case clientHandleMessage of
-        CloseClientConnectionMessage -> return ()
+        CloseClientConnectionMessage -> logger_ Info $ username client ++ " disconnected."
         _ -> clientHandlerMainLoop_ client updatedState sock chan
     Right clientPacket -> do
       case mapPacket (username client) clientPacket of
         Just downstreamMessage -> do
           writeChan gameChannel downstreamMessage
           if opcode clientPacket == socketClosedOpcode
-            then return ()
+            then logger_ Info $ username client ++ " disconnected."
             else clientHandlerMainLoop_ client clientState sock chan
         _ -> clientHandlerMainLoop_ client clientState sock chan
 
@@ -63,3 +69,5 @@ socketPoller_ sock output = do
   packet <- readPacket sock
   writeChan output $ Right packet
   socketPoller_ sock output
+
+logger_ = logger "ClientHandler"

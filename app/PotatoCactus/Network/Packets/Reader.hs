@@ -9,6 +9,7 @@ import Network.Socket.ByteString (recv)
 import PotatoCactus.Network.Binary (toByte, toShort)
 import PotatoCactus.Network.Packets.Opcodes (socketClosedOpcode)
 import PotatoCactus.Network.Packets.PacketLengths (clientPacketSizes)
+import PotatoCactus.Utils.Logging (LogLevel (Debug), logger)
 
 data InboundPacket = InboundPacket
   { opcode :: Int,
@@ -22,8 +23,7 @@ readPacket sock = do
     then return (InboundPacket socketClosedOpcode empty)
     else do
       let decodedOpcode = fromIntegral (toByte opcode)
-      -- putStr "got opcode "
-      -- print decodedOpcode
+      logger_ Debug $ "Received packet " ++ show decodedOpcode
       let predefinedSize = clientPacketSizes !! decodedOpcode
       payload <- readDynamicPayload_ sock predefinedSize
       return $ InboundPacket decodedOpcode payload
@@ -40,3 +40,5 @@ readDynamicPayload_ sock predefinedSize = do
       recv sock $ fromIntegral $ toShort size
     fixed -> do
       recv sock $ fromIntegral fixed
+
+logger_ = logger "Reader"

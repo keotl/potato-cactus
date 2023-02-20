@@ -12,15 +12,6 @@ data MobList a = MobList
     capacity_ :: Int
   }
 
--- data MobList a where
---   MobList ::
---     (Show a) =>
---     { mobs :: [Maybe a],
---       availableIndices :: [Int],
---       capacity_ :: Int
---     } ->
---     MobList a
-
 instance Show a => Show (MobList a) where
   show m = show $ filter isJust (mobs m)
 
