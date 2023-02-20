@@ -22,8 +22,8 @@ testMobList =
         ( assertEqual
             "updateAtIndex"
             (42 + 1000)
-            ( let updated = updateAtIndex mobList 0 (+ 1000)
-               in case findByIndex updated 0 of
+            ( let updated = updateAtIndex mobList 1 (+ 1000)
+               in case findByIndex updated 1 of
                     Nothing -> -1
                     Just x -> x
             )
@@ -32,7 +32,7 @@ testMobList =
         ( assertEqual
             "remove"
             Nothing
-            ( findByIndex (remove mobList 0) 0
+            ( findByIndex (remove mobList 1) 1
             )
         )
     ]

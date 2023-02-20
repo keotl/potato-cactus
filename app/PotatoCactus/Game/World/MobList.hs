@@ -27,8 +27,8 @@ instance Show a => Show (MobList a) where
 create :: (Show a) => Int -> MobList a
 create capacity =
   MobList
-    { mobs = replicate capacity Nothing,
-      availableIndices = [0 .. (capacity - 1)],
+    { mobs = replicate (capacity + 1) Nothing,
+      availableIndices = [1 .. capacity],
       capacity_ = capacity
     }
 
