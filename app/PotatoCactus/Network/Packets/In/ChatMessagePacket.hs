@@ -35,7 +35,7 @@ readPayload_ :: Get [Word8]
 readPayload_ = do
   effect <- getWord8
   colour <- getWord8
-  return [effect, colour]
+  return [128 - effect, 128 - colour]
 
 readBytes_ :: ByteString -> [Word8]
 readBytes_ input =

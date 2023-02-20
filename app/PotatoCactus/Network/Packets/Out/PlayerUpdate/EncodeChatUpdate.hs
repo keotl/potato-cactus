@@ -12,18 +12,14 @@ import PotatoCactus.Network.Binary (toShortLE_, toWord_)
 import PotatoCactus.Network.Encoding.ChatMessageEncoding (encodeChatText)
 import PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeBlock (addBlockIfRequired)
 
--- encodeChatUpdateBlock :: Player -> World -> ByteString
--- encodeChatUpdateBlock = addBlockIfRequired chatFlag encode_
-
 encodeChatUpdateBlock :: Player -> World -> ByteString
 encodeChatUpdateBlock p w =
   toStrict $
     runBitPut
       ( case chatMessage p of
           Just m -> do
-            -- putNBits 8 $ toWord_ (effect m)
-            -- putNBits 8 $ toWord_ (color m)
-            putNBits 16 $ toShortLE_ (color m `shiftR` 8) + (fromIntegral (effect m) .&. 0xff)
+            putNBits 8 $ toWord_ (effect m)
+            putNBits 8 $ toWord_ (color m)
             putNBits 8 $ toWord_ 0 -- player rights
             let messageBytes = messageBytes_ (encodeChatText (message m))
              in do
@@ -33,9 +29,5 @@ encodeChatUpdateBlock p w =
       )
 
 messageBytes_ :: ByteString -> ByteString
-messageBytes_ x =
-  Data.ByteString.reverse $
-    Data.ByteString.pack $
-      map
-        (`xor` 128)
-        (Data.ByteString.unpack x)
+messageBytes_ =
+  Data.ByteString.reverse

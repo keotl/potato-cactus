@@ -5,9 +5,10 @@ data ChatMessage = ChatMessage
     color :: ChatMessageColor,
     effect :: ChatMessageEffect
   }
+  deriving (Show)
 
-instance Show ChatMessage where
-  show m = message m
+-- instance Show ChatMessage where
+--   show m = message m
 
 type ChatMessageColor = Int
 
