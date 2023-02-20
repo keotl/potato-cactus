@@ -4,7 +4,7 @@ import Data.Binary.BitPut (BitPut, putBit, putNBits)
 import qualified PotatoCactus.Game.Movement.Direction as Direction
 import PotatoCactus.Game.Movement.MovementEntity (MovementEntity (PlayerWalkMovement_, StaticMovement_))
 import PotatoCactus.Game.Movement.PlayerWalkMovement (PlayerWalkMovement (isTeleporting, runningDirection, shouldUpdateRegion, walkingDirection))
-import PotatoCactus.Game.Player (Player (movement))
+import PotatoCactus.Game.Player (Player (movement, updateMask))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (z), localX, localY)
 import PotatoCactus.Network.Binary (toWord_)
 
@@ -12,7 +12,7 @@ data MovementUpdateType = UpdateSelf | UpdateOther
 
 encodePlayerMovement :: Player -> MovementUpdateType -> BitPut
 encodePlayerMovement player updateType =
-  encode_ (movement player) updateType True
+  encode_ (movement player) updateType (updateMask player > 0)
 
 encode_ :: MovementEntity -> MovementUpdateType -> Bool -> BitPut
 encode_ (StaticMovement_ m) _ needsUpdate =
