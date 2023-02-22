@@ -7,7 +7,7 @@ import Data.Time
 import GHC.IO (unsafePerformIO)
 import GHC.IORef (readIORef)
 
-data LogLevel = Debug | Info | Warning | Error | Fatal
+data LogLevel = Debug | Info | Warning | Error | Fatal deriving (Show)
 
 logger :: String -> LogLevel -> String -> IO ()
 
@@ -18,13 +18,13 @@ data LoggerConfigRule = LoggerConfigRule
 
 data LoggerConfig = LoggerConfig
   { rules :: [LoggerConfigRule],
-    consumer :: String -> String -> IO ()
+    consumer :: String -> LogLevel -> String -> IO ()
   }
 
-stdoutLogger :: String -> String -> IO ()
-stdoutLogger prefix text = do
+stdoutLogger :: String -> LogLevel -> String -> IO ()
+stdoutLogger prefix level text = do
   timestamp <- getZonedTime
-  putStrLn $ formatTime defaultTimeLocale "%F %T" timestamp ++ " [" ++ prefix ++ "] " ++ text
+  putStrLn $ formatTime defaultTimeLocale "%F %T" timestamp ++ " [" ++ prefix ++ "] [" ++ show level ++ "] " ++ text
 
 loggerConfig_ = unsafePerformIO $ newIORef $ LoggerConfig [LoggerConfigRule "" Info] stdoutLogger
 {-# NOINLINE loggerConfig_ #-}
@@ -32,7 +32,7 @@ loggerConfig_ = unsafePerformIO $ newIORef $ LoggerConfig [LoggerConfigRule "" I
 logger prefix l text = do
   config <- readIORef loggerConfig_
   let rule = findMostSpecificRule_ (rules config) prefix
-  when (shouldLog_ (level rule) l) (consumer config prefix text)
+  when (shouldLog_ (level rule) l) (consumer config prefix l text)
 
 findMostSpecificRule_ :: [LoggerConfigRule] -> String -> LoggerConfigRule
 findMostSpecificRule_ rules p =

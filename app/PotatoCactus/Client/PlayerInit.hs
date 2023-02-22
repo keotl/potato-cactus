@@ -7,8 +7,8 @@ import PotatoCactus.Game.Interface.FriendsList (FriendsListStatus (Loading))
 import PotatoCactus.Game.Interface.GameTabs (TabDefinition (defaultTab, id), allTabs, combatTab)
 import PotatoCactus.Game.Interface.PlayerInteraction (followInteraction, tradeInteraction)
 import PotatoCactus.Game.Interface.PlayerSettings (BrightnessLevel (Brightness4), MouseType (TwoButtons), PlayerSettings (PlayerSettings), VolumeLevel (Volume4))
-import PotatoCactus.Game.ItemContainer (playerEquipment, playerInventory)
-import PotatoCactus.Game.Player (Player)
+import PotatoCactus.Game.Player (Player (equipment, inventory))
+import PotatoCactus.Game.PlayerUpdate.Equipment (Equipment (container))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
 import qualified PotatoCactus.Game.Skills as SK
 import PotatoCactus.Game.World
@@ -37,8 +37,8 @@ playerInit client player = do
   -- TODO - can we skip ?  - keotl 2023-02-05
 
   -- update inventories (opcode 53)
-  putByteString $ updateItemContainerPacket playerInventory
-  putByteString $ updateItemContainerPacket playerEquipment
+  putByteString $ updateItemContainerPacket (inventory player)
+  putByteString $ updateItemContainerPacket (container $ equipment player)
 
   -- run energy (opcode 110)
   putByteString $ updateRunEnergyPacket 100
