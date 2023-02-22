@@ -36,10 +36,6 @@ playerInit client player = do
   -- attach equipment bonuses interface text  (opcode 126)
   -- TODO - can we skip ?  - keotl 2023-02-05
 
-  -- update inventories (opcode 53)
-  putByteString $ updateItemContainerPacket (inventory player)
-  putByteString $ updateItemContainerPacket (container $ equipment player)
-
   -- run energy (opcode 110)
   putByteString $ updateRunEnergyPacket 100
 

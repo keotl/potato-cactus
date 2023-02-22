@@ -1,9 +1,13 @@
 module PotatoCactus.Game.PlayerUpdate.Equipment where
 
 import PotatoCactus.Game.ItemContainer (ItemContainer (content), ItemStack, replaceStack)
+import PotatoCactus.Game.Typing (Advance (advance))
 import PotatoCactus.Utils.Iterable (replaceAtIndex)
 
 data Equipment = Equipment {container :: ItemContainer} deriving (Show)
+
+instance Advance Equipment where
+  advance (Equipment container) = Equipment (advance container)
 
 type EquipmentSlot = Int
 

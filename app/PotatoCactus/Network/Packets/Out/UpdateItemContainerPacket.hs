@@ -1,31 +1,33 @@
 module PotatoCactus.Network.Packets.Out.UpdateItemContainerPacket where
 
-import Data.Binary.BitPut (BitPut, putNBits, runBitPut)
+import Data.Binary.Put (Put, putWord16be, putWord16le, putWord8)
 import Data.ByteString (ByteString)
-import Data.ByteString.Lazy (repeat, toStrict)
-import qualified PotatoCactus.Game.ItemContainer as IC (ItemContainer (capacity, widgetId), ItemStack (Empty))
+import Data.ByteString.Lazy (empty, repeat, toStrict)
+import PotatoCactus.Game.Item (id)
+import PotatoCactus.Game.ItemContainer (ItemContainer (content, updated), ItemStack (quantity))
+import qualified PotatoCactus.Game.ItemContainer as IC (ItemContainer (capacity, widgetId), ItemStack (Empty, item))
 import PotatoCactus.Network.Binary (toShortLE_, toShort_, toWord_)
-import PotatoCactus.Network.Packets.Packet (varShortPacket)
+import PotatoCactus.Network.Packets.Packet (varShortPacket2)
+import Prelude hiding (id)
 
 updateItemContainerPacket :: IC.ItemContainer -> ByteString
-updateItemContainerPacket container =
-  varShortPacket
-    53
-    ( do
-        putNBits 16 $ toShort_ (IC.widgetId container)
-        putNBits 16 $ toShort_ (IC.capacity container)
-        mapM_ putItemStack_ (mockItems_ container)
-    )
+updateItemContainerPacket container
+  | updated container =
+    varShortPacket2
+      53
+      ( do
+          putWord16be $ fromIntegral (IC.widgetId container)
+          putWord16be $ fromIntegral (IC.capacity container)
+          mapM_ putItemStack_ (content container)
+      )
+  | otherwise = toStrict empty
 
-putItemStack_ :: IC.ItemStack -> BitPut
+putItemStack_ :: IC.ItemStack -> Put
 putItemStack_ IC.Empty = do
-  putNBits 8 $ toWord_ 0
-  putNBits 16 $ toShortLE_ (0 + 128)
+  putWord8 $ toWord_ 0
+  putWord16le $ fromIntegral (0 + 128)
 putItemStack_ item = do
-  -- TODO - implement with items, int32 - keotl 2023-02-05
-  putNBits 8 $ toWord_ 0
-  putNBits 16 $ toShortLE_ (0 + 128)
+  putWord8 $ toWord_ (quantity item)
+  putWord16le $ fromIntegral (id (IC.item item) + 128) + 1
 
-mockItems_ :: IC.ItemContainer -> [IC.ItemStack]
-mockItems_ container =
-  replicate (IC.capacity container) IC.Empty
+-- TODO - implement with items, int32 - keotl 2023-02-05

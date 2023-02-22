@@ -11,13 +11,15 @@ import Network.Socket
 import Network.Socket.ByteString (recv, send, sendAll)
 import PotatoCactus.Client.LocalPlayerList (LocalPlayerList, updateLocalPlayers)
 import PotatoCactus.Game.Movement.MovementEntity (hasChangedRegion)
-import PotatoCactus.Game.Player (Player (Player, movement, serverIndex, username))
+import PotatoCactus.Game.Player (Player (Player, equipment, inventory, movement, serverIndex, username))
+import PotatoCactus.Game.PlayerUpdate.Equipment (Equipment (container))
 import PotatoCactus.Game.Position (GetPosition (getPosition))
 import qualified PotatoCactus.Game.World as W (ClientHandle, ClientHandleMessage (CloseClientConnectionMessage, WorldUpdatedMessage), World (players, tick), username, worldInstance)
 import PotatoCactus.Game.World.MobList (findByIndex, findByPredicate)
 import qualified PotatoCactus.Game.World.Selectors as WS
 import PotatoCactus.Network.Packets.Out.LoadMapRegionPacket (loadMapRegionPacket)
 import PotatoCactus.Network.Packets.Out.PlayerUpdate.PlayerUpdatePacket (playerUpdatePacket)
+import PotatoCactus.Network.Packets.Out.UpdateItemContainerPacket (updateItemContainerPacket)
 import PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket (updateRunEnergyPacket)
 import Type.Reflection (typeOf)
 
@@ -44,6 +46,9 @@ updateClient sock client localState W.WorldUpdatedMessage = do
               (WS.localPlayers world p)
        in do
             sendAll sock (playerUpdatePacket p newLocalPlayers world)
+            sendAll sock (updateItemContainerPacket (inventory p))
+            sendAll sock (updateItemContainerPacket (container (equipment p)))
+
             sendAll sock (updateRunEnergyPacket 100)
 
             return

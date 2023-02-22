@@ -2,6 +2,7 @@ module PotatoCactus.Game.ItemContainer where
 
 import Data.List (findIndex)
 import PotatoCactus.Game.Item (Item (id, stackable))
+import PotatoCactus.Game.Typing (Advance (advance))
 import PotatoCactus.Utils.Iterable (replaceAtIndex)
 import Prelude hiding (id)
 
@@ -19,11 +20,15 @@ data ItemContainer = ItemContainer
   { capacity :: Int,
     stackPolicy :: StackPolicy,
     widgetId :: Int,
-    content :: [ItemStack]
+    content :: [ItemStack],
+    updated :: Bool
   }
 
 instance Show ItemContainer where
   show = show . content
+
+instance Advance ItemContainer where
+  advance container = container {updated = False}
 
 playerInventory :: ItemContainer
 playerInventory =
@@ -31,7 +36,8 @@ playerInventory =
     { capacity = 28,
       stackPolicy = Standard,
       widgetId = 3214,
-      content = replicate 28 Empty
+      content = replicate 28 Empty,
+      updated = True
     }
 
 playerEquipmentContainer :: ItemContainer
@@ -40,7 +46,8 @@ playerEquipmentContainer =
     { capacity = 14,
       stackPolicy = Standard,
       widgetId = 1688,
-      content = replicate 14 Empty
+      content = replicate 14 Empty,
+      updated = True
     }
 
 stacksWith :: StackPolicy -> ItemStack -> ItemStack -> Bool
@@ -65,7 +72,15 @@ combine_ a b = a {quantity = quantity a + quantity b}
 addItem :: ItemContainer -> ItemStack -> ItemContainer
 addItem container item =
   case findIndex (stacksWith (stackPolicy container) item) (content container) of
-    Just i -> container {content = replaceAtIndex i (combine_ (content container !! i) item) (content container)}
+    Just i ->
+      container
+        { content =
+            replaceAtIndex
+              i
+              (combine_ (content container !! i) item)
+              (content container),
+          updated = True
+        }
     Nothing -> container
 
 addItems :: ItemContainer -> [ItemStack] -> ItemContainer
@@ -74,4 +89,13 @@ addItems = foldl addItem
 replaceStack :: Int -> ItemContainer -> ItemStack -> (ItemContainer, ItemStack)
 replaceStack index container item =
   let old = content container !! index
-   in (container {content = replaceAtIndex index item (content container)}, old)
+   in ( container
+          { content =
+              replaceAtIndex
+                index
+                item
+                (content container),
+            updated = True
+          },
+        old
+      )
