@@ -9,6 +9,7 @@ import qualified PotatoCactus.Game.ItemContainer as IC (ItemContainer (capacity,
 import PotatoCactus.Network.Binary (toShortLE_, toShort_, toWord_)
 import PotatoCactus.Network.Packets.Packet (varShortPacket2)
 import Prelude hiding (id)
+import Data.Bits (Bits(xor))
 
 updateItemContainerPacket :: IC.ItemContainer -> ByteString
 updateItemContainerPacket container
@@ -28,6 +29,6 @@ putItemStack_ IC.Empty = do
   putWord16le $ fromIntegral (0 + 128)
 putItemStack_ item = do
   putWord8 $ toWord_ (quantity item)
-  putWord16le $ fromIntegral (id (IC.item item) + 128) + 1
+  putWord16le $ fromIntegral (id (IC.item item) `xor` 128) + 1
 
--- TODO - implement with items, int32 - keotl 2023-02-05
+-- TODO - implement with large quantities items, int32 - keotl 2023-02-05
