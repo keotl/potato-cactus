@@ -10,17 +10,17 @@ advancePlayer p =
   if skipUpdate_ p
     then p {skipUpdate_ = False}
     else
-      ( ( foldl
-            processPlayerUpdate
-            (clearTransientProperties_ p)
-            (pendingUpdates p)
-        )
-          { movement = advance (movement p),
-            inventory = advance (inventory p),
-            equipment = advance (equipment p),
-            pendingUpdates = []
-          }
-      )
+      let updated =
+            foldl
+              processPlayerUpdate
+              (clearTransientProperties_ p)
+              (pendingUpdates p)
+       in updated
+            { movement = advance (movement updated),
+              inventory = advance (inventory updated),
+              equipment = advance (equipment updated),
+              pendingUpdates = []
+            }
 
 clearTransientProperties_ :: Player -> Player
 clearTransientProperties_ p =

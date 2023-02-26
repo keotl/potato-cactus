@@ -9,6 +9,7 @@ import PotatoCactus.Game.World (ClientHandle (..))
 import PotatoCactus.Game.Movement.WalkingStep (WalkingStep)
 import PotatoCactus.Game.Movement.PositionXY (PositionXY)
 import PotatoCactus.Game.PlayerUpdate.ChatMessage (ChatMessage)
+import PotatoCactus.Game.Message.EquipItemMessagePayload (EquipItemMessagePayload)
 
 data RegisterClientPayload = RegisterClientPayload
   { -- name :: "registerClient",
@@ -22,6 +23,7 @@ data GameChannelMessage
   | PlayerWalkMessage String PositionXY Bool [WalkingStep]
   | InterfaceButtonClickMessage String Int
   | PlayerChatMessage String ChatMessage
+  | EquipItemMessage String EquipItemMessagePayload
   | UpdateWorldMessage
 
 -- gameChannelRef :: IORef (Chan GameChannelMessage)

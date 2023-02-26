@@ -35,6 +35,7 @@ executable potato-cactus
                    PotatoCactus.Network.InboundPacketMapper
                    PotatoCactus.Network.Packets.In.ButtonClickPacket
                    PotatoCactus.Network.Packets.In.ChatMessagePacket
+                   PotatoCactus.Network.Packets.In.EquipItemPacket
                    PotatoCactus.Network.Packets.In.LoginPacket
                    PotatoCactus.Network.Packets.In.PlayerWalkPacket
                    PotatoCactus.Network.Packets.Packet
@@ -49,6 +50,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket
                    PotatoCactus.Network.Packets.Out.UpdateSkillPacket
                    PotatoCactus.Network.Packets.Out.PlayerInteractionPacket
+                   PotatoCactus.Game.PlayerUpdate.Appearance
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeBlock
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeAppearanceBlock
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeChatUpdate
@@ -67,6 +69,7 @@ executable potato-cactus
                    PotatoCactus.Game.Interface.PlayerSettings
                    PotatoCactus.Game.Item
                    PotatoCactus.Game.ItemContainer
+                   PotatoCactus.Game.Message.EquipItemMessagePayload
                    PotatoCactus.Game.Movement.Direction
                    PotatoCactus.Game.Movement.InterpolatePath
                    PotatoCactus.Game.Movement.MovementEntity
@@ -98,6 +101,10 @@ executable potato-cactus
     build-depends:    base ^>=4.14.3.0, network, bytestring, utf8-string, binary, binary-strict, time
     hs-source-dirs:   app
     default-language: Haskell2010
+    ghc-options:
+      -Werror
+      -fwarn-incomplete-patterns
+      -O3
 
 test-suite tests
     type: exitcode-stdio-1.0

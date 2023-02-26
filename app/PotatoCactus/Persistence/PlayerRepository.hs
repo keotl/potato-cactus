@@ -1,10 +1,11 @@
 module PotatoCactus.Persistence.PlayerRepository where
 
-import PotatoCactus.Game.Item (Item (Item))
+import PotatoCactus.Game.Item (Item (Item), armourItem, stackableItem)
 import PotatoCactus.Game.ItemContainer (ItemContainer (ItemContainer), ItemStack (ItemStack), addItems, playerInventory)
 import PotatoCactus.Game.Movement.MovementEntity (playerWalkMovement)
 import PotatoCactus.Game.Player (Player (Player, inventory, movement, username))
 import qualified PotatoCactus.Game.Player as Player
+import PotatoCactus.Game.PlayerUpdate.Equipment (chestSlot, legsSlot, headSlot)
 import PotatoCactus.Game.Position (Position (Position))
 
 retrievePlayer :: String -> IO (Maybe Player)
@@ -21,6 +22,8 @@ mockInventory_ :: ItemContainer
 mockInventory_ =
   addItems
     playerInventory
-    [ ItemStack (Item 1115 False) 1,
-      ItemStack (Item 1067 False) 1
+    [ ItemStack (armourItem 1115 chestSlot True) 1,
+      ItemStack (armourItem 1067 legsSlot True) 1,
+      ItemStack (armourItem 1137 headSlot False) 1,
+      ItemStack (stackableItem 617) 100000
     ]

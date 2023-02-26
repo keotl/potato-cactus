@@ -6,6 +6,7 @@ import PotatoCactus.Game.Movement.MovementEntity (playerWalkMovement)
 import qualified PotatoCactus.Game.Movement.MovementEntity as M (MovementEntity, issueWalkCommand)
 import PotatoCactus.Game.Movement.PositionXY (PositionXY)
 import PotatoCactus.Game.Movement.WalkingStep (WalkingStep)
+import PotatoCactus.Game.PlayerUpdate.Appearance (PlayerAppearance, defaultPlayerAppearance)
 import PotatoCactus.Game.PlayerUpdate.ChatMessage (ChatMessage)
 import PotatoCactus.Game.PlayerUpdate.Equipment (Equipment (Equipment))
 import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate)
@@ -16,6 +17,7 @@ import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position
 data Player = Player
   { serverIndex :: Int,
     username :: String,
+    appearance :: PlayerAppearance,
     movement :: M.MovementEntity,
     updateMask :: PlayerUpdateMask,
     pendingUpdates :: [PlayerUpdate],
@@ -38,6 +40,7 @@ create username position =
   Player
     { serverIndex = -1,
       username = username,
+      appearance = defaultPlayerAppearance,
       movement = playerWalkMovement position,
       updateMask = appearanceFlag,
       pendingUpdates = [],

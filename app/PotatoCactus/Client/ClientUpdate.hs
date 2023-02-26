@@ -46,6 +46,7 @@ updateClient sock client localState W.WorldUpdatedMessage = do
               (WS.localPlayers world p)
        in do
             sendAll sock (playerUpdatePacket p newLocalPlayers world)
+
             sendAll sock (updateItemContainerPacket (inventory p))
             sendAll sock (updateItemContainerPacket (container (equipment p)))
 

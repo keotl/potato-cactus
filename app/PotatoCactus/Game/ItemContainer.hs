@@ -21,14 +21,15 @@ data ItemContainer = ItemContainer
     stackPolicy :: StackPolicy,
     widgetId :: Int,
     content :: [ItemStack],
-    updated :: Bool
+    willUpdate_ :: Bool, -- Whether the update flag should be set on the next tick cycle
+    updated :: Bool -- Whether to send update to player on the current tick
   }
 
 instance Show ItemContainer where
   show = show . content
 
 instance Advance ItemContainer where
-  advance container = container {updated = False}
+  advance container = container {willUpdate_ = False, updated = willUpdate_ container}
 
 playerInventory :: ItemContainer
 playerInventory =
@@ -37,7 +38,8 @@ playerInventory =
       stackPolicy = Standard,
       widgetId = 3214,
       content = replicate 28 Empty,
-      updated = True
+      willUpdate_ = True,
+      updated = False
     }
 
 playerEquipmentContainer :: ItemContainer
@@ -47,7 +49,8 @@ playerEquipmentContainer =
       stackPolicy = Standard,
       widgetId = 1688,
       content = replicate 14 Empty,
-      updated = True
+      willUpdate_ = True,
+      updated = False
     }
 
 stacksWith :: StackPolicy -> ItemStack -> ItemStack -> Bool
@@ -79,7 +82,7 @@ addItem container item =
               i
               (combine_ (content container !! i) item)
               (content container),
-          updated = True
+          willUpdate_ = True
         }
     Nothing -> container
 
@@ -95,7 +98,11 @@ replaceStack index container item =
                 index
                 item
                 (content container),
-            updated = True
+            willUpdate_ = True
           },
         old
       )
+
+atIndex :: Int -> ItemContainer -> ItemStack
+atIndex index container =
+  content container !! index

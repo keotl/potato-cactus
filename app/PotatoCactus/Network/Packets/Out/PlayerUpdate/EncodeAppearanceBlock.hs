@@ -1,10 +1,13 @@
 module PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeAppearanceBlock where
 
+import Data.Binary (Word16)
 import Data.Binary.BitPut (putNBits, runBitPut)
 import Data.ByteString (ByteString, pack)
 import qualified Data.ByteString as ByteString
 import Data.ByteString.Lazy (toStrict)
-import PotatoCactus.Game.Player (Player (username))
+import PotatoCactus.Game.Player (Player (appearance, equipment, username))
+import PotatoCactus.Game.PlayerUpdate.Appearance (Gender (Male), PlayerAppearance (playerArms, playerBeard, playerChest, playerFeet, playerFeetColour, playerGender, playerHairColour, playerHands, playerHead, playerLegColour, playerLegs, playerSkinColour, playerTorsoColour))
+import PotatoCactus.Game.PlayerUpdate.Equipment (EquipmentSlot, amuletSlot, capeSlot, chestSlot, feetSlot, handsSlot, headSlot, itemIdAtSlot, legsSlot, shieldSlot, shouldShowModel, weaponSlot)
 import PotatoCactus.Game.World (World)
 import PotatoCactus.Network.Binary (encodeToBase37, toShort_, toWord_)
 
@@ -20,27 +23,37 @@ encodeAppearanceBlock player world =
                 -- no player transformId
 
                 -- equipment
-                putNBits 16 $ toShort_ (512 + 0) -- Helmet model
-                putNBits 16 $ toShort_ (512 + 0) -- Cape Model
-                putNBits 16 $ toShort_ (512 + 0) -- Amulet Model
-                putNBits 16 $ toShort_ (512 + 0) -- Weapon Model
+                putNBits 16 $ toShort_ (512 + itemIdAtSlot headSlot (equipment player))
+                putNBits 16 $ toShort_ (512 + itemIdAtSlot capeSlot (equipment player))
+                putNBits 16 $ toShort_ (512 + itemIdAtSlot amuletSlot (equipment player))
+                putNBits 16 $ toShort_ (512 + itemIdAtSlot weaponSlot (equipment player))
 
                 -- chest model
-                putNBits 16 $ toShort_ (256 + 19) -- empty chest, appearance code 19
-                putNBits 16 $ toShort_ (512 + 0) -- shield
-                putNBits 16 $ toShort_ (256 + 27) -- not full armour, so showing arms, appearance code 27
-                putNBits 16 $ toShort_ (256 + 37) -- showing legs, appearance code 37
-                putNBits 16 $ toShort_ (256 + 0) -- no full helmet, so showing head, appearance code 0
-                putNBits 16 $ toShort_ (256 + 33) -- no gloves, so showing hands, appearance code 33
-                putNBits 16 $ toShort_ (256 + 42) -- no boots, so showing hands, appearance code 42
-                putNBits 16 $ toShort_ (256 + 10) -- male, so showing beard, appearance code 10
+                putNBits 16 $ mapEquipment_ chestSlot playerChest player
+                putNBits 16 $ toShort_ (512 + itemIdAtSlot shieldSlot (equipment player))
+                if shouldShowModel chestSlot (equipment player)
+                  then putNBits 16 $ toShort_ (256 + (playerArms . appearance $ player))
+                  else putNBits 8 $ toWord_ 0
+
+                putNBits 16 $ mapEquipment_ legsSlot playerLegs player
+
+                if shouldShowModel headSlot (equipment player)
+                  then putNBits 16 $ toShort_ (256 + (playerHead . appearance $ player))
+                  else putNBits 8 $ toWord_ 0
+
+                putNBits 16 $ mapEquipment_ handsSlot playerHands player
+                putNBits 16 $ mapEquipment_ feetSlot playerFeet player
+
+                case (playerGender (appearance player), shouldShowModel headSlot (equipment player)) of
+                  (Male, True) -> putNBits 16 $ toShort_ (256 + playerBeard (appearance player))
+                  (_, _) -> putNBits 8 $ toWord_ 0
 
                 -- model colours
-                putNBits 8 $ toWord_ 0 -- hair
-                putNBits 8 $ toWord_ 0 -- torso
-                putNBits 8 $ toWord_ 0 -- leg
-                putNBits 8 $ toWord_ 0 -- feet
-                putNBits 8 $ toWord_ 0 -- skin
+                putNBits 8 $ playerHairColour (appearance player)
+                putNBits 8 $ playerTorsoColour (appearance player)
+                putNBits 8 $ playerLegColour (appearance player)
+                putNBits 8 $ playerFeetColour (appearance player)
+                putNBits 8 $ playerSkinColour (appearance player)
 
                 -- model animations
                 putNBits 16 $ toShort_ 808 -- standing
@@ -55,3 +68,9 @@ encodeAppearanceBlock player world =
                 putNBits 16 $ toShort_ 0 -- skill level for games room
             )
    in ByteString.concat [pack [fromIntegral (- ByteString.length body)], body]
+
+mapEquipment_ :: EquipmentSlot -> (PlayerAppearance -> Int) -> Player -> Word16
+mapEquipment_ equipmentSlot bodyPart player =
+  case itemIdAtSlot equipmentSlot (equipment player) of
+    0 -> 256 + (fromIntegral . bodyPart . appearance $ player)
+    x -> 512 + fromIntegral x
