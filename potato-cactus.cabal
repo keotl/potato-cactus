@@ -27,7 +27,7 @@ executable potato-cactus
     -- Modules included in this executable, other than Main.
     other-modules: PotatoCactus.Boot.GameThreadMain
                    PotatoCactus.Boot.GameChannel
-                   PotatoCactus.Boot.Initialization
+                   PotatoCactus.Boot.ServerInit
                    PotatoCactus.Client.ClientUpdate
                    PotatoCactus.Client.LocalPlayerList
                    PotatoCactus.Client.PlayerInit
@@ -38,7 +38,6 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.In.ChatMessagePacket
                    PotatoCactus.Network.Packets.In.EquipItemPacket
                    PotatoCactus.Network.Packets.In.ItemContainerClickPacket
-                   PotatoCactus.Network.Packets.In.LoginPacket
                    PotatoCactus.Network.Packets.In.PlayerWalkPacket
                    PotatoCactus.Network.Packets.Packet
                    PotatoCactus.Network.Packets.Reader
@@ -74,6 +73,8 @@ executable potato-cactus
                    PotatoCactus.Game.Item
                    PotatoCactus.Game.ItemContainer
                    PotatoCactus.Game.Message.EquipItemMessagePayload
+                   PotatoCactus.Game.Message.GameChannelMessage
+                   PotatoCactus.Game.Message.RegisterClientPayload
                    PotatoCactus.Game.Movement.Direction
                    PotatoCactus.Game.Movement.InterpolatePath
                    PotatoCactus.Game.Movement.MovementEntity

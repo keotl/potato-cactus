@@ -4,9 +4,9 @@ import Data.Binary (Get, Word16)
 import Data.Binary.Get (getWord16be, runGet)
 import Data.Bits (xor)
 import Data.ByteString.Lazy (fromStrict)
-import PotatoCactus.Boot.GameChannel (GameChannelMessage (EquipItemMessage))
 import PotatoCactus.Game.Message.EquipItemMessagePayload (EquipItemMessagePayload (EquipItemMessagePayload, itemId))
 import PotatoCactus.Network.Packets.Reader (InboundPacket (InboundPacket, payload))
+import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (EquipItemMessage))
 
 equipItemPacket :: String -> InboundPacket -> GameChannelMessage
 equipItemPacket username packet =

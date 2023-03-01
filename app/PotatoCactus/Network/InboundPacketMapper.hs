@@ -1,6 +1,6 @@
 module PotatoCactus.Network.InboundPacketMapper where
 
-import PotatoCactus.Boot.GameChannel (GameChannelMessage (PlayerWalkMessage, UnregisterClientMessage))
+import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (UnregisterClientMessage))
 import PotatoCactus.Network.Packets.In.ButtonClickPacket (buttonClickMessage)
 import PotatoCactus.Network.Packets.In.ChatMessagePacket (playerChatMessage)
 import PotatoCactus.Network.Packets.In.EquipItemPacket (equipItemPacket)

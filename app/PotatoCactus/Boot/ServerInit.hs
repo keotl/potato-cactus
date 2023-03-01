@@ -1,4 +1,4 @@
-module PotatoCactus.Boot.Initialization where
+module PotatoCactus.Boot.ServerInit where
 
 import Data.Time (diffUTCTime, getCurrentTime)
 import PotatoCactus.Game.Definitions.EquipmentDefinitions (initializeEquipmentDefs)
@@ -19,4 +19,4 @@ initializeServer = do
   logger_ Info $ "Server initialization completed in " ++ show (diffUTCTime endTime startTime)
   return ()
 
-logger_ = logger "Initialization"
+logger_ = logger "ServerInit"

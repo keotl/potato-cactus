@@ -12,11 +12,13 @@ import Data.ByteString.UTF8 as BSU
 import Data.Either
 import Network.Socket
 import Network.Socket.ByteString (recv, sendAll)
-import PotatoCactus.Boot.GameChannel (GameChannelMessage (RegisterClientMessage), RegisterClientPayload (RegisterClientPayload, clientHandle, player), gameChannel)
 import PotatoCactus.Game.Player (Player (username))
 import PotatoCactus.Game.World (ClientHandle (ClientHandle))
 import PotatoCactus.Login.LoginHandler (handleLogin)
 import PotatoCactus.Network.ClientHandler (clientHandlerMain)
+import PotatoCactus.Game.Message.RegisterClientPayload (RegisterClientPayload(RegisterClientPayload, clientHandle, player))
+import PotatoCactus.Boot.GameChannel (gameChannel)
+import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage(RegisterClientMessage))
 
 socketMain :: Socket -> IO ()
 socketMain sock = do

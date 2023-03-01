@@ -9,7 +9,6 @@ import Data.ByteString.Lazy (toStrict)
 import Data.IORef (readIORef)
 import Network.Socket (Socket)
 import Network.Socket.ByteString (recv, sendAll)
-import PotatoCactus.Boot.GameChannel (GameChannelMessage (UnregisterClientMessage), gameChannel)
 import PotatoCactus.Client.ClientUpdate (ClientLocalState_, defaultState, updateClient)
 import PotatoCactus.Client.PlayerInit (playerInit)
 import PotatoCactus.Game.Player (Player)
@@ -19,6 +18,8 @@ import PotatoCactus.Network.Packets.Opcodes
 import PotatoCactus.Network.Packets.Out.InitializePlayerPacket (initializePlayerPacket)
 import PotatoCactus.Network.Packets.Reader (InboundPacket (opcode), readPacket)
 import PotatoCactus.Utils.Logging (LogLevel (Debug, Info), logger)
+import PotatoCactus.Boot.GameChannel (gameChannel)
+import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage(UnregisterClientMessage))
 
 type InternalQueueMessage_ = Either ClientHandleMessage InboundPacket
 

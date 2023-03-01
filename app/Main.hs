@@ -7,7 +7,7 @@ import qualified Data.ByteString as S
 import Network.Socket
 import Network.Socket.ByteString (recv, sendAll)
 import PotatoCactus.Boot.GameThreadMain (gameThreadMain)
-import PotatoCactus.Boot.Initialization (initializeServer)
+import PotatoCactus.Boot.ServerInit (initializeServer)
 import PotatoCactus.Network.SocketHandler
 import PotatoCactus.Utils.Logging (LogLevel (Fatal), logger)
 

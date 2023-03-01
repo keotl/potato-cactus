@@ -4,8 +4,9 @@ import Control.Concurrent (Chan, forkFinally, readChan, threadDelay, writeChan)
 import Data.IORef
 import Data.Typeable (typeOf)
 import GHC.Clock (getMonotonicTimeNSec)
-import PotatoCactus.Boot.GameChannel (GameChannelMessage (UpdateWorldMessage), gameChannel)
+import PotatoCactus.Boot.GameChannel (gameChannel)
 import PotatoCactus.Config.Constants (tickInterval)
+import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (UpdateWorldMessage))
 import PotatoCactus.Game.Reducer (reduceWorld)
 import PotatoCactus.Game.World (ClientHandle (controlChannel, username), ClientHandleMessage (CloseClientConnectionMessage, WorldUpdatedMessage), World (clients), defaultWorldValue, worldInstance)
 import qualified PotatoCactus.Game.World as W

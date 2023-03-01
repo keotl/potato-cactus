@@ -8,6 +8,7 @@ import Data.ByteString (ByteString, drop, length, reverse)
 import Data.ByteString.Lazy (fromStrict)
 import Data.Word (Word8)
 import PotatoCactus.Boot.GameChannel
+import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (PlayerChatMessage))
 import PotatoCactus.Game.PlayerUpdate.ChatMessage (ChatMessage (ChatMessage))
 import PotatoCactus.Network.Binary (nibbles)
 import PotatoCactus.Network.Encoding.ChatMessageEncoding (decodeChatText)

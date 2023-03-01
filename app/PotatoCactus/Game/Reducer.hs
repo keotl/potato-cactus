@@ -1,8 +1,9 @@
 module PotatoCactus.Game.Reducer where
 
-import PotatoCactus.Boot.GameChannel (GameChannelMessage (EquipItemMessage, InterfaceButtonClickMessage, PlayerChatMessage, PlayerWalkMessage, RegisterClientMessage, UnequipItemMessage, UnregisterClientMessage, UpdateWorldMessage), RegisterClientPayload (clientHandle))
 import qualified PotatoCactus.Boot.GameChannel as C
 import PotatoCactus.Game.Interface.InterfaceButtonDispatch (dispatchInterfaceButtonClick)
+import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (..))
+import qualified PotatoCactus.Game.Message.RegisterClientPayload as C
 import qualified PotatoCactus.Game.Player as P
 import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (EquipItem, SayChatMessage, UnequipItem))
 import PotatoCactus.Game.Typing (advance)
@@ -10,7 +11,7 @@ import PotatoCactus.Game.World (ClientHandle (username), World (World, clients, 
 
 reduceWorld :: World -> GameChannelMessage -> World
 reduceWorld world (RegisterClientMessage message) =
-  (addPlayer world (C.player message)) {clients = clientHandle message : clients world}
+  (addPlayer world (C.player message)) {clients = C.clientHandle message : clients world}
 reduceWorld world (UnregisterClientMessage clientIdentifier) =
   let newClients = filter (unregisterClientPredicate_ clientIdentifier) $ clients world
    in (removePlayerByUsername world clientIdentifier) {clients = newClients}

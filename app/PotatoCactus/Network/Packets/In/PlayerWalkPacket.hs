@@ -7,10 +7,10 @@ import Data.Bits (xor)
 import qualified Data.ByteString as ByteString
 import Data.ByteString.Lazy (fromStrict)
 import Data.Word (Word16)
-import PotatoCactus.Boot.GameChannel (GameChannelMessage (PlayerWalkMessage))
 import PotatoCactus.Game.Movement.PositionXY (PositionXY (PositionXY))
 import PotatoCactus.Game.Movement.WalkingStep (WalkingStep (WalkingStep))
 import PotatoCactus.Network.Packets.Reader (InboundPacket (payload))
+import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (PlayerWalkMessage))
 
 playerWalkMessage :: String -> InboundPacket -> GameChannelMessage
 playerWalkMessage username packet =
