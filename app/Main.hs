@@ -7,16 +7,19 @@ import qualified Data.ByteString as S
 import Network.Socket
 import Network.Socket.ByteString (recv, sendAll)
 import PotatoCactus.Boot.GameThreadMain (gameThreadMain)
+import PotatoCactus.Boot.Initialization (initializeServer)
 import PotatoCactus.Network.SocketHandler
 import PotatoCactus.Utils.Logging (LogLevel (Fatal), logger)
 
 main :: IO ()
 main = do
+  initializeServer
+
   gameThreadId <-
     forkFinally
       gameThreadMain
       ( \x -> do
-          logger_ Fatal $ "Game thread exited with value : " ++ show x
+          logger_ Fatal $ "Game thread exited with value '" ++ show x ++ "'"
       )
   runTCPServer Nothing "43594" socketMain
 

@@ -1,7 +1,7 @@
 module PotatoCactus.Game.ItemContainer where
 
 import Data.List (findIndex)
-import PotatoCactus.Game.Item (Item (id, stackable))
+import PotatoCactus.Game.Definitions.ItemDefinitions (ItemDefinition (stackable), ItemId, itemDefinition)
 import PotatoCactus.Game.Typing (Advance (advance))
 import PotatoCactus.Utils.Iterable (replaceAtIndex)
 import Prelude hiding (id)
@@ -10,7 +10,7 @@ data StackPolicy = Always | Standard | Never deriving (Enum, Show)
 
 data ItemStack
   = ItemStack
-      { item :: Item,
+      { itemId :: ItemId,
         quantity :: Int
       }
   | Empty
@@ -56,9 +56,12 @@ playerEquipmentContainer =
 stacksWith :: StackPolicy -> ItemStack -> ItemStack -> Bool
 stacksWith _ Empty _ = True
 stacksWith _ _ Empty = True
-stacksWith Always (ItemStack a _) (ItemStack b _) = id a == id b
+stacksWith Always (ItemStack a _) (ItemStack b _) = a == b
 stacksWith Never _ _ = False
-stacksWith Standard (ItemStack a _) (ItemStack b _) = (id a == id b) && stackable a
+stacksWith Standard (ItemStack a _) (ItemStack b _) =
+  case itemDefinition a of
+    Nothing -> a == b
+    Just itemDef -> stackable itemDef && (a == b)
 
 canAddItem :: ItemContainer -> ItemStack -> Bool
 canAddItem container stack =

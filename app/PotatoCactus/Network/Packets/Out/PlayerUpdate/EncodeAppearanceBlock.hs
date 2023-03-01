@@ -5,9 +5,10 @@ import Data.Binary.BitPut (putNBits, runBitPut)
 import Data.ByteString (ByteString, pack)
 import qualified Data.ByteString as ByteString
 import Data.ByteString.Lazy (toStrict)
+import PotatoCactus.Game.Definitions.EquipmentDefinitions (EquipmentSlot, amuletSlot, capeSlot, chestSlot, feetSlot, handsSlot, headSlot, legsSlot, shieldSlot, weaponSlot)
 import PotatoCactus.Game.Player (Player (appearance, equipment, username))
 import PotatoCactus.Game.PlayerUpdate.Appearance (Gender (Male), PlayerAppearance (playerArms, playerBeard, playerChest, playerFeet, playerFeetColour, playerGender, playerHairColour, playerHands, playerHead, playerLegColour, playerLegs, playerSkinColour, playerTorsoColour))
-import PotatoCactus.Game.PlayerUpdate.Equipment (EquipmentSlot, amuletSlot, capeSlot, chestSlot, feetSlot, handsSlot, headSlot, itemIdAtSlot, legsSlot, shieldSlot, shouldShowModel, weaponSlot)
+import PotatoCactus.Game.PlayerUpdate.Equipment (itemIdAtSlot, shouldShowModel)
 import PotatoCactus.Game.World (World)
 import PotatoCactus.Network.Binary (encodeToBase37, toShort_, toWord_)
 
