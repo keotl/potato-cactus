@@ -36,6 +36,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.In.ButtonClickPacket
                    PotatoCactus.Network.Packets.In.ChatMessagePacket
                    PotatoCactus.Network.Packets.In.EquipItemPacket
+                   PotatoCactus.Network.Packets.In.ItemContainerClickPacket
                    PotatoCactus.Network.Packets.In.LoginPacket
                    PotatoCactus.Network.Packets.In.PlayerWalkPacket
                    PotatoCactus.Network.Packets.Packet

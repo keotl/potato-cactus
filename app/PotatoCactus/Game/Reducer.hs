@@ -1,10 +1,10 @@
 module PotatoCactus.Game.Reducer where
 
-import PotatoCactus.Boot.GameChannel (GameChannelMessage (InterfaceButtonClickMessage, PlayerChatMessage, PlayerWalkMessage, RegisterClientMessage, UnregisterClientMessage, UpdateWorldMessage, EquipItemMessage), RegisterClientPayload (clientHandle))
+import PotatoCactus.Boot.GameChannel (GameChannelMessage (EquipItemMessage, InterfaceButtonClickMessage, PlayerChatMessage, PlayerWalkMessage, RegisterClientMessage, UnequipItemMessage, UnregisterClientMessage, UpdateWorldMessage), RegisterClientPayload (clientHandle))
 import qualified PotatoCactus.Boot.GameChannel as C
 import PotatoCactus.Game.Interface.InterfaceButtonDispatch (dispatchInterfaceButtonClick)
 import qualified PotatoCactus.Game.Player as P
-import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (SayChatMessage, EquipItem))
+import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (EquipItem, SayChatMessage, UnequipItem))
 import PotatoCactus.Game.Typing (advance)
 import PotatoCactus.Game.World (ClientHandle (username), World (World, clients, players, tick), addPlayer, removePlayerByUsername, updatePlayer)
 
@@ -21,7 +21,8 @@ reduceWorld world (PlayerChatMessage playerName message) =
   updatePlayer world playerName (\p -> P.queueUpdate p (SayChatMessage message))
 reduceWorld world (EquipItemMessage playerName payload) =
   updatePlayer world playerName (\p -> P.queueUpdate p (EquipItem payload))
-
+reduceWorld world (UnequipItemMessage playerName slot) =
+  updatePlayer world playerName (\p -> P.queueUpdate p (UnequipItem slot))
 reduceWorld world UpdateWorldMessage =
   advance world
 

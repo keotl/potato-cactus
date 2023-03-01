@@ -4,12 +4,12 @@ import Control.Concurrent (Chan, forkFinally, readChan, threadDelay, writeChan)
 import Data.IORef
 import Data.Typeable (typeOf)
 import GHC.Clock (getMonotonicTimeNSec)
-import PotatoCactus.Boot.GameChannel (GameChannelMessage (EquipItemMessage, PlayerChatMessage, PlayerWalkMessage, UpdateWorldMessage), gameChannel)
+import PotatoCactus.Boot.GameChannel (GameChannelMessage (UpdateWorldMessage), gameChannel)
 import PotatoCactus.Config.Constants (tickInterval)
 import PotatoCactus.Game.Reducer (reduceWorld)
 import PotatoCactus.Game.World (ClientHandle (controlChannel, username), ClientHandleMessage (CloseClientConnectionMessage, WorldUpdatedMessage), World (clients), defaultWorldValue, worldInstance)
 import qualified PotatoCactus.Game.World as W
-import PotatoCactus.Utils.Logging (LogLevel (Debug, Info, Warning), logger)
+import PotatoCactus.Utils.Logging (LogLevel (Debug, Fatal, Info, Warning), logger)
 
 gameThreadMain :: IO ()
 gameThreadMain = do
@@ -18,7 +18,7 @@ gameThreadMain = do
   worldTickThreadId <-
     forkFinally
       (worldTickThread_ tickInterval gameChannel)
-      (\x -> logger_ Warning "WorldTick thread exited.")
+      (\x -> logger_ Fatal "WorldTick thread exited.")
 
   mainLoop
   return ()
@@ -29,7 +29,7 @@ mainLoop = do
   world <- readIORef worldInstance
   newWorld <- reduceUntilNextTick_ world gameChannel
 
-  logger_ Info $ show newWorld
+  -- logger_ Info $ show newWorld
 
   writeIORef worldInstance newWorld
   notifyClients_ WorldUpdatedMessage (clients newWorld)
@@ -46,11 +46,11 @@ reduceUntilNextTick_ world gameChannel = do
   message <- readChan gameChannel
 
   -- TESTING PRINT
-  case message of
-    EquipItemMessage username payload -> do
-      print username
-      print payload
-    _ -> putStr ""
+  -- case message of
+  --   UnequipItemMessage username payload -> do
+  --     print username
+  --     print payload
+  --   _ -> putStr ""
   -- END TESTING PRINT
 
   ( case message of
