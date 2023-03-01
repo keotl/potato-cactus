@@ -24,6 +24,8 @@ reduceWorld world (EquipItemMessage playerName payload) =
   updatePlayer world playerName (\p -> P.queueUpdate p (EquipItem payload))
 reduceWorld world (UnequipItemMessage playerName slot) =
   updatePlayer world playerName (\p -> P.queueUpdate p (UnequipItem slot))
+reduceWorld world (ObjectClickMessage playerName payload) =
+  world -- TODO - dispatch  - keotl 2023-03-01
 reduceWorld world UpdateWorldMessage =
   advance world
 

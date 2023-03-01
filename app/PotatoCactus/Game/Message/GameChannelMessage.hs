@@ -6,6 +6,7 @@ import PotatoCactus.Game.Message.RegisterClientPayload (RegisterClientPayload)
 import PotatoCactus.Game.Movement.PositionXY (PositionXY)
 import PotatoCactus.Game.Movement.WalkingStep (WalkingStep)
 import PotatoCactus.Game.PlayerUpdate.ChatMessage (ChatMessage)
+import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload)
 
 data GameChannelMessage
   = RegisterClientMessage RegisterClientPayload
@@ -15,4 +16,5 @@ data GameChannelMessage
   | PlayerChatMessage String ChatMessage
   | EquipItemMessage String EquipItemMessagePayload
   | UnequipItemMessage String EquipmentSlot
+  | ObjectClickMessage String ObjectClickPayload
   | UpdateWorldMessage

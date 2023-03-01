@@ -48,7 +48,7 @@ reduceUntilNextTick_ world gameChannel = do
 
   -- TESTING PRINT
   -- case message of
-  --   UnequipItemMessage username payload -> do
+  --   ObjectClickMessage username payload -> do
   --     print username
   --     print payload
   --   _ -> putStr ""

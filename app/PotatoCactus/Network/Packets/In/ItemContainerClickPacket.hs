@@ -1,4 +1,4 @@
-module PotatoCactus.Network.Packets.In.ItemContainerClickPacket where
+module PotatoCactus.Network.Packets.In.ItemContainerClickPacket (itemContainerClickPacket) where
 
 import Data.Binary (Get)
 import Data.Binary.Get (getInt16le, getWord16be, getWord16le, runGet)

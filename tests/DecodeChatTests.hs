@@ -1,8 +1,8 @@
 module DecodeChatTests where
 
 import Data.ByteString (length, pack)
-import PotatoCactus.Boot.GameChannel (GameChannelMessage (PlayerChatMessage))
-import PotatoCactus.Game.PlayerUpdate.ChatMessage (ChatMessage (..))
+import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (PlayerChatMessage))
+import PotatoCactus.Game.PlayerUpdate.ChatMessage (ChatMessage (ChatMessage))
 import PotatoCactus.Network.Binary (nibbles)
 import PotatoCactus.Network.Encoding.ChatMessageEncoding (decodeChatText, encodeChatText)
 import PotatoCactus.Network.Packets.In.ChatMessagePacket (playerChatMessage)
@@ -44,6 +44,6 @@ testNibbles =
 
 encodeChatTests :: Test
 encodeChatTests =
-  TestList [
-  TestCase (assertEqual "encode chat text" (pack [0x3E, 0xD1, 0x10]) (encodeChatText "a:ee "))
-           ]
+  TestList
+    [ TestCase (assertEqual "encode chat text" (pack [0x3E, 0xD1, 0x10]) (encodeChatText "a:ee "))
+    ]

@@ -38,6 +38,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.In.ChatMessagePacket
                    PotatoCactus.Network.Packets.In.EquipItemPacket
                    PotatoCactus.Network.Packets.In.ItemContainerClickPacket
+                   PotatoCactus.Network.Packets.In.ObjectActionPacket
                    PotatoCactus.Network.Packets.In.PlayerWalkPacket
                    PotatoCactus.Network.Packets.Packet
                    PotatoCactus.Network.Packets.Reader
@@ -74,6 +75,7 @@ executable potato-cactus
                    PotatoCactus.Game.ItemContainer
                    PotatoCactus.Game.Message.EquipItemMessagePayload
                    PotatoCactus.Game.Message.GameChannelMessage
+                   PotatoCactus.Game.Message.ObjectClickPayload
                    PotatoCactus.Game.Message.RegisterClientPayload
                    PotatoCactus.Game.Movement.Direction
                    PotatoCactus.Game.Movement.InterpolatePath
@@ -114,6 +116,6 @@ executable potato-cactus
 test-suite tests
     type: exitcode-stdio-1.0
     main-is: Main.hs
-    build-depends: HUnit ^>=1.6, base ^>=4.14.3.0, network, bytestring, utf8-string, binary, binary-strict, time
+    build-depends: HUnit ^>=1.6, base ^>=4.14.3.0, network, bytestring, utf8-string, binary, binary-strict, time, containers
     hs-source-dirs: tests, app
     default-language: Haskell2010
