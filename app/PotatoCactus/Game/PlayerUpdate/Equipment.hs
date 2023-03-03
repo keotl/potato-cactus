@@ -2,7 +2,6 @@ module PotatoCactus.Game.PlayerUpdate.Equipment where
 
 import Data.Maybe (mapMaybe)
 import PotatoCactus.Game.Definitions.EquipmentDefinitions (EquipmentDefinition (shouldHideModelWhenEquipped), EquipmentSlot, equipmentDefinition)
-import PotatoCactus.Game.Item (Item (equippedShouldHideModel_), id)
 import PotatoCactus.Game.ItemContainer (ItemContainer (content), ItemStack (Empty, ItemStack), atIndex, replaceStack)
 import PotatoCactus.Game.Typing (Advance (advance))
 import PotatoCactus.Utils.Iterable (replaceAtIndex)

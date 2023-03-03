@@ -58,6 +58,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodePlayerMovement
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.PlayerUpdatePacket
                    PotatoCactus.Network.Packets.Out.PlayerSettingsPackets
+                   PotatoCactus.Network.Packets.Out.RemoveObjectPacket
                    PotatoCactus.Network.Packets.Out.TabInterfacePacket
                    PotatoCactus.Network.ClientHandler
                    PotatoCactus.Network.Binary
@@ -71,7 +72,6 @@ executable potato-cactus
                    PotatoCactus.Game.Interface.InterfaceButtonDispatch
                    PotatoCactus.Game.Interface.PlayerInteraction
                    PotatoCactus.Game.Interface.PlayerSettings
-                   PotatoCactus.Game.Item
                    PotatoCactus.Game.ItemContainer
                    PotatoCactus.Game.Message.EquipItemMessagePayload
                    PotatoCactus.Game.Message.GameChannelMessage

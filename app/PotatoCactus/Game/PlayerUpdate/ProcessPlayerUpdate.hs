@@ -3,7 +3,6 @@ module PotatoCactus.Game.PlayerUpdate.ProcessPlayerUpdate where
 import Data.Bits ((.|.))
 import Debug.Trace (trace)
 import PotatoCactus.Game.Definitions.EquipmentDefinitions (EquipmentDefinition (slot), equipmentDefinition)
-import PotatoCactus.Game.Item (Item (equipSlot))
 import PotatoCactus.Game.ItemContainer (ItemStack (Empty, ItemStack, itemId), addItems, atIndex, canAddItems, replaceStack)
 import PotatoCactus.Game.Message.EquipItemMessagePayload (EquipItemMessagePayload (EquipItemMessagePayload, itemIndex))
 import PotatoCactus.Game.Player (Player (chatMessage, equipment, inventory, updateMask))
