@@ -24,6 +24,14 @@ localY :: Position -> Int
 localY pos =
   y pos - (chunkY pos * 8)
 
+localToRefY :: Position -> Position -> Int
+localToRefY ref pos =
+  y pos - (chunkY ref * 8)
+
+localToRefX :: Position -> Position -> Int
+localToRefX ref pos =
+  x pos - (chunkX ref * 8)
+
 class GetPosition t where
   getPosition :: t -> Position
 

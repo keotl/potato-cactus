@@ -16,6 +16,15 @@ fixedPacket opcode payload =
           payload
       )
 
+fixedPacket2 :: Word8 -> Put -> ByteString
+fixedPacket2 opcode payload =
+  toStrict $
+    runPut
+      ( do
+          putWord8 opcode
+          payload
+      )
+
 -- Variable size packet, size encoded as ubyte
 varPacket :: Word8 -> BitPut -> ByteString
 varPacket opcode payload =

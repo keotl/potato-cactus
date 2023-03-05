@@ -6,7 +6,7 @@ import Data.Typeable (typeOf)
 import GHC.Clock (getMonotonicTimeNSec)
 import PotatoCactus.Boot.GameChannel (gameChannel)
 import PotatoCactus.Config.Constants (tickInterval)
-import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (UpdateWorldMessage))
+import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (UpdateWorldMessage, ObjectClickMessage))
 import PotatoCactus.Game.Reducer (reduceWorld)
 import PotatoCactus.Game.World (ClientHandle (controlChannel, username), ClientHandleMessage (CloseClientConnectionMessage, WorldUpdatedMessage), World (clients), defaultWorldValue, worldInstance)
 import qualified PotatoCactus.Game.World as W
@@ -47,11 +47,11 @@ reduceUntilNextTick_ world gameChannel = do
   message <- readChan gameChannel
 
   -- TESTING PRINT
-  -- case message of
-  --   ObjectClickMessage username payload -> do
-  --     print username
-  --     print payload
-  --   _ -> putStr ""
+  case message of
+    ObjectClickMessage username payload -> do
+      print username
+      print payload
+    _ -> putStr ""
   -- END TESTING PRINT
 
   ( case message of
