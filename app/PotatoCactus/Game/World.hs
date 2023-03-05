@@ -5,6 +5,8 @@ import Data.IORef (newIORef)
 import Data.List (find)
 import GHC.IO (unsafePerformIO)
 import PotatoCactus.Config.Constants (maxPlayers)
+import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
+import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload)
 import qualified PotatoCactus.Game.Player as P (Player (serverIndex), create, username)
 import PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer)
 import PotatoCactus.Game.Position (Position (Position))
@@ -25,7 +27,9 @@ instance Show ClientHandle where
 data World = World
   { tick :: Int,
     players :: MobList P.Player,
-    clients :: [ClientHandle]
+    clients :: [ClientHandle],
+    clickedEntity :: Maybe ObjectClickPayload,
+    queuedEntityClick_ :: Maybe ObjectClickPayload
   }
   deriving (Show)
 
@@ -33,14 +37,18 @@ instance Advance World where
   advance w =
     w
       { tick = tick w + 1,
-        players = updateAll (players w) advancePlayer
+        players = updateAll (players w) advancePlayer,
+        clickedEntity = (queuedEntityClick_ w),
+        queuedEntityClick_ = Nothing
       }
 
 defaultWorldValue =
   World
     { tick = 0,
       players = create maxPlayers,
-      clients = []
+      clients = [],
+      clickedEntity = Nothing,
+      queuedEntityClick_ = Nothing
     }
 
 worldInstance = unsafePerformIO $ newIORef defaultWorldValue
@@ -55,9 +63,6 @@ updatePlayer world playerName update =
           (\x -> P.username x == playerName)
           update
     }
-
-mockPlayer_ :: P.Player
-mockPlayer_ = P.create "the doctor" (Position 3093 3244 0)
 
 addPlayer :: World -> P.Player -> World
 addPlayer world player =

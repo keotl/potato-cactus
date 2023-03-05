@@ -13,8 +13,11 @@ removeObjectPacket refPos object =
   fixedPacket
     101
     ( do
-        putNBits 6 $ toWord_ 0 -- type
-        putNBits 2 $ toWord_ 0 -- facing direction
-        putNBits 4 . toWord_ $ localToRefX refPos (getPosition object)
-        putNBits 4 . toWord_ $ localToRefY refPos (getPosition object)
+        -- putNBits 6 $ toWord_ 0 -- type
+        -- putNBits 2 $ toWord_ 0 -- facing direction
+        putNBits 8 $ toWord_ (-(10 * 4 + 0))
+        -- putNBits 4 . toWord_ $ localToRefX refPos (getPosition object)
+        putNBits 4 . toWord_ $ 1
+        putNBits 4 . toWord_ $ 1
+        -- putNBits 4 . toWord_ $ localToRefY refPos (getPosition object)
     )

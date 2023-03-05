@@ -8,6 +8,7 @@ data GameObject = GameObject
   { id :: GameObjectId,
     position :: Position
   }
+  deriving (Show)
 
 instance GetPosition GameObject where
   getPosition = position

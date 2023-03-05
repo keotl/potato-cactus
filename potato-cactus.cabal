@@ -50,6 +50,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Out.LoadMapRegionPacket
                    PotatoCactus.Network.Packets.Out.UpdateFriendsListStatusPacket
                    PotatoCactus.Network.Packets.Out.UpdateItemContainerPacket
+                   PotatoCactus.Network.Packets.Out.UpdatePlayerPlacementReferencePacket
                    PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket
                    PotatoCactus.Network.Packets.Out.UpdateSkillPacket
                    PotatoCactus.Network.Packets.Out.PlayerInteractionPacket

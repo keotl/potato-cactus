@@ -1,13 +1,15 @@
 module PotatoCactus.Game.Reducer where
 
 import qualified PotatoCactus.Boot.GameChannel as C
+import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject))
 import PotatoCactus.Game.Interface.InterfaceButtonDispatch (dispatchInterfaceButtonClick)
 import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (..))
+import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload (objectId))
 import qualified PotatoCactus.Game.Message.RegisterClientPayload as C
 import qualified PotatoCactus.Game.Player as P
 import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (EquipItem, SayChatMessage, UnequipItem))
 import PotatoCactus.Game.Typing (advance)
-import PotatoCactus.Game.World (ClientHandle (username), World (World, clients, players, tick), addPlayer, removePlayerByUsername, updatePlayer)
+import PotatoCactus.Game.World (ClientHandle (username), World (World, clickedEntity, clients, players, queuedEntityClick_, tick), addPlayer, removePlayerByUsername, updatePlayer)
 
 reduceWorld :: World -> GameChannelMessage -> World
 reduceWorld world (RegisterClientMessage message) =
@@ -25,7 +27,8 @@ reduceWorld world (EquipItemMessage playerName payload) =
 reduceWorld world (UnequipItemMessage playerName slot) =
   updatePlayer world playerName (\p -> P.queueUpdate p (UnequipItem slot))
 reduceWorld world (ObjectClickMessage playerName payload) =
-  world -- TODO - dispatch  - keotl 2023-03-01
+  world {queuedEntityClick_ = Just payload}
+-- world -- TODO - dispatch  - keotl 2023-03-01
 reduceWorld world UpdateWorldMessage =
   advance world
 

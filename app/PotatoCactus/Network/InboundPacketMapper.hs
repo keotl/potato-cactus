@@ -16,7 +16,7 @@ mapPacket clientIdentifier packet =
     4 -> Just $ playerChatMessage clientIdentifier packet
     41 -> Just $ equipItemPacket clientIdentifier packet
     73 -> Just $ objectActionPacket clientIdentifier packet
-    98 -> Just $ playerWalkMessage clientIdentifier packet -- Red X walk
+    -- 98 -> Just $ playerWalkMessage clientIdentifier packet -- Red X walk
     132 -> Just $objectActionPacket clientIdentifier packet
     145 -> itemContainerClickPacket clientIdentifier packet
     164 -> Just $ playerWalkMessage clientIdentifier packet -- Yellow X walk
