@@ -1,18 +1,19 @@
 module PotatoCactus.Network.Packets.Out.AddObjectPacket where
 
 import Data.Binary.BitPut (putNBits)
+import Data.Binary.Put (putWord16le, putWord8)
 import Data.Bits (Bits (shiftL, (.&.)), shiftR)
 import Data.ByteString (ByteString)
-import Debug.Trace (trace)
-import PotatoCactus.Game.Entity.Object.GameObject (GameObject (id))
+import PotatoCactus.Game.Definitions.GameObjectDefinitions (GameObjectDefinition (objectType), objectDefinition)
+import PotatoCactus.Game.Entity.Object.GameObject (GameObject (facingDirection, id))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, y), localToRefX, localToRefY)
 import PotatoCactus.Network.Binary (toShortLE_, toShort_, toWord_)
-import PotatoCactus.Network.Packets.Packet (fixedPacket)
+import PotatoCactus.Network.Packets.Packet (fixedPacket2)
 import Prelude hiding (id)
 
 addObjectPacket :: Position -> GameObject -> ByteString
 addObjectPacket refPos object =
-  fixedPacket
+  fixedPacket2
     151
     ( do
         let offset =
@@ -20,9 +21,11 @@ addObjectPacket refPos object =
                   + ((y refPos - (y . getPosition $ object)) .&. 7)
               )
          in do
-              putNBits 8 $ toWord_ (offset - 128)
-              -- putNBits 16 . toShortLE_ $ 5553
-              putNBits 16 . toShortLE_ . id $ object
-              -- putNBits 8 $ toWord_ (128 - (0 * 4 + 0)) -- door
-              putNBits 8 $ toWord_ (128 - (10 * 4 + 0)) -- interactible default
+              putWord8 . fromIntegral $ offset - 128
+              putWord16le . fromIntegral . id $ object
+              case objectDefinition (id object) of
+                Just def ->
+                  putWord8 . fromIntegral $ (128 - (objectType def * 4 + facingDirection object)) -- door
+                Nothing ->
+                  putWord8 . fromIntegral $ (128 - (10 * 4 + facingDirection object))
     )

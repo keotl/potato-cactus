@@ -5,7 +5,8 @@ import PotatoCactus.Game.Position (GetPosition (getPosition), Position)
 
 data GameObject = GameObject
   { id :: GameObjectId,
-    position :: Position
+    position :: Position,
+    facingDirection :: Int
   }
   deriving (Show)
 

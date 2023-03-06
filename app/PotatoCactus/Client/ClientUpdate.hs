@@ -74,17 +74,21 @@ updateClient sock client localState W.WorldUpdatedMessage = do
                 -- sendAll sock (removeObjectPacket (getPosition p) (GameObject objectId (fromXY position 0)))
                 -- putStrLn $ "sending addobject" ++ (show ((getPosition p) {x = 1 + x (getPosition p)}))
                 sendAll sock $ setPlacementReferencePacket p (fromXY position 0)
-                sendAll
-                  sock
-                  ( addObjectPacket
-                      (fromXY position 0)
-                      -- ((getPosition p) {x = 1 + x (getPosition p)})
-                      ( GameObject
-                          (objectId + 1)
+                if (objectId == 1531)
+                  then sendAll sock (removeObjectPacket (fromXY position 0) (GameObject objectId (fromXY position 0) 0))
+                  else
+                    sendAll
+                      sock
+                      ( addObjectPacket
                           (fromXY position 0)
                           -- ((getPosition p) {x = 1 + x (getPosition p)})
+                          ( GameObject
+                              (objectId + 1)
+                              (fromXY position 0)
+                              0
+                              -- ((getPosition p) {x = 1 + x (getPosition p)})
+                          )
                       )
-                  )
 
             return
               ClientLocalState_
