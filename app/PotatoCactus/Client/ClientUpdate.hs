@@ -14,7 +14,7 @@ import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject))
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload (ObjectClickPayload))
 import PotatoCactus.Game.Movement.MovementEntity (MovementEntity (PlayerWalkMovement_), hasChangedRegion)
 import PotatoCactus.Game.Movement.PlayerWalkMovement (PlayerWalkMovement (lastRegionUpdate_))
-import PotatoCactus.Game.Movement.PositionXY (fromXY)
+import PotatoCactus.Game.Movement.PositionXY (fromXY, toXY)
 import PotatoCactus.Game.Player (Player (Player, equipment, inventory, movement, serverIndex, username))
 import PotatoCactus.Game.PlayerUpdate.Equipment (Equipment (container))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position, x, y))
@@ -23,11 +23,12 @@ import qualified PotatoCactus.Game.World as W (ClientHandle, ClientHandleMessage
 import PotatoCactus.Game.World.MobList (findByIndex, findByPredicate)
 import qualified PotatoCactus.Game.World.Selectors as WS
 import PotatoCactus.Network.Packets.Out.AddObjectPacket (addObjectPacket)
+import PotatoCactus.Network.Packets.Out.ClearChunkObjectsPacket (clearChunkObjectsPacket, clearChunksAroundPlayer)
 import PotatoCactus.Network.Packets.Out.LoadMapRegionPacket (loadMapRegionPacket)
 import PotatoCactus.Network.Packets.Out.PlayerUpdate.PlayerUpdatePacket (playerUpdatePacket)
 import PotatoCactus.Network.Packets.Out.RemoveObjectPacket (removeObjectPacket)
+import PotatoCactus.Network.Packets.Out.SetPlacementReferencePacket (setPlacementReferencePacket)
 import PotatoCactus.Network.Packets.Out.UpdateItemContainerPacket (updateItemContainerPacket)
-import PotatoCactus.Network.Packets.Out.UpdatePlayerPlacementReferencePacket (updatePlayerPlacementReferencePacket)
 import PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket (updateRunEnergyPacket)
 import Type.Reflection (typeOf)
 
@@ -46,8 +47,8 @@ updateClient sock client localState W.WorldUpdatedMessage = do
       if hasChangedRegion (movement p)
         then do
           sendAll sock $ loadMapRegionPacket (getPosition p)
-        else -- sendAll sock $ updatePlayerPlacementReferencePacket (getPosition p)
-          pure ()
+          sendAll sock $ clearChunksAroundPlayer p
+        else pure ()
 
       let newLocalPlayers =
             updateLocalPlayers
@@ -69,22 +70,22 @@ updateClient sock client localState W.WorldUpdatedMessage = do
                 -- 2. Add the object in relation to that point of reference.
                 -- The point of reference has to be selected so that the offset is positive to the object
                 -- Probably easiest to set the reference each time an object is sent
-                
+
                 -- sendAll sock (removeObjectPacket (getPosition p) (GameObject objectId (fromXY position 0)))
-                putStrLn $ "sending addobject" ++ (show ((getPosition p) {x = 1 + x (getPosition p)}))
-                sendAll sock $ updatePlayerPlacementReferencePacket p  ((getPosition p) {x = 1 + x (getPosition p)})
-                case movement p of
-                  PlayerWalkMovement_ m -> do
-                    sendAll
-                      sock
-                      ( addObjectPacket
-                          ((getPosition p) {x = 1 + x (getPosition p)})
-                          ( GameObject
-                              (objectId)
-                              ((getPosition p) {x = 1 + x (getPosition p)})
-                          )
+                -- putStrLn $ "sending addobject" ++ (show ((getPosition p) {x = 1 + x (getPosition p)}))
+                sendAll sock $ setPlacementReferencePacket p (fromXY position 0)
+                sendAll
+                  sock
+                  ( addObjectPacket
+                      (fromXY position 0)
+                      -- ((getPosition p) {x = 1 + x (getPosition p)})
+                      ( GameObject
+                          (objectId + 1)
+                          (fromXY position 0)
+                          -- ((getPosition p) {x = 1 + x (getPosition p)})
                       )
-                  _ -> pure ()
+                  )
+
             return
               ClientLocalState_
                 { localPlayers = newLocalPlayers,

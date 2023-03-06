@@ -15,19 +15,14 @@ addObjectPacket refPos object =
   fixedPacket
     151
     ( do
-        -- putNBits 4 . toWord_ $ localToRefX refPos (getPosition object)
-        -- putNBits 4 . toWord_ $ localToRefY refPos (getPosition object)
-
         let offset =
               ( ((x refPos - (x . getPosition $ object)) `shiftL` 4)
                   + ((y refPos - (y . getPosition $ object)) .&. 7)
               )
          in do
               putNBits 8 $ toWord_ (offset - 128)
-              -- putNBits 4 . toWord_ $ 0
-              -- putNBits 4 . toWord_ $ 0
+              -- putNBits 16 . toShortLE_ $ 5553
               putNBits 16 . toShortLE_ . id $ object
-              putNBits 8 $ toWord_ (128 - (10 * 4 + 0))
-              -- putNBits 6 . toWord_ $ 0 -- type
-              -- putNBits 2 . toWord_ $ 0 -- orientation
+              -- putNBits 8 $ toWord_ (128 - (0 * 4 + 0)) -- door
+              putNBits 8 $ toWord_ (128 - (10 * 4 + 0)) -- interactible default
     )
