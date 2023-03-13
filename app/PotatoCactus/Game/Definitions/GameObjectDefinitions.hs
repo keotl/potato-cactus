@@ -6,10 +6,11 @@ import GHC.IO (unsafePerformIO)
 import GHC.IORef (newIORef)
 
 type GameObjectId = Int
+type GameObjectType = Int
 
 data GameObjectDefinition = GameObjectDefinition
   { id :: GameObjectId,
-    objectType :: Int
+    objectType :: GameObjectType
   }
   deriving (Show)
 

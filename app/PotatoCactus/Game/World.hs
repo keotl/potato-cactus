@@ -5,6 +5,7 @@ import Data.IORef (newIORef)
 import Data.List (find)
 import GHC.IO (unsafePerformIO)
 import PotatoCactus.Config.Constants (maxPlayers)
+import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCollection (DynamicObjectCollection), create)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload)
 import qualified PotatoCactus.Game.Player as P (Player (serverIndex), create, username)
@@ -28,6 +29,8 @@ data World = World
   { tick :: Int,
     players :: MobList P.Player,
     clients :: [ClientHandle],
+    objects :: DynamicObjectCollection,
+    -- TODO - remove these  - keotl 2023-03-13
     clickedEntity :: Maybe ObjectClickPayload,
     queuedEntityClick_ :: Maybe ObjectClickPayload
   }
@@ -45,8 +48,9 @@ instance Advance World where
 defaultWorldValue =
   World
     { tick = 0,
-      players = create maxPlayers,
+      players = PotatoCactus.Game.World.MobList.create maxPlayers,
       clients = [],
+      objects = PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create,
       clickedEntity = Nothing,
       queuedEntityClick_ = Nothing
     }

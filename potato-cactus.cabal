@@ -29,6 +29,8 @@ executable potato-cactus
                    PotatoCactus.Boot.GameChannel
                    PotatoCactus.Boot.ServerInit
                    PotatoCactus.Client.ClientUpdate
+                   PotatoCactus.Client.GameObjectUpdate.EncodeGameObjectUpdate
+                   PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateDiff
                    PotatoCactus.Client.LocalPlayerList
                    PotatoCactus.Client.PlayerInit
                    PotatoCactus.Network.Encoding.ChatMessageEncoding
@@ -67,10 +69,12 @@ executable potato-cactus
                    PotatoCactus.Network.Binary
                    PotatoCactus.Login.LoginHandler
                    PotatoCactus.Login.Models
+                   PotatoCactus.Game.Entity.Object.DynamicObjectCollection
                    PotatoCactus.Game.Entity.Object.GameObject
                    PotatoCactus.Game.Definitions.EquipmentDefinitions
                    PotatoCactus.Game.Definitions.GameObjectDefinitions
                    PotatoCactus.Game.Definitions.ItemDefinitions
+                   PotatoCactus.Game.Definitions.StaticGameObjectSet
                    PotatoCactus.Game.Interface.FriendsList
                    PotatoCactus.Game.Interface.GameTabs
                    PotatoCactus.Game.Interface.InterfaceButtonDispatch

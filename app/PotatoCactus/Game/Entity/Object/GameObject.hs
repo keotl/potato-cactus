@@ -8,7 +8,7 @@ data GameObject = GameObject
     position :: Position,
     facingDirection :: Int
   }
-  deriving (Show)
+  deriving (Show, Eq)
 
 instance GetPosition GameObject where
   getPosition = position
