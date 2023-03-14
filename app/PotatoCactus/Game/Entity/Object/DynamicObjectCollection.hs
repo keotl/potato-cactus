@@ -7,11 +7,11 @@ import PotatoCactus.Game.Entity.Object.GameObject (GameObject (id, position))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position, x, y, z), chunkX, chunkY)
 import Prelude hiding (id)
 
-data DynamicObject = Added GameObject | Removed Position GameObjectType deriving (Eq, Show)
+data DynamicObject = Added GameObject | Removed GameObject deriving (Eq, Show)
 
 instance GetPosition DynamicObject where
   getPosition (Added object) = getPosition object
-  getPosition (Removed pos _) = pos
+  getPosition (Removed object) = getPosition object
 
 data DynamicObjectCollection = DynamicObjectCollection
   { elements_ :: IntMap DynamicObject
@@ -33,7 +33,8 @@ removeDynamicObject keyLike collection =
 
 key_ :: DynamicObject -> Int
 key_ (Added object) = rawKey_ (position object, objectTypeKey_ . objectDefinition . id $ object)
-key_ (Removed position objectType) = rawKey_ (position, objectType)
+key_ (Removed object) = rawKey_ (position object, objectTypeKey_ . objectDefinition . id $ object)
+
 
 rawKey_ :: (Position, GameObjectType) -> Int
 rawKey_ (position, objectType) =

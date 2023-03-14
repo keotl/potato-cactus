@@ -8,6 +8,7 @@ import Game.InterpolatePathTests (interpolatePathTests)
 import DecodeChatTests (decodeChatTests, testNibbles, encodeChatTests)
 import IterableTests (testReplaceAt)
 import MobListTests (testMobList)
+import Game.GameObjectUpdateDiffTests (testObjectDiff)
 
 tests =
   TestList
@@ -27,7 +28,8 @@ tests =
       encodeChatTests,
       testNibbles,
       testReplaceAt,
-      testMobList
+      testMobList,
+      testObjectDiff
     ]
 
 main :: IO ()

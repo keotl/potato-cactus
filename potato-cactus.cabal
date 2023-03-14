@@ -69,6 +69,7 @@ executable potato-cactus
                    PotatoCactus.Network.Binary
                    PotatoCactus.Login.LoginHandler
                    PotatoCactus.Login.Models
+                   PotatoCactus.Game.Entity.Object.DispatchGameObjectClick
                    PotatoCactus.Game.Entity.Object.DynamicObjectCollection
                    PotatoCactus.Game.Entity.Object.GameObject
                    PotatoCactus.Game.Definitions.EquipmentDefinitions
