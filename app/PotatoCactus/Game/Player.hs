@@ -1,6 +1,8 @@
 module PotatoCactus.Game.Player where
 
 import Data.Foldable (fold)
+import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction)
+import qualified PotatoCactus.Game.Entity.Interaction.Interaction as Interaction
 import PotatoCactus.Game.ItemContainer (ItemContainer, playerEquipmentContainer, playerInventory)
 import PotatoCactus.Game.Movement.MovementEntity (playerWalkMovement)
 import qualified PotatoCactus.Game.Movement.MovementEntity as M (MovementEntity, issueWalkCommand)
@@ -14,8 +16,10 @@ import PotatoCactus.Game.PlayerUpdate.UpdateMask (PlayerUpdateMask, appearanceFl
 import qualified PotatoCactus.Game.PlayerUpdate.UpdateMask as Mask
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
 
+type PlayerIndex = Int
+
 data Player = Player
-  { serverIndex :: Int,
+  { serverIndex :: PlayerIndex,
     username :: String,
     appearance :: PlayerAppearance,
     movement :: M.MovementEntity,
@@ -24,6 +28,7 @@ data Player = Player
     chatMessage :: Maybe ChatMessage,
     inventory :: ItemContainer,
     equipment :: Equipment,
+    interaction :: Interaction,
     skipUpdate_ :: Bool
   }
   deriving (Show)
@@ -47,6 +52,7 @@ create username position =
       chatMessage = Nothing,
       inventory = playerInventory,
       equipment = Equipment playerEquipmentContainer,
+      interaction = Interaction.create,
       skipUpdate_ = True
     }
 

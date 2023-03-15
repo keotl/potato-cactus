@@ -78,3 +78,6 @@ shouldUpdateRegion_ :: Position -> Position -> Bool
 shouldUpdateRegion_ lastUpdate currentPos =
   let (deltaX, deltaY) = (x currentPos - chunkX lastUpdate * 8, y currentPos - chunkY lastUpdate * 8)
    in deltaX < 16 || deltaX >= 88 || deltaY < 16 || deltaY > 88
+
+isStopped :: PlayerWalkMovement -> Bool
+isStopped = null . queue_

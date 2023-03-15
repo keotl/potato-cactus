@@ -8,9 +8,9 @@ import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (..))
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload (objectId))
 import qualified PotatoCactus.Game.Message.RegisterClientPayload as C
 import qualified PotatoCactus.Game.Player as P
-import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (EquipItem, SayChatMessage, UnequipItem))
+import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (EquipItem, InteractWithObject, SayChatMessage, UnequipItem))
 import PotatoCactus.Game.Typing (advance)
-import PotatoCactus.Game.World (ClientHandle (username), World (World, clickedEntity, clients, players, queuedEntityClick_, tick), addPlayer, removePlayerByUsername, updatePlayer)
+import PotatoCactus.Game.World (ClientHandle (username), World (World, clickedEntity, clients, players, queuedEntityClick_, tick), addPlayer, removePlayerByUsername, updatePlayer, updatePlayerByIndex)
 
 reduceWorld :: World -> GameChannelMessage -> World
 reduceWorld world (RegisterClientMessage message) =
@@ -27,8 +27,8 @@ reduceWorld world (EquipItemMessage playerName payload) =
   updatePlayer world playerName (\p -> P.queueUpdate p (EquipItem payload))
 reduceWorld world (UnequipItemMessage playerName slot) =
   updatePlayer world playerName (\p -> P.queueUpdate p (UnequipItem slot))
-reduceWorld world (ObjectClickMessage playerName payload) =
-  dispatchGameObjectClick playerName payload world
+reduceWorld world (ObjectClickMessage playerId payload) =
+  updatePlayerByIndex world playerId (\p -> P.queueUpdate p (InteractWithObject payload))
 reduceWorld world UpdateWorldMessage =
   advance world
 

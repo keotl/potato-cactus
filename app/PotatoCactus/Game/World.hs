@@ -8,6 +8,7 @@ import PotatoCactus.Config.Constants (maxPlayers)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCollection (DynamicObjectCollection), create)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload)
+import PotatoCactus.Game.Player (PlayerIndex)
 import qualified PotatoCactus.Game.Player as P (Player (serverIndex), create, username)
 import PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer)
 import PotatoCactus.Game.Position (Position (Position))
@@ -65,6 +66,16 @@ updatePlayer world playerName update =
         updateByPredicate
           (players world)
           (\x -> P.username x == playerName)
+          update
+    }
+
+updatePlayerByIndex :: World -> PlayerIndex -> (P.Player -> P.Player) -> World
+updatePlayerByIndex world playerId update =
+  world
+    { players =
+        updateAtIndex
+          (players world)
+          playerId
           update
     }
 

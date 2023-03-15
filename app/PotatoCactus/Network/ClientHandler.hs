@@ -9,8 +9,10 @@ import Data.ByteString.Lazy (toStrict)
 import Data.IORef (readIORef)
 import Network.Socket (Socket)
 import Network.Socket.ByteString (recv, sendAll)
-import PotatoCactus.Client.ClientUpdate (ClientLocalState_, defaultState, updateClient)
+import PotatoCactus.Boot.GameChannel (gameChannel)
+import PotatoCactus.Client.ClientUpdate (ClientLocalState_ (localPlayerIndex), defaultState, updateClient)
 import PotatoCactus.Client.PlayerInit (playerInit)
+import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (UnregisterClientMessage))
 import PotatoCactus.Game.Player (Player)
 import PotatoCactus.Game.World (ClientHandle (controlChannel, username), ClientHandleMessage (CloseClientConnectionMessage), worldInstance)
 import PotatoCactus.Network.InboundPacketMapper (mapPacket)
@@ -18,8 +20,6 @@ import PotatoCactus.Network.Packets.Opcodes
 import PotatoCactus.Network.Packets.Out.InitializePlayerPacket (initializePlayerPacket)
 import PotatoCactus.Network.Packets.Reader (InboundPacket (opcode), readPacket)
 import PotatoCactus.Utils.Logging (LogLevel (Debug, Info), logger)
-import PotatoCactus.Boot.GameChannel (gameChannel)
-import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage(UnregisterClientMessage))
 
 type InternalQueueMessage_ = Either ClientHandleMessage InboundPacket
 
@@ -51,7 +51,7 @@ clientHandlerMainLoop_ client clientState sock chan = do
         CloseClientConnectionMessage -> logger_ Info $ username client ++ " disconnected."
         _ -> clientHandlerMainLoop_ client updatedState sock chan
     Right clientPacket -> do
-      case mapPacket (username client) clientPacket of
+      case mapPacket (localPlayerIndex clientState) (username client) clientPacket of
         Just downstreamMessage -> do
           writeChan gameChannel downstreamMessage
           if opcode clientPacket == socketClosedOpcode

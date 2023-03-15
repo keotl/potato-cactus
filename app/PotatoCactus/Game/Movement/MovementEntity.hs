@@ -36,3 +36,8 @@ setRunning :: MovementEntity -> Bool -> MovementEntity
 setRunning (PlayerWalkMovement_ m) running =
   PlayerWalkMovement_ m {isRunning = running}
 setRunning m _ = m
+
+isStopped :: MovementEntity -> Bool
+isStopped (PlayerWalkMovement_ m) =
+  PlayerWalkMovement.isStopped m
+isStopped _ = True

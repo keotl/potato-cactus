@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module PotatoCactus.Client.ClientUpdate (updateClient, defaultState, ClientLocalState_) where
+module PotatoCactus.Client.ClientUpdate (updateClient, defaultState, ClientLocalState_(localPlayerIndex)) where
 
 import Data.Binary.BitPut (runBitPut)
 import Data.ByteString (pack)

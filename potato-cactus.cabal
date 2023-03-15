@@ -69,9 +69,13 @@ executable potato-cactus
                    PotatoCactus.Network.Binary
                    PotatoCactus.Login.LoginHandler
                    PotatoCactus.Login.Models
+                   PotatoCactus.Game.Entity.Interaction.Interaction
+                   PotatoCactus.Game.Entity.Interaction.State
+                   PotatoCactus.Game.Entity.Interaction.Target
                    PotatoCactus.Game.Entity.Object.DispatchGameObjectClick
                    PotatoCactus.Game.Entity.Object.DynamicObjectCollection
                    PotatoCactus.Game.Entity.Object.GameObject
+                   PotatoCactus.Game.Entity.Object.GameObjectKey
                    PotatoCactus.Game.Definitions.EquipmentDefinitions
                    PotatoCactus.Game.Definitions.GameObjectDefinitions
                    PotatoCactus.Game.Definitions.ItemDefinitions
@@ -102,6 +106,12 @@ executable potato-cactus
                    PotatoCactus.Game.PlayerUpdate.PlayerUpdate
                    PotatoCactus.Game.PlayerUpdate.ProcessPlayerUpdate
                    PotatoCactus.Game.Position
+                   PotatoCactus.Game.Scripting.Events.ApplyScriptActionResult
+                   PotatoCactus.Game.Scripting.Events.CreateGameEvents
+                   PotatoCactus.Game.Scripting.Events.PlayerEvents
+                   PotatoCactus.Game.Scripting.MockScriptInteractions
+                   PotatoCactus.Game.Scripting.ProcessTickUpdates
+                   PotatoCactus.Game.Scripting.ScriptUpdates
                    PotatoCactus.Game.Skills
                    PotatoCactus.Game.Typing
                    PotatoCactus.Game.World

@@ -41,3 +41,11 @@ isWithin distance a b =
     && ( let (deltaX, deltaY) = (x a - x b, y a - y b)
           in (abs deltaX <= distance) && (abs deltaY <= distance)
        )
+
+-- isNextTo in 4-neighbour connectivity
+isNextTo :: Position -> Position -> Bool
+isNextTo a b =
+  z a == z b
+    && ( let (deltaX, deltaY) = (x a - x b, y a - y b)
+          in (abs deltaX == 1 && abs deltaY == 0) || (abs deltaX == 0 && abs deltaY == 1)
+       )

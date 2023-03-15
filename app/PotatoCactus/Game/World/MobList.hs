@@ -1,9 +1,8 @@
 {-# LANGUAGE LambdaCase #-}
-
-module PotatoCactus.Game.World.MobList (MobList (mobs), create, add, remove, updateAll, updateAtIndex, findByIndex, findIndexByPredicate, findByPredicate, updateByPredicate, findAllByPredicate) where
+module PotatoCactus.Game.World.MobList (MobList (mobs), create, add, remove, updateAll, updateAtIndex, findByIndex, findIndexByPredicate, findByPredicate, updateByPredicate, findAllByPredicate, iter) where
 
 import Data.List (find, findIndex)
-import Data.Maybe (fromMaybe, isJust, isNothing, mapMaybe)
+import Data.Maybe (catMaybes, fromMaybe, isJust, isNothing, mapMaybe)
 import PotatoCactus.Utils.Iterable (replaceAtIndex)
 
 data MobList a = MobList
@@ -92,3 +91,7 @@ updateByPredicate list predicate transform =
   case findIndexByPredicate list predicate of
     Nothing -> list
     Just index -> updateAtIndex list index transform
+
+iter :: MobList a -> [a]
+iter list =
+  catMaybes (mobs list)

@@ -8,13 +8,14 @@ import Data.Word (Word16)
 import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (ObjectClickMessage))
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload (ObjectClickPayload))
 import PotatoCactus.Game.Movement.PositionXY (PositionXY (PositionXY))
+import PotatoCactus.Game.Player (PlayerIndex)
 import PotatoCactus.Network.Packets.Reader (InboundPacket (opcode, payload))
 
-objectActionPacket :: String -> InboundPacket -> GameChannelMessage
-objectActionPacket username packet =
+objectActionPacket :: PlayerIndex -> InboundPacket -> GameChannelMessage
+objectActionPacket playerId packet =
   let (actionIndex, objectId, x, y) = runGet (selectReader_ (opcode packet)) (fromStrict . payload $ packet)
    in ObjectClickMessage
-        username
+        playerId
         ( ObjectClickPayload
             (fromIntegral objectId)
             (PositionXY (fromIntegral x) (fromIntegral y))
