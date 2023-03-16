@@ -24,8 +24,9 @@ addObjectPacket refPos object =
               putWord8 . fromIntegral $ offset - 128
               putWord16le . fromIntegral . id $ object
               case objectDefinition (id object) of
+                -- TODO - object type depends on position as well!  - keotl 2023-03-16
                 Just def ->
-                  putWord8 . fromIntegral $ (128 - (objectType def * 4 + facingDirection object)) -- door
+                  putWord8 . fromIntegral $ (128 - (objectType def * 4 + facingDirection object))
                 Nothing ->
                   putWord8 . fromIntegral $ (128 - (10 * 4 + facingDirection object))
     )

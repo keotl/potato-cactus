@@ -1,11 +1,12 @@
 module PotatoCactus.Game.Scripting.MockScriptInteractions where
 
 import Debug.Trace (trace)
+import PotatoCactus.Game.Definitions.StaticGameObjectSet (staticObjectAt)
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction (state, target))
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (..))
 import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (ObjectTarget))
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject (Added))
-import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject))
+import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, facingDirection))
 import PotatoCactus.Game.Entity.Object.GameObjectKey (GameObjectKey (GameObjectKey))
 import PotatoCactus.Game.Message.RegisterClientPayload (RegisterClientPayload (player))
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
@@ -22,14 +23,20 @@ dispatchScriptEvent world (PlayerInteraction player interaction) =
         (ObjectTarget (GameObjectKey 1530 pos) 1, InProgress) ->
           return
             [ ClearPlayerInteraction (serverIndex player),
-              AddGameObject (Added $ GameObject 1531 pos 0) -- TODO - read facing from static set  - keotl 2023-03-14
+              AddGameObject (Added $ GameObject 1531 pos (((objDirection_ pos 0) +1) `mod` 4))
             ]
         (ObjectTarget (GameObjectKey 1531 pos) 1, InProgress) ->
           return
             [ ClearPlayerInteraction (serverIndex player),
-              AddGameObject (Added $ GameObject 1530 pos 3) -- TODO - read facing from static set  - keotl 2023-03-14
+              AddGameObject (Added $ GameObject 1530 pos (((objDirection_ pos 0))))
             ]
         _ -> return [ClearPlayerInteraction (serverIndex player)]
     )
 
 -- dispatchTickUpdate _ _ = return []
+
+objDirection_ :: Position -> Int -> Int
+objDirection_ pos objType =
+  case staticObjectAt pos objType of
+    Just obj -> trace ("got static object:" ++ (show obj) ) facingDirection obj
+    Nothing -> 0
