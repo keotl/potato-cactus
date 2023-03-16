@@ -30,10 +30,7 @@ data World = World
   { tick :: Int,
     players :: MobList P.Player,
     clients :: [ClientHandle],
-    objects :: DynamicObjectCollection,
-    -- TODO - remove these  - keotl 2023-03-13
-    clickedEntity :: Maybe ObjectClickPayload,
-    queuedEntityClick_ :: Maybe ObjectClickPayload
+    objects :: DynamicObjectCollection
   }
   deriving (Show)
 
@@ -41,9 +38,7 @@ instance Advance World where
   advance w =
     w
       { tick = tick w + 1,
-        players = updateAll (players w) advancePlayer,
-        clickedEntity = (queuedEntityClick_ w),
-        queuedEntityClick_ = Nothing
+        players = updateAll (players w) advancePlayer
       }
 
 defaultWorldValue =
@@ -51,9 +46,7 @@ defaultWorldValue =
     { tick = 0,
       players = PotatoCactus.Game.World.MobList.create maxPlayers,
       clients = [],
-      objects = PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create,
-      clickedEntity = Nothing,
-      queuedEntityClick_ = Nothing
+      objects = PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create
     }
 
 worldInstance = unsafePerformIO $ newIORef defaultWorldValue

@@ -65,7 +65,7 @@ create pos =
   PlayerWalkMovement
     { position_ = pos,
       queue_ = [],
-      isRunning = False,
+      isRunning = True,
       isTeleporting = True,
       runEnergy = 100,
       shouldUpdateRegion = True,

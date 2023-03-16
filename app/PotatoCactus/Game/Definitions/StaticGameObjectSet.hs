@@ -4,8 +4,7 @@ import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.List (find)
 import Data.Maybe (fromMaybe)
 import GHC.IO (unsafePerformIO)
-import PotatoCactus.Game.Definitions.GameObjectDefinitions (GameObjectDefinition (objectType), GameObjectType, objectDefinition)
-import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, id))
+import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, id, objectType), GameObjectType)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
 import Prelude hiding (id)
 
@@ -21,9 +20,9 @@ initializeStaticGameSet :: IO Int
 initializeStaticGameSet = do
   let i =
         StaticGameObjectSet
-          [ GameObject 1530 (Position 3088 3251 0) 3, -- door example
-            GameObject 1530 (Position 3101 3258 0) 2, -- door example
-            GameObject 1530 (Position 3101 3258 0) 2 -- diagonal door example
+          [ GameObject 1530 (Position 3088 3251 0) 0 3, -- door example
+            GameObject 1530 (Position 3101 3258 0) 0 2, -- door example
+            GameObject 1530 (Position 3092 3274 0) 9 2 -- diagonal door example
           ]
   writeIORef instance_ i
 
@@ -37,14 +36,8 @@ staticObjectAt pos objType =
         return
           ( find
               ( \e ->
-                  getPosition e == pos && objTypeForObject_ e == objType
+                  getPosition e == pos && objectType e == objType
               )
               (elements_ set)
           )
     )
-
-objTypeForObject_ :: GameObject -> GameObjectType
-objTypeForObject_ obj =
-  case objectDefinition . id $ obj of
-    Just def -> objectType def
-    Nothing -> 10

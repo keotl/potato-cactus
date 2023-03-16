@@ -72,7 +72,6 @@ executable potato-cactus
                    PotatoCactus.Game.Entity.Interaction.Interaction
                    PotatoCactus.Game.Entity.Interaction.State
                    PotatoCactus.Game.Entity.Interaction.Target
-                   PotatoCactus.Game.Entity.Object.DispatchGameObjectClick
                    PotatoCactus.Game.Entity.Object.DynamicObjectCollection
                    PotatoCactus.Game.Entity.Object.GameObject
                    PotatoCactus.Game.Entity.Object.GameObjectKey

@@ -2,8 +2,7 @@ module PotatoCactus.Game.Entity.Object.DynamicObjectCollection where
 
 import Data.IntMap (IntMap, delete, empty, toList)
 import Data.IntMap.Lazy (insert)
-import PotatoCactus.Game.Definitions.GameObjectDefinitions (GameObjectDefinition (objectType), GameObjectType, objectDefinition)
-import PotatoCactus.Game.Entity.Object.GameObject (GameObject (id, position))
+import PotatoCactus.Game.Entity.Object.GameObject (GameObject (position, objectType), GameObjectType)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position, x, y, z), chunkX, chunkY)
 import Prelude hiding (id)
 
@@ -32,8 +31,8 @@ removeDynamicObject keyLike collection =
    in collection {elements_ = updatedElements}
 
 key_ :: DynamicObject -> Int
-key_ (Added object) = rawKey_ (position object, objectTypeKey_ . objectDefinition . id $ object)
-key_ (Removed object) = rawKey_ (position object, objectTypeKey_ . objectDefinition . id $ object)
+key_ (Added object) = rawKey_ (position object, objectType object)
+key_ (Removed object) = rawKey_ (position object, objectType object)
 
 
 rawKey_ :: (Position, GameObjectType) -> Int
@@ -42,10 +41,6 @@ rawKey_ (position, objectType) =
     + y position * 10 ^ 5
     + z position * 10 ^ 10
     + objectType * 10 ^ 11
-
-objectTypeKey_ :: Maybe GameObjectDefinition -> Int
-objectTypeKey_ Nothing = 10
-objectTypeKey_ (Just def) = objectType def
 
 -- TODO - use a more suitable data structure  - keotl 2023-03-12
 findByChunkXY :: Int -> Int -> DynamicObjectCollection -> [DynamicObject]

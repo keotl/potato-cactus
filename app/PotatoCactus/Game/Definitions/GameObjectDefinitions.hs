@@ -6,11 +6,12 @@ import GHC.IO (unsafePerformIO)
 import GHC.IORef (newIORef)
 
 type GameObjectId = Int
-type GameObjectType = Int
+
+-- type GameObjectType = Int
 
 data GameObjectDefinition = GameObjectDefinition
-  { id :: GameObjectId,
-    objectType :: GameObjectType
+  { id :: GameObjectId
+  -- objectType :: GameObjectType
   }
   deriving (Show)
 
@@ -33,13 +34,13 @@ initializeObjectDb = do
         foldl
           (\a e -> e a)
           db
-          [ addMockObject_ 5553 10,
-            addMockObject_ 1530 0,
-            addMockObject_ 1531 0
+          [ addMockObject_ 5553,
+            addMockObject_ 1530,
+            addMockObject_ 1531
           ]
   writeIORef objectDb updated
   return $ length updated
 
-addMockObject_ :: GameObjectId -> Int -> (IntMap GameObjectDefinition -> IntMap GameObjectDefinition)
-addMockObject_ objectId objectType =
-  insert objectId (GameObjectDefinition objectId objectType)
+addMockObject_ :: GameObjectId -> (IntMap GameObjectDefinition -> IntMap GameObjectDefinition)
+addMockObject_ objectId =
+  insert objectId (GameObjectDefinition objectId)

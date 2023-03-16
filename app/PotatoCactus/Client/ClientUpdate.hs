@@ -20,7 +20,6 @@ import PotatoCactus.Game.Movement.PositionXY (fromXY, toXY)
 import PotatoCactus.Game.Player (Player (Player, equipment, inventory, movement, serverIndex, username))
 import PotatoCactus.Game.PlayerUpdate.Equipment (Equipment (container))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position, x, y))
-import PotatoCactus.Game.World (clickedEntity)
 import qualified PotatoCactus.Game.World as W (ClientHandle, ClientHandleMessage (CloseClientConnectionMessage, WorldUpdatedMessage), World (players, tick), username, worldInstance)
 import PotatoCactus.Game.World.MobList (findByIndex, findByPredicate)
 import qualified PotatoCactus.Game.World.Selectors as WS

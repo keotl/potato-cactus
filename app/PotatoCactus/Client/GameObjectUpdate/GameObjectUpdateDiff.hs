@@ -2,12 +2,11 @@ module PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateDiff (computeDiff, G
 
 import Data.List (find)
 import Data.Maybe (mapMaybe)
-import PotatoCactus.Game.Definitions.GameObjectDefinitions (GameObjectDefinition (objectType), objectDefinition)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject)
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as Object
-import PotatoCactus.Game.Entity.Object.GameObject (GameObject (id))
 import PotatoCactus.Game.Position (getPosition)
 import Prelude hiding (id)
+import PotatoCactus.Game.Entity.Object.GameObject (GameObject (objectType))
 
 data GameObjectDiff = Added DynamicObject | Retained DynamicObject | Removed DynamicObject deriving (Eq, Show)
 
@@ -33,17 +32,13 @@ hasOtherInSameSpot (Object.Added obj) set =
   any
     ( ( \other ->
           getPosition other == getPosition obj
-            && objectType_ obj == objectType_ other
+            && objectType obj == objectType other
       )
         . unwrap_
     )
     set
 hasOtherInSameSpot (Object.Removed _) _ =
   False
-
-objectType_ :: GameObject -> Int
-objectType_ obj =
-  maybe 10 objectType (objectDefinition . id $ obj)
 
 unwrap_ :: DynamicObject -> GameObject
 unwrap_ (Object.Added obj) = obj

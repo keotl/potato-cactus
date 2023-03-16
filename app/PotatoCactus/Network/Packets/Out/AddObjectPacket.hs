@@ -4,8 +4,7 @@ import Data.Binary.BitPut (putNBits)
 import Data.Binary.Put (putWord16le, putWord8)
 import Data.Bits (Bits (shiftL, (.&.)), shiftR)
 import Data.ByteString (ByteString)
-import PotatoCactus.Game.Definitions.GameObjectDefinitions (GameObjectDefinition (objectType), objectDefinition)
-import PotatoCactus.Game.Entity.Object.GameObject (GameObject (facingDirection, id))
+import PotatoCactus.Game.Entity.Object.GameObject (GameObject (facingDirection, id, objectType))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, y), localToRefX, localToRefY)
 import PotatoCactus.Network.Binary (toShortLE_, toShort_, toWord_)
 import PotatoCactus.Network.Packets.Packet (fixedPacket2)
@@ -23,10 +22,5 @@ addObjectPacket refPos object =
          in do
               putWord8 . fromIntegral $ offset - 128
               putWord16le . fromIntegral . id $ object
-              case objectDefinition (id object) of
-                -- TODO - object type depends on position as well!  - keotl 2023-03-16
-                Just def ->
-                  putWord8 . fromIntegral $ (128 - (objectType def * 4 + facingDirection object))
-                Nothing ->
-                  putWord8 . fromIntegral $ (128 - (10 * 4 + facingDirection object))
+              putWord8 . fromIntegral $ (128 - (objectType object * 4 + facingDirection object))
     )

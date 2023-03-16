@@ -1,7 +1,6 @@
 module PotatoCactus.Game.Reducer where
 
 import qualified PotatoCactus.Boot.GameChannel as C
-import PotatoCactus.Game.Entity.Object.DispatchGameObjectClick (dispatchGameObjectClick)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject))
 import PotatoCactus.Game.Interface.InterfaceButtonDispatch (dispatchInterfaceButtonClick)
 import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (..))
@@ -10,7 +9,7 @@ import qualified PotatoCactus.Game.Message.RegisterClientPayload as C
 import qualified PotatoCactus.Game.Player as P
 import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (EquipItem, InteractWithObject, SayChatMessage, UnequipItem))
 import PotatoCactus.Game.Typing (advance)
-import PotatoCactus.Game.World (ClientHandle (username), World (World, clickedEntity, clients, players, queuedEntityClick_, tick), addPlayer, removePlayerByUsername, updatePlayer, updatePlayerByIndex)
+import PotatoCactus.Game.World (ClientHandle (username), World (World, clients, players, tick), addPlayer, removePlayerByUsername, updatePlayer, updatePlayerByIndex)
 
 reduceWorld :: World -> GameChannelMessage -> World
 reduceWorld world (RegisterClientMessage message) =
