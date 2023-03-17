@@ -56,6 +56,7 @@ closeDoor_ pos =
     Nothing ->
       ( case staticObjectAt pos 9 of
           Just diagonalDoor ->
+            -- TODO - We might need to group together multiple object types. e.g. interactible object group  - keotl 2023-03-16
             [ AddGameObject (Added $ GameObject 1530 pos 9 (objDirection_ pos 0))
             ]
           _ -> []

@@ -9,7 +9,7 @@ import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position
 import Prelude hiding (id)
 
 data StaticGameObjectSet = StaticGameObjectSet
-  { elements_ :: [GameObject]
+  { elements_ :: [GameObject] -- TODO - replace with a smarter data structure - keotl 2023-03-17
   }
 
 instance_ :: IORef StaticGameObjectSet
