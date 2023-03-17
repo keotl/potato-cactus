@@ -15,6 +15,7 @@ import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate)
 import PotatoCactus.Game.PlayerUpdate.UpdateMask (PlayerUpdateMask, appearanceFlag)
 import qualified PotatoCactus.Game.PlayerUpdate.UpdateMask as Mask
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
+import PotatoCactus.Game.Typing (Keyable (key))
 
 type PlayerIndex = Int
 
@@ -35,6 +36,9 @@ data Player = Player
 
 instance GetPosition Player where
   getPosition = getPosition . movement
+
+instance Keyable Player where
+  key = username
 
 issueWalkCommand :: (PositionXY, Bool, [WalkingStep]) -> Player -> Player
 issueWalkCommand (startPos, isRunning, steps) p =

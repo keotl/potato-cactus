@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module PotatoCactus.Client.ClientUpdate (updateClient, defaultState, ClientLocalState_(localPlayerIndex)) where
+module PotatoCactus.Client.ClientUpdate (updateClient, defaultState, ClientLocalState_ (localPlayerIndex)) where
 
 import Data.Binary.BitPut (runBitPut)
 import Data.ByteString (pack)
@@ -10,7 +10,7 @@ import GHC.IORef (readIORef)
 import Network.Socket
 import Network.Socket.ByteString (recv, send, sendAll)
 import PotatoCactus.Client.GameObjectUpdate.EncodeGameObjectUpdate (encodeGameObjectUpdate)
-import PotatoCactus.Client.LocalPlayerList (LocalPlayerList, updateLocalPlayers)
+import PotatoCactus.Client.LocalEntityList (LocalEntityList, updateLocalEntities)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject))
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload (ObjectClickPayload))
@@ -34,7 +34,7 @@ import PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket (updateRunEnergyPa
 import Type.Reflection (typeOf)
 
 data ClientLocalState_ = ClientLocalState_
-  { localPlayers :: LocalPlayerList,
+  { localPlayers :: LocalEntityList Player,
     gameObjects :: [DynamicObject],
     localPlayerIndex :: Int
   }
@@ -52,7 +52,7 @@ updateClient sock client localState W.WorldUpdatedMessage = do
         else pure ()
 
       let newLocalPlayers =
-            updateLocalPlayers
+            updateLocalEntities
               (localPlayers localState)
               (WS.localPlayers world p)
        in do

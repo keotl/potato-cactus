@@ -6,3 +6,6 @@ class Advance t where
 
 class ToNumeric t where
   toNumeric :: t -> Int
+
+class Keyable t where
+  key :: t -> String
