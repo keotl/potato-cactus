@@ -28,6 +28,7 @@ executable potato-cactus
     other-modules: PotatoCactus.Boot.GameThreadMain
                    PotatoCactus.Boot.GameChannel
                    PotatoCactus.Boot.ServerInit
+                   PotatoCactus.Boot.WorldInit
                    PotatoCactus.Client.ClientUpdate
                    PotatoCactus.Client.GameObjectUpdate.EncodeGameObjectUpdate
                    PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateDiff
@@ -55,6 +56,8 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Out.UpdateItemContainerPacket
                    PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket
                    PotatoCactus.Network.Packets.Out.UpdateSkillPacket
+                   PotatoCactus.Network.Packets.Out.NpcUpdate.NpcUpdatePacket
+                   PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeNpcMovement
                    PotatoCactus.Network.Packets.Out.PlayerInteractionPacket
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeBlock
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeAppearanceBlock
@@ -73,6 +76,8 @@ executable potato-cactus
                    PotatoCactus.Game.Entity.Interaction.State
                    PotatoCactus.Game.Entity.Interaction.Target
                    PotatoCactus.Game.Entity.Npc.Npc
+                   PotatoCactus.Game.Entity.Npc.NpcUpdateMask
+                   PotatoCactus.Game.Entity.Npc.NpcMovement
                    PotatoCactus.Game.Entity.Object.DynamicObjectCollection
                    PotatoCactus.Game.Entity.Object.GameObject
                    PotatoCactus.Game.Entity.Object.GameObjectKey

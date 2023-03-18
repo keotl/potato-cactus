@@ -32,4 +32,4 @@ testObjectDiff =
 
 mockObject_ :: Int -> Object.DynamicObject
 mockObject_ objectId =
-  Object.Added $ Object.GameObject objectId (Position 100 100 0) 10
+  Object.Added $ Object.GameObject objectId (Position 100 100 0) 10 0

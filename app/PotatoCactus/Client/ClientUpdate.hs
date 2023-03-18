@@ -11,6 +11,7 @@ import Network.Socket
 import Network.Socket.ByteString (recv, send, sendAll)
 import PotatoCactus.Client.GameObjectUpdate.EncodeGameObjectUpdate (encodeGameObjectUpdate)
 import PotatoCactus.Client.LocalEntityList (LocalEntityList, updateLocalEntities)
+import PotatoCactus.Game.Entity.Npc.Npc (Npc)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject))
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload (ObjectClickPayload))
@@ -26,6 +27,7 @@ import qualified PotatoCactus.Game.World.Selectors as WS
 import PotatoCactus.Network.Packets.Out.AddObjectPacket (addObjectPacket)
 import PotatoCactus.Network.Packets.Out.ClearChunkObjectsPacket (clearChunkObjectsPacket, clearChunksAroundPlayer)
 import PotatoCactus.Network.Packets.Out.LoadMapRegionPacket (loadMapRegionPacket)
+import PotatoCactus.Network.Packets.Out.NpcUpdate.NpcUpdatePacket (npcUpdatePacket)
 import PotatoCactus.Network.Packets.Out.PlayerUpdate.PlayerUpdatePacket (playerUpdatePacket)
 import PotatoCactus.Network.Packets.Out.RemoveObjectPacket (removeObjectPacket)
 import PotatoCactus.Network.Packets.Out.SetPlacementReferencePacket (setPlacementReferencePacket)
@@ -35,11 +37,18 @@ import Type.Reflection (typeOf)
 
 data ClientLocalState_ = ClientLocalState_
   { localPlayers :: LocalEntityList Player,
+    localNpcs :: LocalEntityList Npc,
     gameObjects :: [DynamicObject],
     localPlayerIndex :: Int
   }
 
-defaultState = ClientLocalState_ {localPlayers = [], gameObjects = [], localPlayerIndex = -1}
+defaultState =
+  ClientLocalState_
+    { localPlayers = [],
+      localNpcs = [],
+      gameObjects = [],
+      localPlayerIndex = -1
+    }
 
 updateClient :: Socket -> W.ClientHandle -> ClientLocalState_ -> W.ClientHandleMessage -> IO ClientLocalState_
 updateClient sock client localState W.WorldUpdatedMessage = do
@@ -55,51 +64,53 @@ updateClient sock client localState W.WorldUpdatedMessage = do
             updateLocalEntities
               (localPlayers localState)
               (WS.localPlayers world p)
-       in do
-            sendAll sock (playerUpdatePacket p newLocalPlayers world)
+       in let newLocalNpcs = updateLocalEntities (localNpcs localState) (WS.localNpcs world p)
+           in do
+                sendAll sock (playerUpdatePacket p newLocalPlayers world)
+                sendAll sock (npcUpdatePacket p newLocalNpcs world)
 
-            sendAll sock (updateItemContainerPacket (inventory p))
-            sendAll sock (updateItemContainerPacket (container (equipment p)))
+                sendAll sock (updateItemContainerPacket (inventory p))
+                sendAll sock (updateItemContainerPacket (container (equipment p)))
 
-            sendAll sock (updateRunEnergyPacket 100)
+                sendAll sock (updateRunEnergyPacket 100)
 
-            -- case clickedEntity world of
-            --   Nothing -> pure ()
-            --   Just (ObjectClickPayload objectId position index) -> do
-            --     -- to add an object :
-            --     -- 1. set a point of reference in relation to the player's last update chunk base
-            --     -- 2. Add the object in relation to that point of reference.
-            --     -- The point of reference has to be selected so that the offset is positive to the object
-            --     -- Probably easiest to set the reference each time an object is sent
+                -- case clickedEntity world of
+                --   Nothing -> pure ()
+                --   Just (ObjectClickPayload objectId position index) -> do
+                --     -- to add an object :
+                --     -- 1. set a point of reference in relation to the player's last update chunk base
+                --     -- 2. Add the object in relation to that point of reference.
+                --     -- The point of reference has to be selected so that the offset is positive to the object
+                --     -- Probably easiest to set the reference each time an object is sent
 
-            --     -- sendAll sock (removeObjectPacket (getPosition p) (GameObject objectId (fromXY position 0)))
-            --     -- putStrLn $ "sending addobject" ++ (show ((getPosition p) {x = 1 + x (getPosition p)}))
-            --     sendAll sock $ setPlacementReferencePacket p (fromXY position 0)
-            --     if (objectId == 1531)
-            --       then sendAll sock (removeObjectPacket (fromXY position 0) (GameObject objectId (fromXY position 0) 0))
-            --       else
-            --         sendAll
-            --           sock
-            --           ( addObjectPacket
-            --               (fromXY position 0)
-            --               -- ((getPosition p) {x = 1 + x (getPosition p)})
-            --               ( GameObject
-            --                   (objectId + 1)
-            --                   (fromXY position 0)
-            --                   0
-            --                   -- ((getPosition p) {x = 1 + x (getPosition p)})
-            --               )
-            --           )
-            let (newObjects, packets) = encodeGameObjectUpdate (gameObjects localState) world p
-             in do
-                  sendAll sock packets
-                  return
-                    ClientLocalState_
-                      { localPlayers = newLocalPlayers,
-                        localPlayerIndex = serverIndex p,
-                        gameObjects = newObjects
-                      }
-    -- TODO - NPC update - keotl 2023-02-08
+                --     -- sendAll sock (removeObjectPacket (getPosition p) (GameObject objectId (fromXY position 0)))
+                --     -- putStrLn $ "sending addobject" ++ (show ((getPosition p) {x = 1 + x (getPosition p)}))
+                --     sendAll sock $ setPlacementReferencePacket p (fromXY position 0)
+                --     if (objectId == 1531)
+                --       then sendAll sock (removeObjectPacket (fromXY position 0) (GameObject objectId (fromXY position 0) 0))
+                --       else
+                --         sendAll
+                --           sock
+                --           ( addObjectPacket
+                --               (fromXY position 0)
+                --               -- ((getPosition p) {x = 1 + x (getPosition p)})
+                --               ( GameObject
+                --                   (objectId + 1)
+                --                   (fromXY position 0)
+                --                   0
+                --                   -- ((getPosition p) {x = 1 + x (getPosition p)})
+                --               )
+                --           )
+                let (newObjects, packets) = encodeGameObjectUpdate (gameObjects localState) world p
+                 in do
+                      sendAll sock packets
+                      return
+                        ClientLocalState_
+                          { localPlayers = newLocalPlayers,
+                            localNpcs = newLocalNpcs,
+                            localPlayerIndex = serverIndex p,
+                            gameObjects = newObjects
+                          }
     Nothing -> do
       putStrLn $ "could not find player " ++ W.username client
       return localState

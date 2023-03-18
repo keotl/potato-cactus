@@ -1,6 +1,6 @@
 {-# LANGUAGE BlockArguments #-}
 
-module PotatoCactus.Network.Packets.Out.PlayerUpdate.PlayerUpdatePacket where
+module PotatoCactus.Network.Packets.Out.PlayerUpdate.PlayerUpdatePacket (playerUpdatePacket) where
 
 import Data.Binary (Word16, Word8)
 import Data.Binary.BitPut (BitPut, putBit, putBits, putByteString, putNBits, runBitPut)

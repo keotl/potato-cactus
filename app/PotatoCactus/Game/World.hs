@@ -4,7 +4,8 @@ import Control.Concurrent (Chan)
 import Data.IORef (newIORef)
 import Data.List (find)
 import GHC.IO (unsafePerformIO)
-import PotatoCactus.Config.Constants (maxPlayers)
+import PotatoCactus.Config.Constants (maxNpcs, maxPlayers)
+import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCollection (DynamicObjectCollection), create)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload)
@@ -29,6 +30,7 @@ instance Show ClientHandle where
 data World = World
   { tick :: Int,
     players :: MobList P.Player,
+    npcs :: MobList NPC.Npc,
     clients :: [ClientHandle],
     objects :: DynamicObjectCollection
   }
@@ -41,10 +43,12 @@ instance Advance World where
         players = updateAll (players w) advancePlayer
       }
 
+defaultWorldValue :: World
 defaultWorldValue =
   World
     { tick = 0,
       players = PotatoCactus.Game.World.MobList.create maxPlayers,
+      npcs = PotatoCactus.Game.World.MobList.create maxNpcs,
       clients = [],
       objects = PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create
     }
@@ -84,3 +88,10 @@ removePlayerByUsername world username =
   case findByPredicate (players world) (\p -> P.username p == username) of
     Just p -> world {players = remove (players world) (P.serverIndex p)}
     Nothing -> world
+
+addNpc :: World -> NPC.Npc -> World
+addNpc world npc =
+  case add (npcs world) npc of
+    Left (newNpcs, index) ->
+      world {npcs = updateAtIndex newNpcs index (\n -> n {NPC.serverIndex = index})}
+    Right _ -> world

@@ -1,11 +1,12 @@
 module PotatoCactus.Boot.ServerInit where
 
 import Data.Time (diffUTCTime, getCurrentTime)
+import PotatoCactus.Boot.WorldInit (initializeWorld)
 import PotatoCactus.Game.Definitions.EquipmentDefinitions (initializeEquipmentDefs)
-import PotatoCactus.Game.Definitions.ItemDefinitions (initializeDb)
-import PotatoCactus.Utils.Logging (LogLevel (Info), logger)
 import PotatoCactus.Game.Definitions.GameObjectDefinitions (initializeObjectDb)
+import PotatoCactus.Game.Definitions.ItemDefinitions (initializeDb)
 import PotatoCactus.Game.Definitions.StaticGameObjectSet (initializeStaticGameSet)
+import PotatoCactus.Utils.Logging (LogLevel (Info), logger)
 
 initializeServer :: IO ()
 initializeServer = do
@@ -22,6 +23,9 @@ initializeServer = do
 
   staticObjects <- initializeStaticGameSet
   logger_ Info $ "Loaded " ++ show staticObjects ++ " static game objects."
+
+  initializeWorld
+  logger_ Info "Loaded world."
 
   endTime <- getCurrentTime
   logger_ Info $ "Server initialization completed in " ++ show (diffUTCTime endTime startTime)

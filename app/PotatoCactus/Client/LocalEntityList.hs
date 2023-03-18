@@ -1,4 +1,4 @@
-module PotatoCactus.Client.LocalEntityList (LocalEntityList, LocalEntityStatus (Added, Removed, Retained), LocalEntity (LocalEntity), updateLocalEntities) where
+module PotatoCactus.Client.LocalEntityList (LocalEntityList, LocalEntityStatus (Added, Removed, Retained), LocalEntity (LocalEntity), updateLocalEntities, clientKnownEntities) where
 
 import Data.List (find)
 import Data.Maybe (catMaybes, isNothing, mapMaybe)
@@ -50,3 +50,15 @@ isAlreadyKnown_ known other =
   case find (\(LocalEntity p _) -> key p == key other) known of
     Nothing -> False
     Just _ -> True
+
+-- Number of entities that are not being added on the current cycle. i.e. Retained or Removed
+clientKnownEntities :: LocalEntityList a -> Int
+clientKnownEntities localEntities =
+  length
+    ( filter
+        ( \(LocalEntity p status) -> case status of
+            Added -> False
+            _ -> True
+        )
+        localEntities
+    )

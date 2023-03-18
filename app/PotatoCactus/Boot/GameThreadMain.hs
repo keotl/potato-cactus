@@ -20,7 +20,7 @@ gameThreadMain = do
   worldTickThreadId <-
     forkFinally
       (worldTickThread_ tickInterval gameChannel)
-      (\x -> logger_ Fatal "WorldTick thread exited.")
+      (\x -> logger_ Fatal $ "WorldTick thread exited with '" ++ show x ++ "'.")
 
   mainLoop
   return ()

@@ -8,3 +8,6 @@ entityViewingDistance = 15
 
 maxPlayers :: Int
 maxPlayers = 2000
+
+maxNpcs :: Int
+maxNpcs = 16000
