@@ -40,7 +40,8 @@ instance Advance World where
   advance w =
     w
       { tick = tick w + 1,
-        players = updateAll (players w) advancePlayer
+        players = updateAll (players w) advancePlayer,
+        npcs = updateAll (npcs w) advance
       }
 
 defaultWorldValue :: World

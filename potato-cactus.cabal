@@ -113,6 +113,7 @@ executable potato-cactus
                    PotatoCactus.Game.Position
                    PotatoCactus.Game.Scripting.Events.ApplyScriptActionResult
                    PotatoCactus.Game.Scripting.Events.CreateGameEvents
+                   PotatoCactus.Game.Scripting.Events.NpcEvents
                    PotatoCactus.Game.Scripting.Events.PlayerEvents
                    PotatoCactus.Game.Scripting.MockScriptInteractions
                    PotatoCactus.Game.Scripting.ProcessTickUpdates

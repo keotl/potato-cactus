@@ -5,15 +5,18 @@ import PotatoCactus.Game.Definitions.StaticGameObjectSet (staticObjectAt)
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction (state, target))
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (..))
 import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (ObjectTarget))
+import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
+import PotatoCactus.Game.Entity.Npc.NpcMovement (doMovement)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject (Added))
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, facingDirection))
 import PotatoCactus.Game.Entity.Object.GameObjectKey (GameObjectKey (GameObjectKey))
 import PotatoCactus.Game.Message.RegisterClientPayload (RegisterClientPayload (player))
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
 import PotatoCactus.Game.Player (Player (serverIndex))
-import PotatoCactus.Game.Position (GetPosition (getPosition), Position (z))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (PlayerInteraction), ScriptActionResult (AddGameObject, ClearPlayerInteraction))
-import PotatoCactus.Game.World (World)
+import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, z))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcEntityTick, PlayerInteraction), ScriptActionResult (AddGameObject, ClearPlayerInteraction, UpdateNpc))
+import PotatoCactus.Game.Typing (key)
+import PotatoCactus.Game.World (World (tick))
 
 dispatchScriptEvent :: World -> GameEvent -> IO [ScriptActionResult]
 dispatchScriptEvent world (PlayerInteraction player interaction) =
@@ -25,6 +28,23 @@ dispatchScriptEvent world (PlayerInteraction player interaction) =
         (ObjectTarget (GameObjectKey 1531 pos) 1, InProgress) ->
           return (ClearPlayerInteraction (serverIndex player) : closeDoor_ pos)
         _ -> return [ClearPlayerInteraction (serverIndex player)]
+    )
+dispatchScriptEvent world (NpcEntityTick npc) =
+  return
+    ( case key npc of
+        "hans" ->
+          [ UpdateNpc
+              (NPC.serverIndex npc)
+              ( npc
+                  { NPC.movement =
+                      doMovement
+                        (NPC.movement npc)
+                        ((getPosition npc) {x = x (getPosition npc) + 1})
+                  }
+              )
+            | tick world `mod` 8 == 0
+          ]
+        _ -> []
     )
 
 -- dispatchTickUpdate _ _ = return []

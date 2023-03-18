@@ -3,7 +3,7 @@ module PotatoCactus.Game.Entity.Npc.Npc where
 import PotatoCactus.Game.Entity.Npc.NpcMovement (NpcMovement, create)
 import PotatoCactus.Game.Entity.Npc.NpcUpdateMask (NpcUpdateMask)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position)
-import PotatoCactus.Game.Typing (Keyable (key))
+import PotatoCactus.Game.Typing (Advance (advance), Keyable (key))
 
 type NpcIndex = Int
 
@@ -23,6 +23,12 @@ instance GetPosition Npc where
 
 instance Keyable Npc where
   key = uniqueId_
+
+instance Advance Npc where
+  advance npc =
+    npc
+      { movement = advance . movement $ npc
+      }
 
 create :: NpcDefinitionId -> String -> Position -> Npc
 create definitionId uniqueId pos =
