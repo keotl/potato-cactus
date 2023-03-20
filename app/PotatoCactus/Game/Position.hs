@@ -49,3 +49,7 @@ isNextTo a b =
     && ( let (deltaX, deltaY) = (x a - x b, y a - y b)
           in (abs deltaX == 1 && abs deltaY == 0) || (abs deltaX == 0 && abs deltaY == 1)
        )
+
+faraway :: Position -> Position
+faraway refPos =
+  refPos {x = 666666, y = 666666}

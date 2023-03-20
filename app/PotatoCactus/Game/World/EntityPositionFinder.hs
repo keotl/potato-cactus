@@ -7,6 +7,7 @@ import PotatoCactus.Game.Position (GetPosition (getPosition), Position)
 import PotatoCactus.Game.World.MobList (MobList, findByIndex)
 
 type CombatTargetPosOrDefault = CombatTarget -> Position -> Position
+
 combatTargetPosOrDefault :: MobList Player -> MobList Npc -> CombatTarget -> Position -> Position
 combatTargetPosOrDefault _ _ None defaultValue = defaultValue
 combatTargetPosOrDefault allPlayers _ (PlayerTarget playerId) defaultValue =
