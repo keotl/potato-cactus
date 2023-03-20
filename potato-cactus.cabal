@@ -82,6 +82,7 @@ executable potato-cactus
                    PotatoCactus.Game.Entity.Interaction.Interaction
                    PotatoCactus.Game.Entity.Interaction.State
                    PotatoCactus.Game.Entity.Interaction.Target
+                   PotatoCactus.Game.Entity.Npc.AdvanceNpc
                    PotatoCactus.Game.Entity.Npc.Npc
                    PotatoCactus.Game.Entity.Npc.NpcUpdateMask
                    PotatoCactus.Game.Entity.Npc.NpcMovement
@@ -107,6 +108,7 @@ executable potato-cactus
                    PotatoCactus.Game.Movement.InterpolatePath
                    PotatoCactus.Game.Movement.MovementEntity
                    PotatoCactus.Game.Movement.PlayerWalkMovement
+                   PotatoCactus.Game.Movement.PathPlanner
                    PotatoCactus.Game.Movement.PositionXY
                    PotatoCactus.Game.Movement.StaticMovement
                    PotatoCactus.Game.Movement.WalkingStep
@@ -129,6 +131,7 @@ executable potato-cactus
                    PotatoCactus.Game.Skills
                    PotatoCactus.Game.Typing
                    PotatoCactus.Game.World
+                   PotatoCactus.Game.World.EntityPositionFinder
                    PotatoCactus.Game.World.MobList
                    PotatoCactus.Game.World.Selectors
                    PotatoCactus.Game.Reducer

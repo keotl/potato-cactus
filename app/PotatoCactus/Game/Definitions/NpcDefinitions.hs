@@ -9,7 +9,8 @@ type NpcDefinitionId = Int
 
 data NpcDefinition = NpcDefinition
   { id :: NpcDefinitionId,
-    hitpoints :: Int
+    hitpoints :: Int,
+    attackRange :: Int -- used to decide whether the entity should move to try to hit their target
   }
   deriving (Show)
 
@@ -32,11 +33,11 @@ initializeNpcDb = do
         foldl
           (\a e -> e a)
           db
-          [ addMockNpc_ 100 5
+          [ addMockNpc_ 100 5 1
           ]
   writeIORef npcDb updated
   return $ length updated
 
-addMockNpc_ :: NpcDefinitionId -> Int -> (IntMap NpcDefinition -> IntMap NpcDefinition)
-addMockNpc_ npcId hitpoints =
-  insert npcId (NpcDefinition npcId hitpoints)
+addMockNpc_ :: NpcDefinitionId -> Int -> Int -> (IntMap NpcDefinition -> IntMap NpcDefinition)
+addMockNpc_ npcId hitpoints attackRange =
+  insert npcId (NpcDefinition npcId hitpoints attackRange)

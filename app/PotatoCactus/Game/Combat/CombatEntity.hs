@@ -2,6 +2,7 @@ module PotatoCactus.Game.Combat.CombatEntity where
 
 import PotatoCactus.Game.Combat.Hit (Hit (damage))
 import PotatoCactus.Game.Typing (Advance (advance))
+import PotatoCactus.Game.Position (Position)
 
 data CombatTarget = PlayerTarget Int | NpcTarget Int | None deriving (Show)
 

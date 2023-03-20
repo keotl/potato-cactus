@@ -5,6 +5,7 @@ import Data.IORef (newIORef)
 import Data.List (find)
 import GHC.IO (unsafePerformIO)
 import PotatoCactus.Config.Constants (maxNpcs, maxPlayers)
+import PotatoCactus.Game.Entity.Npc.AdvanceNpc (advanceNpc)
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCollection (DynamicObjectCollection), create)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
@@ -14,6 +15,7 @@ import qualified PotatoCactus.Game.Player as P (Player (serverIndex), create, us
 import PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer)
 import PotatoCactus.Game.Position (Position (Position))
 import PotatoCactus.Game.Typing (Advance (advance))
+import PotatoCactus.Game.World.EntityPositionFinder (combatTargetPosOrDefault)
 import PotatoCactus.Game.World.MobList (MobList, add, create, findByIndex, findByPredicate, remove, updateAll, updateAtIndex, updateByPredicate)
 import PotatoCactus.Utils.Iterable (replace)
 
@@ -38,7 +40,11 @@ data World = World
 
 instance Advance World where
   advance w =
-    let newNpcs = updateAll (npcs w) advance
+    let newNpcs =
+          updateAll
+            (npcs w)
+            ( advanceNpc (combatTargetPosOrDefault (players w) (npcs w)) 666
+            )
      in w
           { tick = tick w + 1,
             players = updateAll (players w) (advancePlayer (findByIndex newNpcs)),

@@ -42,3 +42,8 @@ doMovement m target =
       queue_ = [],
       walkingDirection = directionBetween (toXY (position_ m)) (toXY target)
     }
+
+-- for scripts, set new position instantly
+immediatelyQueueMovement :: NpcMovement -> [Position] -> NpcMovement
+immediatelyQueueMovement m path =
+  advance m {queue_ = path}

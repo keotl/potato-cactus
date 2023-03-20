@@ -27,14 +27,6 @@ instance GetPosition Npc where
 instance Keyable Npc where
   key n = (show . definitionId $ n) ++ (show . serverIndex $ n)
 
-instance Advance Npc where
-  advance npc =
-    npc
-      { movement = advance . movement $ npc,
-        combat = advance . combat $ npc,
-        updateMask = 0
-      }
-
 create :: NpcDefinitionId -> Position -> Npc
 create definitionId pos =
   case npcDefinition definitionId of
