@@ -14,7 +14,7 @@ import Data.List (find)
 import GHC.RTS.Flags (ProfFlags (modSelector))
 import PotatoCactus.Client.LocalEntityList (LocalEntity (LocalEntity), LocalEntityList, LocalEntityStatus (Added, Removed, Retained))
 import PotatoCactus.Game.Player as P (Player (serverIndex, updateMask, username))
-import PotatoCactus.Game.PlayerUpdate.UpdateMask (PlayerUpdateMask, appearanceFlag, chatFlag)
+import PotatoCactus.Game.PlayerUpdate.UpdateMask (PlayerUpdateMask, appearanceFlag, chatFlag, primaryHealthUpdateFlag, secondaryHealthUpdateFlag)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, y))
 import PotatoCactus.Game.World as W
   ( ClientHandle (username),
@@ -25,6 +25,8 @@ import PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeAppearanceBlock (enco
 import PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeBlock (addBlockIfRequired)
 import PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeChatUpdate (encodeChatUpdateBlock)
 import PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodePlayerMovement (MovementUpdateType (UpdateOther, UpdateSelf), encodePlayerMovement)
+import PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodePrimaryHitUpdateBlock (encodePrimaryHitUpdateBlock)
+import PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeSecondaryHitUpdateBlock (encodeSecondaryHitUpdateBlock)
 import PotatoCactus.Network.Packets.Packet (varShortPacket)
 
 playerUpdatePacket :: Player -> LocalEntityList Player -> World -> ByteString
@@ -133,6 +135,9 @@ playerBlockSet_ player world = do
   ByteString.concat $
     map
       (\x -> x (updateMask player) player world)
+      -- TODO - Do we need to pass World as a parameter?  - keotl 2023-03-20
       [ addBlockIfRequired appearanceFlag encodeAppearanceBlock,
-        addBlockIfRequired chatFlag encodeChatUpdateBlock
+        addBlockIfRequired chatFlag encodeChatUpdateBlock,
+        addBlockIfRequired primaryHealthUpdateFlag encodePrimaryHitUpdateBlock,
+        addBlockIfRequired secondaryHealthUpdateFlag encodeSecondaryHitUpdateBlock
       ]

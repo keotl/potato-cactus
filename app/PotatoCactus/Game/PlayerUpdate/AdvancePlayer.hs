@@ -30,6 +30,7 @@ advancePlayer findNpc p =
                     { movement = advance (movement updated),
                       inventory = advance (inventory updated),
                       equipment = advance (equipment updated),
+                      combat = advance . combat $ p,
                       interaction = updatedInteraction,
                       pendingUpdates = []
                     }
@@ -38,6 +39,7 @@ advancePlayer findNpc p =
                     { movement = advance (movement updated), -- TODO - interpolate path and issue walk command  - keotl 2023-03-20
                       inventory = advance (inventory updated),
                       equipment = advance (equipment updated),
+                      combat = advance . combat $ p,
                       interaction = updatedInteraction,
                       pendingUpdates = []
                     }

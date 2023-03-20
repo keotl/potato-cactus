@@ -59,12 +59,16 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Out.UpdateSkillPacket
                    PotatoCactus.Network.Packets.Out.NpcUpdate.NpcUpdatePacket
                    PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeNpcMovement
+                   PotatoCactus.Network.Packets.Out.NpcUpdate.EncodePrimaryNpcHitUpdateBlock
+                   PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeSecondaryNpcHitUpdateBlock
                    PotatoCactus.Network.Packets.Out.PlayerInteractionPacket
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeBlock
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeAppearanceBlock
+                   PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodePrimaryHitUpdateBlock
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeChatUpdate
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodePlayerMovement
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.PlayerUpdatePacket
+                   PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeSecondaryHitUpdateBlock
                    PotatoCactus.Network.Packets.Out.PlayerSettingsPackets
                    PotatoCactus.Network.Packets.Out.RemoveObjectPacket
                    PotatoCactus.Network.Packets.Out.SetPlacementReferencePacket
@@ -73,6 +77,8 @@ executable potato-cactus
                    PotatoCactus.Network.Binary
                    PotatoCactus.Login.LoginHandler
                    PotatoCactus.Login.Models
+                   PotatoCactus.Game.Combat.CombatEntity
+                   PotatoCactus.Game.Combat.Hit
                    PotatoCactus.Game.Entity.Interaction.Interaction
                    PotatoCactus.Game.Entity.Interaction.State
                    PotatoCactus.Game.Entity.Interaction.Target
@@ -85,6 +91,7 @@ executable potato-cactus
                    PotatoCactus.Game.Definitions.EquipmentDefinitions
                    PotatoCactus.Game.Definitions.GameObjectDefinitions
                    PotatoCactus.Game.Definitions.ItemDefinitions
+                   PotatoCactus.Game.Definitions.NpcDefinitions
                    PotatoCactus.Game.Definitions.StaticGameObjectSet
                    PotatoCactus.Game.Interface.FriendsList
                    PotatoCactus.Game.Interface.GameTabs

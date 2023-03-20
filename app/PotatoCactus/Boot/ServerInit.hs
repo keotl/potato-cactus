@@ -7,6 +7,7 @@ import PotatoCactus.Game.Definitions.GameObjectDefinitions (initializeObjectDb)
 import PotatoCactus.Game.Definitions.ItemDefinitions (initializeDb)
 import PotatoCactus.Game.Definitions.StaticGameObjectSet (initializeStaticGameSet)
 import PotatoCactus.Utils.Logging (LogLevel (Info), logger)
+import PotatoCactus.Game.Definitions.NpcDefinitions (initializeNpcDb)
 
 initializeServer :: IO ()
 initializeServer = do
@@ -20,6 +21,9 @@ initializeServer = do
 
   objectDefs <- initializeObjectDb
   logger_ Info $ "Loaded " ++ show objectDefs ++ " game object definitions."
+
+  npcDefs <- initializeNpcDb
+  logger_ Info $ "Loaded " ++ show npcDefs ++ " game NPC definitions."
 
   staticObjects <- initializeStaticGameSet
   logger_ Info $ "Loaded " ++ show staticObjects ++ " static game objects."

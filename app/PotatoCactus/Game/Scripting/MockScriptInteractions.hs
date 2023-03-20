@@ -1,10 +1,12 @@
 module PotatoCactus.Game.Scripting.MockScriptInteractions where
 
 import Debug.Trace (trace)
+import qualified PotatoCactus.Game.Combat.CombatEntity as Combat
+import PotatoCactus.Game.Combat.Hit (DamageType (MeleeAttack), Hit (Hit))
 import PotatoCactus.Game.Definitions.StaticGameObjectSet (staticObjectAt)
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction (state, target))
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (..))
-import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (ObjectTarget))
+import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (NpcTarget, ObjectTarget), NpcInteractionType (NpcAttack))
 import PotatoCactus.Game.Entity.Npc.Npc (Npc (definitionId))
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Npc.NpcMovement (doMovement)
@@ -15,7 +17,7 @@ import PotatoCactus.Game.Message.RegisterClientPayload (RegisterClientPayload (p
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
 import PotatoCactus.Game.Player (Player (serverIndex))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, z))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcEntityTick, PlayerInteraction), ScriptActionResult (AddGameObject, ClearPlayerInteraction, UpdateNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcEntityTick, PlayerAttack, PlayerInteraction), ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackPlayerToNpc, UpdateNpc))
 import PotatoCactus.Game.Typing (key)
 import PotatoCactus.Game.World (World (tick))
 
@@ -28,6 +30,11 @@ dispatchScriptEvent world (PlayerInteraction player interaction) =
           return (ClearPlayerInteraction (serverIndex player) : openDoor_ pos)
         (ObjectTarget (GameObjectKey 1531 pos) 1, InProgress) ->
           return (ClearPlayerInteraction (serverIndex player) : closeDoor_ pos)
+        (NpcTarget npcId NpcAttack, InProgress) ->
+          return
+            [ DispatchAttackPlayerToNpc (serverIndex player) npcId (Hit 0 MeleeAttack),
+              ClearPlayerInteraction (serverIndex player)
+            ]
         _ -> return [ClearPlayerInteraction (serverIndex player)]
     )
 dispatchScriptEvent world (NpcEntityTick npc) =
@@ -46,6 +53,16 @@ dispatchScriptEvent world (NpcEntityTick npc) =
             | tick world `mod` 8 == 0
           ]
         _ -> []
+    )
+dispatchScriptEvent world (PlayerAttack player target) =
+  trace
+    "dispatched attack event"
+    ( case target of
+        Combat.NpcTarget npcId ->
+          return
+            [ DispatchAttackPlayerToNpc (serverIndex player) npcId (Hit 0 MeleeAttack)
+            ]
+        _ -> return []
     )
 
 -- dispatchTickUpdate _ _ = return []

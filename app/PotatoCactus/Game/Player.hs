@@ -1,6 +1,10 @@
 module PotatoCactus.Game.Player where
 
+import Data.Bits ((.&.), (.|.))
 import Data.Foldable (fold)
+import PotatoCactus.Game.Combat.CombatEntity (CombatEntity)
+import qualified PotatoCactus.Game.Combat.CombatEntity as CombatEntity
+import PotatoCactus.Game.Combat.Hit (Hit)
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction)
 import qualified PotatoCactus.Game.Entity.Interaction.Interaction as Interaction
 import PotatoCactus.Game.ItemContainer (ItemContainer, playerEquipmentContainer, playerInventory)
@@ -12,7 +16,7 @@ import PotatoCactus.Game.PlayerUpdate.Appearance (PlayerAppearance, defaultPlaye
 import PotatoCactus.Game.PlayerUpdate.ChatMessage (ChatMessage)
 import PotatoCactus.Game.PlayerUpdate.Equipment (Equipment (Equipment))
 import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate)
-import PotatoCactus.Game.PlayerUpdate.UpdateMask (PlayerUpdateMask, appearanceFlag)
+import PotatoCactus.Game.PlayerUpdate.UpdateMask (PlayerUpdateMask, appearanceFlag, primaryHealthUpdateFlag, secondaryHealthUpdateFlag)
 import qualified PotatoCactus.Game.PlayerUpdate.UpdateMask as Mask
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
 import PotatoCactus.Game.Typing (Keyable (key))
@@ -30,6 +34,7 @@ data Player = Player
     inventory :: ItemContainer,
     equipment :: Equipment,
     interaction :: Interaction,
+    combat :: CombatEntity,
     skipUpdate_ :: Bool
   }
   deriving (Show)
@@ -42,7 +47,10 @@ instance Keyable Player where
 
 issueWalkCommand :: (PositionXY, Bool, [WalkingStep]) -> Player -> Player
 issueWalkCommand (startPos, isRunning, steps) p =
-  p {movement = M.issueWalkCommand (movement p) startPos steps}
+  p
+    { movement = M.issueWalkCommand (movement p) startPos steps,
+      combat = CombatEntity.clearTarget . combat $ p
+    }
 
 create :: String -> Position -> Player
 create username position =
@@ -57,9 +65,33 @@ create username position =
       inventory = playerInventory,
       equipment = Equipment playerEquipmentContainer,
       interaction = Interaction.create,
+      combat = CombatEntity.create 10,
       skipUpdate_ = True
     }
 
 queueUpdate :: Player -> PlayerUpdate -> Player
 queueUpdate p update =
-  p {pendingUpdates = update : pendingUpdates p}
+  p
+    { pendingUpdates = update : pendingUpdates p,
+      interaction = Interaction.create,
+      combat = CombatEntity.clearTarget (combat p)
+    }
+
+applyHit :: CombatEntity.CombatTarget -> Hit -> Player -> Player
+applyHit sourceEntity hit player =
+  player
+    { combat = CombatEntity.applyHit (combat player) sourceEntity hit,
+      updateMask =
+        if (updateMask player .&. primaryHealthUpdateFlag) > 0
+          then updateMask player .|. secondaryHealthUpdateFlag
+          else updateMask player .|. primaryHealthUpdateFlag
+    }
+
+-- Sets the attack cooldown based on equipped items
+setAttackCooldown :: Player -> Player
+setAttackCooldown p =
+  p {combat = CombatEntity.setAttackCooldown (combat p) 10}
+
+setAttackTarget :: Player -> CombatEntity.CombatTarget -> Player
+setAttackTarget p target =
+  p {combat = CombatEntity.setTarget (combat p) target}
