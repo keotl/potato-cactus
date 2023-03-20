@@ -13,8 +13,7 @@ data Npc = Npc
   { serverIndex :: NpcIndex,
     movement :: NpcMovement,
     updateMask :: NpcUpdateMask,
-    definitionId :: NpcDefinitionId,
-    uniqueId_ :: String -- to disambiguate local entities in update packets. Should be globally unique.
+    definitionId :: NpcDefinitionId
   }
   deriving (Show)
 
@@ -22,7 +21,7 @@ instance GetPosition Npc where
   getPosition = getPosition . movement
 
 instance Keyable Npc where
-  key = uniqueId_
+  key n = (show . definitionId $ n) ++ (show . serverIndex $ n)
 
 instance Advance Npc where
   advance npc =
@@ -30,12 +29,11 @@ instance Advance Npc where
       { movement = advance . movement $ npc
       }
 
-create :: NpcDefinitionId -> String -> Position -> Npc
-create definitionId uniqueId pos =
+create :: NpcDefinitionId -> Position -> Npc
+create definitionId pos =
   Npc
     { serverIndex = -1,
       movement = PotatoCactus.Game.Entity.Npc.NpcMovement.create pos,
       updateMask = 0,
-      definitionId = definitionId,
-      uniqueId_ = uniqueId
+      definitionId = definitionId
     }

@@ -5,6 +5,7 @@ import PotatoCactus.Game.Definitions.StaticGameObjectSet (staticObjectAt)
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction (state, target))
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (..))
 import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (ObjectTarget))
+import PotatoCactus.Game.Entity.Npc.Npc (Npc (definitionId))
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Npc.NpcMovement (doMovement)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject (Added))
@@ -31,8 +32,8 @@ dispatchScriptEvent world (PlayerInteraction player interaction) =
     )
 dispatchScriptEvent world (NpcEntityTick npc) =
   return
-    ( case key npc of
-        "hans" ->
+    ( case definitionId npc of
+        0 ->
           [ UpdateNpc
               (NPC.serverIndex npc)
               ( npc
@@ -76,7 +77,6 @@ closeDoor_ pos =
     Nothing ->
       ( case staticObjectAt pos 9 of
           Just diagonalDoor ->
-            -- TODO - We might need to group together multiple object types. e.g. interactible object group  - keotl 2023-03-16
             [ AddGameObject (Added $ GameObject 1530 pos 9 (objDirection_ pos 0))
             ]
           _ -> []

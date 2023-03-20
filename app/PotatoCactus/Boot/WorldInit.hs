@@ -13,4 +13,4 @@ initializeWorld = do
 
 initialize_ :: World -> World
 initialize_ w =
-  addNpc w (NPC.create 0 "hans" (Position 3093 3240 0))
+  addNpc w (NPC.create 0 (Position 3093 3240 0))
