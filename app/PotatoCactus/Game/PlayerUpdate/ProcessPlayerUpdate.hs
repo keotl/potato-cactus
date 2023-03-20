@@ -1,10 +1,9 @@
 module PotatoCactus.Game.PlayerUpdate.ProcessPlayerUpdate where
 
 import Data.Bits ((.|.))
-import Debug.Trace (trace)
 import PotatoCactus.Game.Definitions.EquipmentDefinitions (EquipmentDefinition (slot), equipmentDefinition)
 import PotatoCactus.Game.Entity.Interaction.Interaction (createForTarget)
-import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (ObjectTarget))
+import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (NpcTarget, ObjectTarget))
 import PotatoCactus.Game.Entity.Object.GameObjectKey (GameObjectKey (GameObjectKey))
 import PotatoCactus.Game.ItemContainer (ItemStack (Empty, ItemStack, itemId), addItems, atIndex, canAddItems, replaceStack)
 import PotatoCactus.Game.Message.EquipItemMessagePayload (EquipItemMessagePayload (EquipItemMessagePayload, itemIndex))
@@ -12,7 +11,7 @@ import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload (index, 
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
 import PotatoCactus.Game.Player (Player (chatMessage, equipment, interaction, inventory, updateMask))
 import PotatoCactus.Game.PlayerUpdate.Equipment (Equipment (container), equipItem, unequipItem)
-import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (EquipItem, InteractWithObject, SayChatMessage, UnequipItem))
+import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (EquipItem, InteractWithNpc, InteractWithObject, SayChatMessage, UnequipItem))
 import PotatoCactus.Game.PlayerUpdate.UpdateMask (appearanceFlag, chatFlag)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (z))
 
@@ -56,4 +55,6 @@ processPlayerUpdate p (InteractWithObject payload) =
               (index payload)
           )
     }
+processPlayerUpdate p (InteractWithNpc npcId interactionType) =
+  p {interaction = createForTarget (NpcTarget npcId interactionType)}
 processPlayerUpdate p _ = p

@@ -13,4 +13,9 @@ initializeWorld = do
 
 initialize_ :: World -> World
 initialize_ w =
-  addNpc w (NPC.create 0 (Position 3093 3240 0))
+  foldl
+    addNpc
+    w
+    [ NPC.create 0 (Position 3093 3240 0),
+      NPC.create 100 (Position 3093 3250 0)
+    ]
