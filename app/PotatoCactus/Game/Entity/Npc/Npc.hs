@@ -56,3 +56,12 @@ applyHit target hit npc =
           then updateMask npc .|. npcSecondaryHealthUpdateFlag
           else updateMask npc .|. npcPrimaryHealthUpdateFlag
     }
+
+-- Sets the attack cooldown based on definition
+setAttackCooldown :: Npc -> Npc
+setAttackCooldown npc =
+  npc {combat = CombatEntity.setAttackCooldown (combat npc) 10}
+
+setAttackTarget :: Npc -> CombatEntity.CombatTarget -> Npc
+setAttackTarget npc target =
+  npc {combat = CombatEntity.setTarget (combat npc) target}

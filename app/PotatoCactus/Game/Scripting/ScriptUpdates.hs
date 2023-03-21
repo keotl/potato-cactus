@@ -9,9 +9,10 @@ import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Player (Player, PlayerIndex)
 
 data GameEvent
-  = PlayerInteraction Player Interaction
-  | PlayerAttack Player CombatTarget
-  | NpcEntityTick Npc
+  = PlayerInteractionEvent Player Interaction
+  | PlayerAttackEvent Player CombatTarget
+  | NpcAttackEvent Npc CombatTarget
+  | NpcEntityTickEvent Npc
 
 data ScriptActionResult
   = AddGameObject DynamicObject

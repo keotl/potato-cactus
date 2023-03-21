@@ -17,12 +17,12 @@ import PotatoCactus.Game.Message.RegisterClientPayload (RegisterClientPayload (p
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
 import PotatoCactus.Game.Player (Player (serverIndex))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, z))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcEntityTick, PlayerAttack, PlayerInteraction), ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackPlayerToNpc, UpdateNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, UpdateNpc))
 import PotatoCactus.Game.Typing (key)
 import PotatoCactus.Game.World (World (tick))
 
 dispatchScriptEvent :: World -> GameEvent -> IO [ScriptActionResult]
-dispatchScriptEvent world (PlayerInteraction player interaction) =
+dispatchScriptEvent world (PlayerInteractionEvent player interaction) =
   trace
     ("Dispatched interaction event " ++ show interaction)
     ( case (target interaction, state interaction) of
@@ -37,7 +37,7 @@ dispatchScriptEvent world (PlayerInteraction player interaction) =
             ]
         _ -> return [ClearPlayerInteraction (serverIndex player)]
     )
-dispatchScriptEvent world (NpcEntityTick npc) =
+dispatchScriptEvent world (NpcEntityTickEvent npc) =
   return
     ( case definitionId npc of
         0 ->
@@ -54,13 +54,23 @@ dispatchScriptEvent world (NpcEntityTick npc) =
           ]
         _ -> []
     )
-dispatchScriptEvent world (PlayerAttack player target) =
+dispatchScriptEvent world (PlayerAttackEvent player target) =
   trace
     "dispatched attack event"
     ( case target of
         Combat.NpcTarget npcId ->
           return
             [ DispatchAttackPlayerToNpc (serverIndex player) npcId (Hit 0 MeleeAttack)
+            ]
+        _ -> return []
+    )
+dispatchScriptEvent world (NpcAttackEvent npc target) =
+  trace
+    "dispatched NPC attack event"
+    ( case target of
+        Combat.PlayerTarget targetPlayer ->
+          return
+            [ DispatchAttackNpcToPlayer (NPC.serverIndex npc) targetPlayer (Hit 0 MeleeAttack)
             ]
         _ -> return []
     )

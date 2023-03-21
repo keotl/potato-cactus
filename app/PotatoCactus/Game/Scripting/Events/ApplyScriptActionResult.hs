@@ -38,5 +38,10 @@ applyScriptResult world (DispatchAttackPlayerToNpc srcPlayer targetNpc hit) =
     }
 applyScriptResult world (DispatchAttackNpcToPlayer srcNpc targetPlayer hit) =
   world
-    { players = updateAtIndex (players world) targetPlayer (P.applyHit (NpcTarget srcNpc) hit)
+    { players = updateAtIndex (players world) targetPlayer (P.applyHit (NpcTarget srcNpc) hit),
+      npcs =
+        updateAtIndex
+          (npcs world)
+          srcNpc
+          (\p -> NPC.setAttackTarget (NPC.setAttackCooldown p) (PlayerTarget targetPlayer))
     }

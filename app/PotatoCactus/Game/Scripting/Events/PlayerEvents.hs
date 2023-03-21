@@ -6,7 +6,7 @@ import qualified PotatoCactus.Game.Combat.CombatEntity as Combat
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction (state))
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (InProgress))
 import PotatoCactus.Game.Player (Player (combat, interaction))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (PlayerAttack, PlayerInteraction))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (PlayerAttackEvent, PlayerInteractionEvent))
 
 createPlayerEvents :: Player -> [GameEvent]
 createPlayerEvents player =
@@ -18,7 +18,7 @@ createPlayerEvents player =
 interactionEvent_ :: Player -> Maybe GameEvent
 interactionEvent_ p =
   case state . interaction $ p of
-    InProgress -> Just $ PlayerInteraction p (interaction p)
+    InProgress -> Just $ PlayerInteractionEvent p (interaction p)
     _ -> Nothing
 
 attackEvent_ :: Player -> Maybe GameEvent
@@ -27,5 +27,5 @@ attackEvent_ p =
     None -> Nothing
     target ->
       if 0 == (cooldown . combat $ p)
-        then Just $ PlayerAttack p target
+        then Just $ PlayerAttackEvent p target
         else Nothing
