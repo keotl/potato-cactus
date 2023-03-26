@@ -17,7 +17,8 @@ data Npc = Npc
     movement :: NpcMovement,
     updateMask :: NpcUpdateMask,
     definitionId :: NpcDefinitionId,
-    combat :: CombatEntity
+    combat :: CombatEntity,
+    canReachTarget :: Bool -- whether to send script event for pathing
   }
   deriving (Show)
 
@@ -36,7 +37,8 @@ create definitionId pos =
           movement = PotatoCactus.Game.Entity.Npc.NpcMovement.create pos,
           updateMask = 0,
           definitionId = definitionId,
-          combat = CombatEntity.create (hitpoints def)
+          combat = CombatEntity.create (hitpoints def),
+          canReachTarget = True
         }
     Nothing ->
       Npc
@@ -44,7 +46,8 @@ create definitionId pos =
           movement = PotatoCactus.Game.Entity.Npc.NpcMovement.create pos,
           updateMask = 0,
           definitionId = definitionId,
-          combat = CombatEntity.create 1
+          combat = CombatEntity.create 1,
+          canReachTarget = True
         }
 
 applyHit :: CombatEntity.CombatTarget -> Hit -> Npc -> Npc

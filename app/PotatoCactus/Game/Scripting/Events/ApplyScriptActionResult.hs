@@ -1,14 +1,20 @@
 module PotatoCactus.Game.Scripting.Events.ApplyScriptActionResult (applyScriptResult) where
 
-import PotatoCactus.Game.Combat.CombatEntity (CombatTarget (NpcTarget, PlayerTarget))
+import Debug.Trace (trace)
+import PotatoCactus.Game.Combat.CombatEntity (CombatEntity (target), CombatTarget (NpcTarget, PlayerTarget))
 import PotatoCactus.Game.Entity.Interaction.Interaction (create)
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
+import PotatoCactus.Game.Entity.Npc.NpcMovement (immediatelyQueueMovement)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (addDynamicObject)
+import PotatoCactus.Game.Movement.PathPlanner (findPathNaive)
 import PotatoCactus.Game.Player (Player (interaction))
 import qualified PotatoCactus.Game.Player as P
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, UpdateNpc))
+import PotatoCactus.Game.Position (GetPosition (getPosition))
+import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, NpcMoveTowardsTarget, UpdateNpc))
 import PotatoCactus.Game.World (World (npcs, objects, players))
-import PotatoCactus.Game.World.MobList (updateAtIndex)
+import qualified PotatoCactus.Game.World as W
+import PotatoCactus.Game.World.MobList (findByIndex, updateAtIndex)
+import PotatoCactus.Game.World.Selectors (isNpcAt)
 
 applyScriptResult :: World -> ScriptActionResult -> World
 applyScriptResult world (AddGameObject obj) =
@@ -43,5 +49,32 @@ applyScriptResult world (DispatchAttackNpcToPlayer srcNpc targetPlayer hit) =
         updateAtIndex
           (npcs world)
           srcNpc
-          (\p -> NPC.setAttackTarget (NPC.setAttackCooldown p) (PlayerTarget targetPlayer))
+          (\n -> NPC.setAttackTarget (NPC.setAttackCooldown n) (PlayerTarget targetPlayer))
     }
+applyScriptResult world (NpcMoveTowardsTarget npc) =
+  case target . NPC.combat $ npc of
+    PlayerTarget playerId ->
+      case findByIndex (W.players world) playerId of
+        Just p ->
+          case findPathNaive 666 (getPosition npc) (getPosition p) of
+            [] -> world
+            (desiredMove : _) ->
+              if isNpcAt world desiredMove
+                then world
+                else
+                  world
+                    { npcs =
+                        updateAtIndex
+                          (W.npcs world)
+                          (NPC.serverIndex npc)
+                          ( \npc ->
+                              npc
+                                { NPC.movement =
+                                    immediatelyQueueMovement
+                                      (NPC.movement npc)
+                                      [desiredMove]
+                                }
+                          )
+                    }
+        Nothing -> world
+    _ -> world

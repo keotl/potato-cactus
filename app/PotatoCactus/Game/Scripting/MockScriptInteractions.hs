@@ -17,7 +17,7 @@ import PotatoCactus.Game.Message.RegisterClientPayload (RegisterClientPayload (p
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
 import PotatoCactus.Game.Player (Player (serverIndex))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, z))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, UpdateNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcCannotReachTargetEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, UpdateNpc, NpcMoveTowardsTarget))
 import PotatoCactus.Game.Typing (key)
 import PotatoCactus.Game.World (World (tick))
 
@@ -37,6 +37,8 @@ dispatchScriptEvent world (PlayerInteractionEvent player interaction) =
             ]
         _ -> return [ClearPlayerInteraction (serverIndex player)]
     )
+dispatchScriptEvent world (NpcCannotReachTargetEvent npc target) =
+  return [NpcMoveTowardsTarget npc]
 dispatchScriptEvent world (NpcEntityTickEvent npc) =
   return
     ( case definitionId npc of

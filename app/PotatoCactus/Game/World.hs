@@ -43,7 +43,7 @@ instance Advance World where
     let newNpcs =
           updateAll
             (npcs w)
-            ( advanceNpc (combatTargetPosOrDefault (players w) (npcs w)) 666
+            ( advanceNpc (combatTargetPosOrDefault (players w) (npcs w))
             )
      in w
           { tick = tick w + 1,

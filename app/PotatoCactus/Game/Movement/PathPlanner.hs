@@ -1,4 +1,4 @@
-module PotatoCactus.Game.Movement.PathPlanner (findPath, CollisionMap) where
+module PotatoCactus.Game.Movement.PathPlanner (findPath, findPathNaive, CollisionMap) where
 
 import PotatoCactus.Game.Movement.InterpolatePath (interpolatePath)
 import PotatoCactus.Game.Position (Position (Position, x, y, z))
@@ -10,3 +10,8 @@ findPath collisionMap start end =
   -- TODO - Do something smarter taking in consideration the collision map  - keotl 2023-03-20
   let mid = Position (x start) (y end) (z start)
    in init $ interpolatePath [start, mid, end]
+
+-- For NPC combat pathing
+findPathNaive :: CollisionMap -> Position -> Position -> [Position]
+findPathNaive =
+  findPath -- TODO - implement  - keotl 2023-03-26

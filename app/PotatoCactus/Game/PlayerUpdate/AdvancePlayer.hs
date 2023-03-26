@@ -19,30 +19,19 @@ advancePlayer findNpc p =
               processPlayerUpdate
               (clearTransientProperties_ p)
               (pendingUpdates p)
-       in let (updatedInteraction, pathOverride) =
+       in let updatedInteraction =
                 advanceInteraction
                   findNpc
                   (interaction updated)
                   (getPosition updated, isStopped . movement $ updated)
-           in case pathOverride of
-                [] ->
-                  updated
-                    { movement = advance (movement updated),
-                      inventory = advance (inventory updated),
-                      equipment = advance (equipment updated),
-                      combat = advance . combat $ p,
-                      interaction = updatedInteraction,
-                      pendingUpdates = []
-                    }
-                newPath ->
-                  updated
-                    { movement = advance (movement updated), -- TODO - interpolate path and issue walk command  - keotl 2023-03-20
-                      inventory = advance (inventory updated),
-                      equipment = advance (equipment updated),
-                      combat = advance . combat $ p,
-                      interaction = updatedInteraction,
-                      pendingUpdates = []
-                    }
+           in updated
+                { movement = advance (movement updated),
+                  inventory = advance (inventory updated),
+                  equipment = advance (equipment updated),
+                  combat = advance . combat $ p,
+                  interaction = updatedInteraction,
+                  pendingUpdates = []
+                }
 
 clearTransientProperties_ :: Player -> Player
 clearTransientProperties_ p =

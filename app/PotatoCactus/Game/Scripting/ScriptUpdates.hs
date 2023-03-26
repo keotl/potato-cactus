@@ -12,6 +12,7 @@ data GameEvent
   = PlayerInteractionEvent Player Interaction
   | PlayerAttackEvent Player CombatTarget
   | NpcAttackEvent Npc CombatTarget
+  | NpcCannotReachTargetEvent Npc CombatTarget
   | NpcEntityTickEvent Npc
 
 data ScriptActionResult
@@ -19,4 +20,5 @@ data ScriptActionResult
   | ClearPlayerInteraction PlayerIndex
   | DispatchAttackPlayerToNpc PlayerIndex NpcIndex Hit
   | DispatchAttackNpcToPlayer NpcIndex PlayerIndex Hit
-  | UpdateNpc NpcIndex Npc
+  | NpcMoveTowardsTarget Npc
+  | UpdateNpc NpcIndex Npc -- deprecated

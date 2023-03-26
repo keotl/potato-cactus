@@ -5,7 +5,7 @@ import PotatoCactus.Game.Entity.Npc.Npc (Npc)
 import PotatoCactus.Game.Player (Player (serverIndex))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position, isWithin)
 import PotatoCactus.Game.World (World (npcs, players))
-import PotatoCactus.Game.World.MobList (findAllByPredicate)
+import PotatoCactus.Game.World.MobList (findAllByPredicate, findByPredicate)
 
 localEntities :: (GetPosition a) => a -> [a] -> [a]
 localEntities ref = filter (isViewableFrom_ ref)
@@ -22,3 +22,9 @@ localPlayers world refPlayer =
 localNpcs :: World -> Player -> [Npc]
 localNpcs world refPlayer =
   findAllByPredicate (npcs world) (isViewableFrom_ refPlayer)
+
+isNpcAt :: World -> Position -> Bool
+isNpcAt w pos =
+  case findByPredicate (npcs w) ((==) pos . getPosition) of
+    Nothing -> False
+    Just _ -> True
