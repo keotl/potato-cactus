@@ -23,3 +23,9 @@ Takes some inspiration from
 - Revision-317 cache files
 - Revision-317 client with encryption disabled
 
+## Debugging
+### Running with stacktraces
+```
+cabal configure --enable-profiling --profiling-detail toplevel-functions
+cabal run potato-cactus -- +RTS -xc
+```

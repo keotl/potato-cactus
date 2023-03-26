@@ -9,7 +9,10 @@ findPath :: CollisionMap -> Position -> Position -> [Position]
 findPath collisionMap start end =
   -- TODO - Do something smarter taking in consideration the collision map  - keotl 2023-03-20
   let mid = Position (x start) (y end) (z start)
-   in init $ interpolatePath [start, mid, end]
+   in case interpolatePath [start, mid, end] of
+        [] -> []
+        [_] -> []
+        interpolated -> init interpolated
 
 -- For NPC combat pathing
 findPathNaive :: CollisionMap -> Position -> Position -> [Position]
