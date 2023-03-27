@@ -20,4 +20,5 @@ data GameChannelMessage
   | UnequipItemMessage String EquipmentSlot
   | ObjectClickMessage PlayerIndex ObjectClickPayload
   | NpcAttackMessage PlayerIndex NpcIndex
+  | NpcClickMessage PlayerIndex NpcIndex Int
   | UpdateWorldMessage

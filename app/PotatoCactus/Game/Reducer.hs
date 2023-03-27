@@ -1,7 +1,7 @@
 module PotatoCactus.Game.Reducer where
 
 import qualified PotatoCactus.Boot.GameChannel as C
-import PotatoCactus.Game.Entity.Interaction.Target (NpcInteractionType (NpcAttack))
+import PotatoCactus.Game.Entity.Interaction.Target (NpcInteractionType (NpcAction, NpcAttack))
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject))
 import PotatoCactus.Game.Interface.InterfaceButtonDispatch (dispatchInterfaceButtonClick)
 import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (..))
@@ -31,6 +31,8 @@ reduceWorld world (ObjectClickMessage playerId payload) =
   updatePlayerByIndex world playerId (\p -> P.queueUpdate p (InteractWithObject payload))
 reduceWorld world (NpcAttackMessage playerId npcIndex) =
   updatePlayerByIndex world playerId (\p -> P.queueUpdate p (InteractWithNpc npcIndex NpcAttack))
+reduceWorld world (NpcClickMessage playerId npcIndex actionIndex) =
+  updatePlayerByIndex world playerId (\p -> P.queueUpdate p (InteractWithNpc npcIndex (NpcAction actionIndex)))
 reduceWorld world UpdateWorldMessage =
   advance world
 

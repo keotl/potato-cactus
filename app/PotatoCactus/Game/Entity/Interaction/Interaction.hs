@@ -24,8 +24,14 @@ advanceInteraction findNpc (Interaction (NpcTarget npcId interactionType) Pendin
     Nothing -> Interaction None Pending
     Just npc -> case (isStopped, canStartInteractionFromPos (getPosition npc) pos) of
       (True, True) -> Interaction (NpcTarget npcId interactionType) InProgress
-      (True, False) -> Interaction None PendingPathing
+      (True, False) -> Interaction (NpcTarget npcId interactionType) PendingPathing
       _ -> Interaction (NpcTarget npcId interactionType) Pending
+advanceInteraction findNpc (Interaction (NpcTarget npcId interactionType) PendingPathing) (pos, isStopped) =
+  case findNpc npcId of
+    Nothing -> Interaction None Pending
+    Just npc -> case (isStopped, canStartInteractionFromPos (getPosition npc) pos) of
+      (_, True) -> Interaction (NpcTarget npcId interactionType) InProgress
+      _ -> Interaction (NpcTarget npcId interactionType) PendingPathing
 advanceInteraction _ (Interaction (ObjectTarget objectKey actionIndex) Pending) (pos, isStopped) =
   case (isStopped, canStartInteractionFromPos (getPosition objectKey) pos) of
     (True, True) -> Interaction (ObjectTarget objectKey actionIndex) InProgress

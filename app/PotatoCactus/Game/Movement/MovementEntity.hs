@@ -41,3 +41,9 @@ isStopped :: MovementEntity -> Bool
 isStopped (PlayerWalkMovement_ m) =
   PlayerWalkMovement.isStopped m
 isStopped _ = True
+
+-- for scripts, set new position instantly
+immediatelyQueueMovement :: MovementEntity -> [Position] -> MovementEntity
+immediatelyQueueMovement (PlayerWalkMovement_ m) path =
+  PlayerWalkMovement_ $ advance m {queue_ = path}
+immediatelyQueueMovement m _ = m

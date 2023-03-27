@@ -10,7 +10,7 @@ data InteractionTarget
   | None
   deriving (Show)
 
-data NpcInteractionType = NpcAttack deriving (Show)
+data NpcInteractionType = NpcAttack | NpcAction Int deriving (Show)
 
 -- TODO - Some entities are larger than 1 tile. e.g. trees.  - keotl 2023-03-15
 -- TODO - For those entities, we have to somehow check the clickbox - keotl 2023-03-15
