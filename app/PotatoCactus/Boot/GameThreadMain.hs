@@ -9,7 +9,7 @@ import PotatoCactus.Config.Constants (tickInterval)
 import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (ObjectClickMessage, UpdateWorldMessage))
 import PotatoCactus.Game.Reducer (reduceWorld)
 import PotatoCactus.Game.Scripting.ProcessTickUpdates (dispatchScriptEvents)
-import PotatoCactus.Game.World (ClientHandle (controlChannel, username), ClientHandleMessage (CloseClientConnectionMessage, WorldUpdatedMessage), World (clients), defaultWorldValue, worldInstance)
+import PotatoCactus.Game.World (ClientHandle (controlChannel, username), ClientHandleMessage (CloseClientConnectionMessage, WorldUpdatedMessage), World (clients, tick), defaultWorldValue, worldInstance)
 import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Utils.Logging (LogLevel (Debug, Fatal, Info, Warning), logger)
 
@@ -32,9 +32,11 @@ mainLoop = do
   newWorld <- reduceUntilNextTick_ world gameChannel
   newWorld2 <- dispatchScriptEvents newWorld
 
-  -- logger_ Info $ show newWorld
+  -- logger_ Info $ (show $ tick newWorld2) ++ (show $ clients newWorld2)
 
   writeIORef worldInstance newWorld2
+  -- TODO - Investigate blocking IO for freeze on player disconnect bug  - keotl 2023-03-27
+  -- appears to be fixed with -threaded flag
   notifyClients_ WorldUpdatedMessage (clients newWorld2)
   mainLoop
 

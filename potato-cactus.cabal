@@ -150,6 +150,7 @@ executable potato-cactus
       -Werror
       -fwarn-incomplete-patterns
       -O3
+      -threaded
 
 test-suite tests
     type: exitcode-stdio-1.0
