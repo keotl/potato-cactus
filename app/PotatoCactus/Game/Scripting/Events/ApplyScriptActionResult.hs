@@ -11,8 +11,7 @@ import PotatoCactus.Game.Movement.PathPlanner (findPathNaive)
 import PotatoCactus.Game.Player (Player (interaction))
 import qualified PotatoCactus.Game.Player as P
 import PotatoCactus.Game.Position (GetPosition (getPosition))
-import PotatoCactus.Game.Scripting.Api.AttackModel (AttackModel (AttackModel))
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, NpcMoveTowardsTarget, UpdateNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, NpcMoveTowardsTarget, NpcSetAnimation, UpdateNpc))
 import PotatoCactus.Game.World (World (npcs, objects, players))
 import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex, updateAtIndex)
@@ -44,7 +43,7 @@ applyScriptResult world (DispatchAttackPlayerToNpc srcPlayer targetNpc hit) =
           srcPlayer
           (\p -> P.setAttackTarget (P.setAttackCooldown p) (NpcTarget targetNpc))
     }
-applyScriptResult world (DispatchAttackNpcToPlayer srcNpc targetPlayer (AttackModel hit animationId)) =
+applyScriptResult world (DispatchAttackNpcToPlayer srcNpc targetPlayer hit) =
   world
     { players = updateAtIndex (players world) targetPlayer (P.applyHit (NpcTarget srcNpc) hit),
       npcs =
@@ -52,9 +51,12 @@ applyScriptResult world (DispatchAttackNpcToPlayer srcNpc targetPlayer (AttackMo
           (npcs world)
           srcNpc
           ( \n ->
-              let withTarget = NPC.setAttackTarget (NPC.setAttackCooldown n) (PlayerTarget targetPlayer)
-               in NPC.setAnimation withTarget (Anim.Animation animationId 0 Anim.High)
+              NPC.setAttackTarget (NPC.setAttackCooldown n) (PlayerTarget targetPlayer)
           )
+    }
+applyScriptResult world (NpcSetAnimation npcIndex anim) =
+  world
+    { npcs = updateAtIndex (npcs world) npcIndex (`NPC.setAnimation` anim)
     }
 applyScriptResult world (NpcMoveTowardsTarget npc) =
   case target . NPC.combat $ npc of

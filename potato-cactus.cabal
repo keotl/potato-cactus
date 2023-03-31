@@ -124,7 +124,6 @@ executable potato-cactus
                    PotatoCactus.Game.PlayerUpdate.PlayerUpdate
                    PotatoCactus.Game.PlayerUpdate.ProcessPlayerUpdate
                    PotatoCactus.Game.Position
-                   PotatoCactus.Game.Scripting.Api.AttackModel
                    PotatoCactus.Game.Scripting.Events.ApplyScriptActionResult
                    PotatoCactus.Game.Scripting.Events.CreateGameEvents
                    PotatoCactus.Game.Scripting.Events.NpcEvents

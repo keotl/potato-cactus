@@ -4,6 +4,7 @@ import Debug.Trace (trace)
 import qualified PotatoCactus.Game.Combat.CombatEntity as Combat
 import PotatoCactus.Game.Combat.Hit (DamageType (MeleeAttack), Hit (Hit))
 import PotatoCactus.Game.Definitions.StaticGameObjectSet (staticObjectAt)
+import PotatoCactus.Game.Entity.Animation.Animation (Animation (Animation), AnimationPriority (High))
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction (state, target))
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (..))
 import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (NpcTarget, ObjectTarget), NpcInteractionType (NpcAttack))
@@ -17,8 +18,7 @@ import PotatoCactus.Game.Message.RegisterClientPayload (RegisterClientPayload (p
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
 import PotatoCactus.Game.Player (Player (serverIndex))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, z))
-import PotatoCactus.Game.Scripting.Api.AttackModel (AttackModel (AttackModel))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcCannotReachTargetEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, NpcMoveTowardsTarget, UpdateNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcCannotReachTargetEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, NpcMoveTowardsTarget, NpcSetAnimation, UpdateNpc))
 import PotatoCactus.Game.Typing (key)
 import PotatoCactus.Game.World (World (tick))
 
@@ -73,12 +73,13 @@ dispatchScriptEvent world (NpcAttackEvent npc target) =
     ( case target of
         Combat.PlayerTarget targetPlayer ->
           return
-            [ DispatchAttackNpcToPlayer (NPC.serverIndex npc) targetPlayer (AttackModel (Hit 0 MeleeAttack) 309)
+            [ DispatchAttackNpcToPlayer (NPC.serverIndex npc) targetPlayer (Hit 0 MeleeAttack),
+              NpcSetAnimation (NPC.serverIndex npc) (Animation 309 0 High)
             ]
         _ -> return []
     )
 
--- dispatchTickUpdate _ _ = return []
+-- dispatchScriptEvent world (NpcSe)
 
 objDirection_ :: Position -> Int -> Int
 objDirection_ pos objType =

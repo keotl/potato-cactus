@@ -2,12 +2,12 @@ module PotatoCactus.Game.Scripting.ScriptUpdates where
 
 import PotatoCactus.Game.Combat.CombatEntity (CombatTarget)
 import PotatoCactus.Game.Combat.Hit (Hit)
+import PotatoCactus.Game.Entity.Animation.Animation (Animation)
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc, NpcIndex)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Player (Player, PlayerIndex)
-import PotatoCactus.Game.Scripting.Api.AttackModel (AttackModel)
 
 data GameEvent
   = PlayerInteractionEvent Player Interaction
@@ -20,6 +20,7 @@ data ScriptActionResult
   = AddGameObject DynamicObject
   | ClearPlayerInteraction PlayerIndex
   | DispatchAttackPlayerToNpc PlayerIndex NpcIndex Hit
-  | DispatchAttackNpcToPlayer NpcIndex PlayerIndex AttackModel
+  | DispatchAttackNpcToPlayer NpcIndex PlayerIndex Hit
+  | NpcSetAnimation NpcIndex Animation
   | NpcMoveTowardsTarget Npc
   | UpdateNpc NpcIndex Npc -- deprecated
