@@ -95,8 +95,8 @@ setAttackCooldown :: Player -> Player
 setAttackCooldown p =
   p {combat = CombatEntity.setAttackCooldown (combat p) 10}
 
-setAttackTarget :: Player -> CombatEntity.CombatTarget -> Player
-setAttackTarget p target =
+setAttackTarget :: CombatEntity.CombatTarget -> Player -> Player
+setAttackTarget target p =
   p {combat = CombatEntity.setTarget (combat p) target}
 
 setAnimation :: Anim.Animation -> Player -> Player
