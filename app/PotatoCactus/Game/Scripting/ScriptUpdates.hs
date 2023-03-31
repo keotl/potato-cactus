@@ -7,6 +7,7 @@ import PotatoCactus.Game.Entity.Npc.Npc (Npc, NpcIndex)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Player (Player, PlayerIndex)
+import PotatoCactus.Game.Scripting.Api.AttackModel (AttackModel)
 
 data GameEvent
   = PlayerInteractionEvent Player Interaction
@@ -19,6 +20,6 @@ data ScriptActionResult
   = AddGameObject DynamicObject
   | ClearPlayerInteraction PlayerIndex
   | DispatchAttackPlayerToNpc PlayerIndex NpcIndex Hit
-  | DispatchAttackNpcToPlayer NpcIndex PlayerIndex Hit
+  | DispatchAttackNpcToPlayer NpcIndex PlayerIndex AttackModel
   | NpcMoveTowardsTarget Npc
   | UpdateNpc NpcIndex Npc -- deprecated

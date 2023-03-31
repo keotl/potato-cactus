@@ -13,7 +13,7 @@ import qualified Data.ByteString.Lazy as Data.Binary
 import Data.List (find)
 import PotatoCactus.Client.LocalEntityList (LocalEntity (LocalEntity), LocalEntityList, LocalEntityStatus (Added, Removed, Retained), clientKnownEntities)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc (Npc, definitionId, serverIndex, updateMask))
-import PotatoCactus.Game.Entity.Npc.NpcUpdateMask (NpcUpdateMask, npcPrimaryHealthUpdateFlag, npcSecondaryHealthUpdateFlag)
+import PotatoCactus.Game.Entity.Npc.NpcUpdateMask (NpcUpdateMask, npcAnimationUpdateFlag, npcPrimaryHealthUpdateFlag, npcSecondaryHealthUpdateFlag)
 import PotatoCactus.Game.Player (Player)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, y))
 import PotatoCactus.Game.World as W
@@ -21,6 +21,7 @@ import PotatoCactus.Game.World as W
     World (World),
   )
 import PotatoCactus.Network.Binary (encodeToBase37, toByte, toShortLE_, toShort_, toWord_)
+import PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeNpcAnimationBlock (encodeNpcAnimationBlock)
 import PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeNpcMovement (encodeNpcMovement)
 import PotatoCactus.Network.Packets.Out.NpcUpdate.EncodePrimaryNpcHitUpdateBlock (encodePrimaryNpcHitUpdateBlock)
 import PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeSecondaryNpcHitUpdateBlock (encodeSecondaryNpcHitUpdateBlock)
@@ -117,13 +118,10 @@ npcBlockSet_ npc world = do
   ByteString.concat $
     map
       (\x -> x (updateMask npc) npc world)
-      [ addBlockIfRequired npcPrimaryHealthUpdateFlag encodePrimaryNpcHitUpdateBlock,
-        addBlockIfRequired npcSecondaryHealthUpdateFlag encodeSecondaryNpcHitUpdateBlock
+      [ addBlockIfRequired npcAnimationUpdateFlag encodeNpcAnimationBlock,
+        addBlockIfRequired npcSecondaryHealthUpdateFlag encodeSecondaryNpcHitUpdateBlock,
+        addBlockIfRequired npcPrimaryHealthUpdateFlag encodePrimaryNpcHitUpdateBlock
       ]
-
--- [ addBlockIfRequired appearanceFlag encodeAppearanceBlock,
---   addBlockIfRequired chatFlag encodeChatUpdateBlock
--- ]
 
 addBlockIfRequired :: Word16 -> (Npc -> World -> ByteString) -> (Word16 -> (Npc -> World -> ByteString))
 addBlockIfRequired updateFlag createBlock mask =

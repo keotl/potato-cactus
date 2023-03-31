@@ -13,6 +13,14 @@ import PotatoCactus.Game.World.MobList (findByIndex)
 
 advanceNpc :: CombatTargetPosOrDefault -> Npc -> Npc
 advanceNpc targetPosOrDefault npc =
+  let withCombat = updateCombat targetPosOrDefault npc
+   in withCombat
+        { updateMask = 0,
+          animation = Nothing
+        }
+
+updateCombat :: CombatTargetPosOrDefault -> Npc -> Npc
+updateCombat targetPosOrDefault npc =
   let shouldDisengage =
         not $
           isWithin
@@ -24,14 +32,12 @@ advanceNpc targetPosOrDefault npc =
           npc
             { movement = create . getPosition $ npc,
               combat = clearTarget . combat $ npc,
-              updateMask = 0,
               canReachTarget = True
             }
         else
           npc
             { movement = advance . movement $ npc,
               combat = advance . combat $ npc,
-              updateMask = 0,
               canReachTarget = canReachCombatTarget_ npc targetPosOrDefault
             }
 

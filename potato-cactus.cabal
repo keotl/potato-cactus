@@ -59,6 +59,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket
                    PotatoCactus.Network.Packets.Out.UpdateSkillPacket
                    PotatoCactus.Network.Packets.Out.NpcUpdate.NpcUpdatePacket
+                   PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeNpcAnimationBlock
                    PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeNpcMovement
                    PotatoCactus.Network.Packets.Out.NpcUpdate.EncodePrimaryNpcHitUpdateBlock
                    PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeSecondaryNpcHitUpdateBlock
@@ -80,6 +81,7 @@ executable potato-cactus
                    PotatoCactus.Login.Models
                    PotatoCactus.Game.Combat.CombatEntity
                    PotatoCactus.Game.Combat.Hit
+                   PotatoCactus.Game.Entity.Animation.Animation
                    PotatoCactus.Game.Entity.Interaction.Interaction
                    PotatoCactus.Game.Entity.Interaction.State
                    PotatoCactus.Game.Entity.Interaction.Target
@@ -122,6 +124,7 @@ executable potato-cactus
                    PotatoCactus.Game.PlayerUpdate.PlayerUpdate
                    PotatoCactus.Game.PlayerUpdate.ProcessPlayerUpdate
                    PotatoCactus.Game.Position
+                   PotatoCactus.Game.Scripting.Api.AttackModel
                    PotatoCactus.Game.Scripting.Events.ApplyScriptActionResult
                    PotatoCactus.Game.Scripting.Events.CreateGameEvents
                    PotatoCactus.Game.Scripting.Events.NpcEvents

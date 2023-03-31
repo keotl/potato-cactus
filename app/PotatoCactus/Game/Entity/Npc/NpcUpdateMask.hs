@@ -9,3 +9,6 @@ npcPrimaryHealthUpdateFlag = 64
 
 npcSecondaryHealthUpdateFlag :: Word16
 npcSecondaryHealthUpdateFlag = 8
+
+npcAnimationUpdateFlag :: Word16
+npcAnimationUpdateFlag = 16

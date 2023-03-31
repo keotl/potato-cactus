@@ -17,7 +17,8 @@ import PotatoCactus.Game.Message.RegisterClientPayload (RegisterClientPayload (p
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
 import PotatoCactus.Game.Player (Player (serverIndex))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, z))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcCannotReachTargetEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, UpdateNpc, NpcMoveTowardsTarget))
+import PotatoCactus.Game.Scripting.Api.AttackModel (AttackModel (AttackModel))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcCannotReachTargetEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, NpcMoveTowardsTarget, UpdateNpc))
 import PotatoCactus.Game.Typing (key)
 import PotatoCactus.Game.World (World (tick))
 
@@ -72,7 +73,7 @@ dispatchScriptEvent world (NpcAttackEvent npc target) =
     ( case target of
         Combat.PlayerTarget targetPlayer ->
           return
-            [ DispatchAttackNpcToPlayer (NPC.serverIndex npc) targetPlayer (Hit 0 MeleeAttack)
+            [ DispatchAttackNpcToPlayer (NPC.serverIndex npc) targetPlayer (AttackModel (Hit 0 MeleeAttack) 309)
             ]
         _ -> return []
     )
