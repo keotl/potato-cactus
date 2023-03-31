@@ -5,6 +5,7 @@ import Data.Foldable (fold)
 import PotatoCactus.Game.Combat.CombatEntity (CombatEntity)
 import qualified PotatoCactus.Game.Combat.CombatEntity as CombatEntity
 import PotatoCactus.Game.Combat.Hit (Hit)
+import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction)
 import qualified PotatoCactus.Game.Entity.Interaction.Interaction as Interaction
 import PotatoCactus.Game.ItemContainer (ItemContainer, playerEquipmentContainer, playerInventory)
@@ -16,7 +17,7 @@ import PotatoCactus.Game.PlayerUpdate.Appearance (PlayerAppearance, defaultPlaye
 import PotatoCactus.Game.PlayerUpdate.ChatMessage (ChatMessage)
 import PotatoCactus.Game.PlayerUpdate.Equipment (Equipment (Equipment))
 import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate)
-import PotatoCactus.Game.PlayerUpdate.UpdateMask (PlayerUpdateMask, appearanceFlag, primaryHealthUpdateFlag, secondaryHealthUpdateFlag)
+import PotatoCactus.Game.PlayerUpdate.UpdateMask (PlayerUpdateMask, animationFlag, appearanceFlag, primaryHealthUpdateFlag, secondaryHealthUpdateFlag)
 import qualified PotatoCactus.Game.PlayerUpdate.UpdateMask as Mask
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
 import PotatoCactus.Game.Typing (Keyable (key))
@@ -35,6 +36,7 @@ data Player = Player
     equipment :: Equipment,
     interaction :: Interaction,
     combat :: CombatEntity,
+    animation :: Maybe Anim.Animation,
     skipUpdate_ :: Bool
   }
   deriving (Show)
@@ -66,6 +68,7 @@ create username position =
       equipment = Equipment playerEquipmentContainer,
       interaction = Interaction.create,
       combat = CombatEntity.create 10,
+      animation = Nothing,
       skipUpdate_ = True
     }
 
@@ -95,3 +98,10 @@ setAttackCooldown p =
 setAttackTarget :: Player -> CombatEntity.CombatTarget -> Player
 setAttackTarget p target =
   p {combat = CombatEntity.setTarget (combat p) target}
+
+setAnimation :: Anim.Animation -> Player -> Player
+setAnimation anim player =
+  player
+    { animation = Anim.setAnimation (animation player) anim,
+      updateMask = updateMask player .|. animationFlag
+    }

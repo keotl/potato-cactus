@@ -10,12 +10,14 @@ import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (addDynamicObject
 import PotatoCactus.Game.Movement.PathPlanner (findPathNaive)
 import PotatoCactus.Game.Player (Player (interaction))
 import qualified PotatoCactus.Game.Player as P
+import qualified PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions as PAnim
 import PotatoCactus.Game.Position (GetPosition (getPosition))
 import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, NpcMoveTowardsTarget, NpcSetAnimation, UpdateNpc))
 import PotatoCactus.Game.World (World (npcs, objects, players))
 import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex, updateAtIndex)
 import PotatoCactus.Game.World.Selectors (isNpcAt)
+import PotatoCactus.Utils.Flow ((|>))
 
 applyScriptResult :: World -> ScriptActionResult -> World
 applyScriptResult world (AddGameObject obj) =
@@ -45,7 +47,15 @@ applyScriptResult world (DispatchAttackPlayerToNpc srcPlayer targetNpc hit) =
     }
 applyScriptResult world (DispatchAttackNpcToPlayer srcNpc targetPlayer hit) =
   world
-    { players = updateAtIndex (players world) targetPlayer (P.applyHit (NpcTarget srcNpc) hit),
+    { players =
+        updateAtIndex
+          (players world)
+          targetPlayer
+          ( \p ->
+              -- TODO - Improve syntactic flow  - keotl 2023-03-31
+              let withHit = P.applyHit (NpcTarget srcNpc) hit p
+               in P.setAnimation (PAnim.defenceAnimation withHit) withHit
+          ),
       npcs =
         updateAtIndex
           (npcs world)

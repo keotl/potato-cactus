@@ -14,13 +14,14 @@ import Data.List (find)
 import GHC.RTS.Flags (ProfFlags (modSelector))
 import PotatoCactus.Client.LocalEntityList (LocalEntity (LocalEntity), LocalEntityList, LocalEntityStatus (Added, Removed, Retained))
 import PotatoCactus.Game.Player as P (Player (serverIndex, updateMask, username))
-import PotatoCactus.Game.PlayerUpdate.UpdateMask (PlayerUpdateMask, appearanceFlag, chatFlag, primaryHealthUpdateFlag, secondaryHealthUpdateFlag)
+import PotatoCactus.Game.PlayerUpdate.UpdateMask (PlayerUpdateMask, animationFlag, appearanceFlag, chatFlag, primaryHealthUpdateFlag, secondaryHealthUpdateFlag)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, y))
 import PotatoCactus.Game.World as W
   ( ClientHandle (username),
     World (players),
   )
 import PotatoCactus.Network.Binary (encodeToBase37, toByte, toShortLE_, toShort_, toWord_)
+import PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeAnimationBlock (encodeAnimationBlock)
 import PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeAppearanceBlock (encodeAppearanceBlock)
 import PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeBlock (addBlockIfRequired)
 import PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeChatUpdate (encodeChatUpdateBlock)
@@ -136,7 +137,8 @@ playerBlockSet_ player world = do
     map
       (\x -> x (updateMask player) player world)
       -- TODO - Do we need to pass World as a parameter?  - keotl 2023-03-20
-      [ addBlockIfRequired appearanceFlag encodeAppearanceBlock,
+      [ addBlockIfRequired animationFlag encodeAnimationBlock,
+        addBlockIfRequired appearanceFlag encodeAppearanceBlock,
         addBlockIfRequired chatFlag encodeChatUpdateBlock,
         addBlockIfRequired primaryHealthUpdateFlag encodePrimaryHitUpdateBlock,
         addBlockIfRequired secondaryHealthUpdateFlag encodeSecondaryHitUpdateBlock
