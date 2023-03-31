@@ -1,6 +1,5 @@
 module PotatoCactus.Game.Scripting.Events.ApplyScriptActionResult (applyScriptResult) where
 
-import Debug.Trace (trace)
 import PotatoCactus.Game.Combat.CombatEntity (CombatEntity (target), CombatTarget (NpcTarget, PlayerTarget))
 import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
 import PotatoCactus.Game.Entity.Interaction.Interaction (create)
@@ -52,9 +51,9 @@ applyScriptResult world (DispatchAttackNpcToPlayer srcNpc targetPlayer hit) =
           (players world)
           targetPlayer
           ( \p ->
-              -- TODO - Improve syntactic flow  - keotl 2023-03-31
-              let withHit = P.applyHit (NpcTarget srcNpc) hit p
-               in P.setAnimation (PAnim.defenceAnimation withHit) withHit
+              p
+                |> P.applyHit (NpcTarget srcNpc) hit
+                |> P.setAnimation (PAnim.defenceAnimation p)
           ),
       npcs =
         updateAtIndex
