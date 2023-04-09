@@ -14,6 +14,7 @@ data GameEvent
   | PlayerAttackEvent Player CombatTarget
   | NpcAttackEvent Npc CombatTarget
   | NpcCannotReachTargetEvent Npc CombatTarget
+  | NpcDeadEvent Npc
   | NpcEntityTickEvent Npc
 
 data ScriptActionResult

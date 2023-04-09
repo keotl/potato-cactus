@@ -14,9 +14,9 @@ import PotatoCactus.Game.Player (PlayerIndex)
 import qualified PotatoCactus.Game.Player as P (Player (serverIndex), create, username)
 import PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer)
 import PotatoCactus.Game.Position (Position (Position))
-import PotatoCactus.Game.Typing (Advance (advance))
+import PotatoCactus.Game.Typing (Advance (advance), ShouldDiscard (shouldDiscard))
 import PotatoCactus.Game.World.EntityPositionFinder (combatTargetPosOrDefault)
-import PotatoCactus.Game.World.MobList (MobList, add, create, findByIndex, findByPredicate, remove, updateAll, updateAtIndex, updateByPredicate)
+import PotatoCactus.Game.World.MobList (MobList, add, create, findByIndex, findByPredicate, remove, removeByPredicate, updateAll, updateAtIndex, updateByPredicate)
 import PotatoCactus.Utils.Iterable (replace)
 
 data ClientHandleMessage = WorldUpdatedMessage | CloseClientConnectionMessage
@@ -48,7 +48,7 @@ instance Advance World where
      in w
           { tick = tick w + 1,
             players = updateAll (players w) (advancePlayer (findByIndex newNpcs)),
-            npcs = newNpcs
+            npcs = removeByPredicate newNpcs shouldDiscard
           }
 
 defaultWorldValue :: World

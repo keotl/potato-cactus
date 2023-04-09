@@ -1,6 +1,6 @@
 module MobListTests (testMobList) where
 
-import PotatoCactus.Game.World.MobList (MobList, add, create, findByIndex, remove, updateAtIndex)
+import PotatoCactus.Game.World.MobList (MobList, add, create, enumerate, findByIndex, remove, removeByPredicate, updateAtIndex)
 import Test.HUnit
 
 mobList :: MobList Int
@@ -34,5 +34,8 @@ testMobList =
             Nothing
             ( findByIndex (remove mobList 1) 1
             )
-        )
+        ),
+      TestCase (assertEqual "enumerate" [(1, 42)] (enumerate mobList)),
+      TestCase (assertEqual "removeByPredicate" [] (enumerate $ removeByPredicate mobList (== 42))),
+      TestCase (assertEqual "removeByPredicate" [(1, 42)] (enumerate $ removeByPredicate mobList (== 666)))
     ]

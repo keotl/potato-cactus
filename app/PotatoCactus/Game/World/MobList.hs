@@ -1,5 +1,6 @@
 {-# LANGUAGE LambdaCase #-}
-module PotatoCactus.Game.World.MobList (MobList (mobs), create, add, remove, updateAll, updateAtIndex, findByIndex, findIndexByPredicate, findByPredicate, updateByPredicate, findAllByPredicate, iter) where
+
+module PotatoCactus.Game.World.MobList (MobList (mobs), create, add, remove, updateAll, updateAtIndex, findByIndex, findIndexByPredicate, findByPredicate, updateByPredicate, findAllByPredicate, iter, enumerate, removeByPredicate) where
 
 import Data.List (find, findIndex)
 import Data.Maybe (catMaybes, fromMaybe, isJust, isNothing, mapMaybe)
@@ -69,6 +70,21 @@ remove list index =
           then availableIndices list
           else index : availableIndices list
     }
+
+removeByPredicate :: MobList a -> (a -> Bool) -> MobList a
+removeByPredicate list shouldRemove =
+  let removed = filter (\(i, mob) -> shouldRemove mob) (enumerate list)
+   in foldl remove list (map fst removed)
+
+-- enumerate ignoring empty spaces
+enumerate :: MobList a -> [(Int, a)]
+enumerate list =
+  mapMaybe
+    ( \(i, elem) -> case elem of
+        Nothing -> Nothing
+        Just e -> Just (i, e)
+    )
+    (zip [0 ..] (mobs list))
 
 updateAll :: MobList a -> (a -> a) -> MobList a
 updateAll list transform =

@@ -18,7 +18,7 @@ import PotatoCactus.Game.Message.RegisterClientPayload (RegisterClientPayload (p
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
 import PotatoCactus.Game.Player (Player (serverIndex))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, z))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcCannotReachTargetEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, NpcMoveTowardsTarget, NpcSetAnimation, UpdateNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcCannotReachTargetEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, NpcMoveTowardsTarget, NpcSetAnimation, UpdateNpc))
 import PotatoCactus.Game.Typing (key)
 import PotatoCactus.Game.World (World (tick))
 
@@ -63,9 +63,9 @@ dispatchScriptEvent world (PlayerAttackEvent player target) =
     ( case target of
         Combat.NpcTarget npcId ->
           return
-            [ DispatchAttackPlayerToNpc (serverIndex player) npcId (Hit 0 MeleeAttack)
+            [ DispatchAttackPlayerToNpc (serverIndex player) npcId (Hit 1 MeleeAttack)
             ]
-        _ -> return []
+        _ -> return [ClearPlayerInteraction (serverIndex player)]
     )
 dispatchScriptEvent world (NpcAttackEvent npc target) =
   trace
@@ -77,6 +77,13 @@ dispatchScriptEvent world (NpcAttackEvent npc target) =
               NpcSetAnimation (NPC.serverIndex npc) (Animation 309 0 High)
             ]
         _ -> return []
+    )
+dispatchScriptEvent world (NpcDeadEvent npc) =
+  trace
+    "dispatched NPC dead event"
+    ( return
+        [ NpcSetAnimation (NPC.serverIndex npc) (Animation 2607 0 High)
+        ]
     )
 
 -- dispatchScriptEvent world (NpcSe)

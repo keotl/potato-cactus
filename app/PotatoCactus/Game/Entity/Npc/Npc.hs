@@ -8,8 +8,10 @@ import PotatoCactus.Game.Definitions.NpcDefinitions (NpcDefinition (hitpoints), 
 import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
 import PotatoCactus.Game.Entity.Npc.NpcMovement (NpcMovement, create)
 import PotatoCactus.Game.Entity.Npc.NpcUpdateMask (NpcUpdateMask, npcAnimationUpdateFlag, npcPrimaryHealthUpdateFlag, npcSecondaryHealthUpdateFlag)
+import PotatoCactus.Game.Entity.Npc.RespawnStrategy (RespawnStrategy (Never), markEntityDead, shouldDiscardEntity, respawning)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position)
-import PotatoCactus.Game.Typing (Advance (advance), Keyable (key))
+import PotatoCactus.Game.Typing (Advance (advance), IsEntityActive (isEntityActive), Keyable (key), ShouldDiscard (shouldDiscard))
+import PotatoCactus.Utils.Flow ((|>))
 
 type NpcIndex = Int
 
@@ -20,6 +22,7 @@ data Npc = Npc
     definitionId :: NpcDefinitionId,
     animation :: Maybe Anim.Animation,
     combat :: CombatEntity,
+    respawn :: RespawnStrategy,
     canReachTarget :: Bool -- whether to send script event for pathing
   }
   deriving (Show)
@@ -40,6 +43,7 @@ create definitionId pos =
             definitionId = definitionId,
             combat = CombatEntity.create 1,
             animation = Nothing,
+            respawn = respawning pos 10,
             canReachTarget = True
           }
    in case npcDefinition definitionId of
@@ -75,3 +79,23 @@ setAnimation npc anim =
     { animation = Anim.setAnimation (animation npc) anim,
       updateMask = updateMask npc .|. npcAnimationUpdateFlag
     }
+
+initiateRespawn :: Npc -> Npc
+initiateRespawn npc =
+  case (combat npc, shouldDiscardEntity . respawn $ npc) of
+    (CombatEntity.CombatEntity {CombatEntity.state = CombatEntity.Dying}, True) ->
+      npc
+        { respawn = markEntityDead . respawn $ npc
+        }
+    _ -> npc
+
+instance IsEntityActive Npc where
+  isEntityActive npc =
+    case npc |> combat |> CombatEntity.state of
+      CombatEntity.Dead -> False
+      _ -> True
+
+instance ShouldDiscard Npc where
+  shouldDiscard npc =
+    (shouldDiscardEntity . respawn $ npc)
+      && (not . isEntityActive $ npc)

@@ -1,13 +1,16 @@
 module PotatoCactus.Game.Combat.CombatEntity where
 
 import PotatoCactus.Game.Combat.Hit (Hit (damage))
-import PotatoCactus.Game.Typing (Advance (advance))
 import PotatoCactus.Game.Position (Position)
+import PotatoCactus.Game.Typing (Advance (advance))
 
 data CombatTarget = PlayerTarget Int | NpcTarget Int | None deriving (Show)
 
+data CombatState = Alive | Dying | Dead deriving (Show)
+
 data CombatEntity = CombatEntity
   { hitpoints :: Int,
+    state :: CombatState,
     maxHitpoints :: Int,
     target :: CombatTarget,
     hits :: [Hit],
@@ -19,6 +22,7 @@ create :: Int -> CombatEntity
 create hitpoints =
   CombatEntity
     { hitpoints = hitpoints,
+      state = Alive,
       maxHitpoints = hitpoints,
       target = None,
       hits = [],
@@ -37,10 +41,15 @@ applyHit c damageSource hit =
 
 instance Advance CombatEntity where
   advance c =
-    c
-      { hits = [],
-        cooldown = max 0 (cooldown c - 1)
-      }
+    case state c of
+      Dying -> c {state = Dead}
+      Dead -> c
+      Alive ->
+        c
+          { hits = [],
+            cooldown = max 0 (cooldown c - 1),
+            state = if hitpoints c == 0 then Dying else Alive
+          }
 
 clearTarget :: CombatEntity -> CombatEntity
 clearTarget c = c {target = None}

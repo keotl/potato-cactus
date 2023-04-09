@@ -90,6 +90,7 @@ executable potato-cactus
                    PotatoCactus.Game.Entity.Npc.Npc
                    PotatoCactus.Game.Entity.Npc.NpcUpdateMask
                    PotatoCactus.Game.Entity.Npc.NpcMovement
+                   PotatoCactus.Game.Entity.Npc.RespawnStrategy
                    PotatoCactus.Game.Entity.Object.DynamicObjectCollection
                    PotatoCactus.Game.Entity.Object.GameObject
                    PotatoCactus.Game.Entity.Object.GameObjectKey

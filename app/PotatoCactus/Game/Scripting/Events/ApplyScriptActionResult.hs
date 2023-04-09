@@ -3,6 +3,7 @@ module PotatoCactus.Game.Scripting.Events.ApplyScriptActionResult (applyScriptRe
 import PotatoCactus.Game.Combat.CombatEntity (CombatEntity (target), CombatTarget (NpcTarget, PlayerTarget))
 import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
 import PotatoCactus.Game.Entity.Interaction.Interaction (create)
+import PotatoCactus.Game.Entity.Npc.Npc (Npc (respawn))
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Npc.NpcMovement (immediatelyQueueMovement)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (addDynamicObject)
@@ -14,7 +15,7 @@ import PotatoCactus.Game.Position (GetPosition (getPosition))
 import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, NpcMoveTowardsTarget, NpcSetAnimation, UpdateNpc))
 import PotatoCactus.Game.World (World (npcs, objects, players))
 import qualified PotatoCactus.Game.World as W
-import PotatoCactus.Game.World.MobList (findByIndex, updateAtIndex)
+import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAtIndex)
 import PotatoCactus.Game.World.Selectors (isNpcAt)
 import PotatoCactus.Utils.Flow ((|>))
 
