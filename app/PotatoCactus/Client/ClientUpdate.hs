@@ -33,7 +33,7 @@ import PotatoCactus.Network.Packets.Out.RemoveObjectPacket (removeObjectPacket)
 import PotatoCactus.Network.Packets.Out.SetPlacementReferencePacket (setPlacementReferencePacket)
 import PotatoCactus.Network.Packets.Out.UpdateItemContainerPacket (updateItemContainerPacket)
 import PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket (updateRunEnergyPacket)
-import Type.Reflection (typeOf)
+import PotatoCactus.Utils.Logging (LogLevel (Error, Info), logger)
 
 data ClientLocalState_ = ClientLocalState_
   { localPlayers :: LocalEntityList Player,
@@ -112,7 +112,7 @@ updateClient sock client localState W.WorldUpdatedMessage = do
                             gameObjects = newObjects
                           }
     Nothing -> do
-      putStrLn $ "could not find player " ++ W.username client
+      logger_ Error $ "Could not find player for client update " ++ W.username client
       return localState
 updateClient _ _ _ W.CloseClientConnectionMessage = return defaultState
 
@@ -121,3 +121,5 @@ findPlayer_ world index playerName =
   if index /= -1
     then findByIndex (W.players world) index
     else findByPredicate (W.players world) (\p -> username p == playerName)
+
+logger_ = logger "ClientUpdate"

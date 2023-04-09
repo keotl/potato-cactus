@@ -8,7 +8,7 @@ import PotatoCactus.Game.Definitions.NpcDefinitions (NpcDefinition (hitpoints), 
 import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
 import PotatoCactus.Game.Entity.Npc.NpcMovement (NpcMovement, create)
 import PotatoCactus.Game.Entity.Npc.NpcUpdateMask (NpcUpdateMask, npcAnimationUpdateFlag, npcPrimaryHealthUpdateFlag, npcSecondaryHealthUpdateFlag)
-import PotatoCactus.Game.Entity.Npc.RespawnStrategy (RespawnStrategy (Never), markEntityDead, shouldDiscardEntity, respawning)
+import PotatoCactus.Game.Entity.Npc.RespawnStrategy (RespawnStrategy (Never), respawning, shouldDiscardEntity)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position)
 import PotatoCactus.Game.Typing (Advance (advance), IsEntityActive (isEntityActive), Keyable (key), ShouldDiscard (shouldDiscard))
 import PotatoCactus.Utils.Flow ((|>))
@@ -33,8 +33,8 @@ instance GetPosition Npc where
 instance Keyable Npc where
   key n = (show . definitionId $ n) ++ (show . serverIndex $ n)
 
-create :: NpcDefinitionId -> Position -> Npc
-create definitionId pos =
+create :: NpcDefinitionId -> Position -> RespawnStrategy -> Npc
+create definitionId pos respawnStrategy =
   let defaultValues =
         Npc
           { serverIndex = -1,
@@ -43,7 +43,7 @@ create definitionId pos =
             definitionId = definitionId,
             combat = CombatEntity.create 1,
             animation = Nothing,
-            respawn = respawning pos 10,
+            respawn = respawnStrategy,
             canReachTarget = True
           }
    in case npcDefinition definitionId of
@@ -79,15 +79,6 @@ setAnimation npc anim =
     { animation = Anim.setAnimation (animation npc) anim,
       updateMask = updateMask npc .|. npcAnimationUpdateFlag
     }
-
-initiateRespawn :: Npc -> Npc
-initiateRespawn npc =
-  case (combat npc, shouldDiscardEntity . respawn $ npc) of
-    (CombatEntity.CombatEntity {CombatEntity.state = CombatEntity.Dying}, True) ->
-      npc
-        { respawn = markEntityDead . respawn $ npc
-        }
-    _ -> npc
 
 instance IsEntityActive Npc where
   isEntityActive npc =

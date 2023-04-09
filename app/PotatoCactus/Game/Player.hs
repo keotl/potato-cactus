@@ -94,7 +94,7 @@ applyHit sourceEntity hit player =
 -- Sets the attack cooldown based on equipped items
 setAttackCooldown :: Player -> Player
 setAttackCooldown p =
-  p {combat = CombatEntity.setAttackCooldown (combat p) 10}
+  p {combat = CombatEntity.setAttackCooldown (combat p) 3}
 
 setAttackTarget :: CombatEntity.CombatTarget -> Player -> Player
 setAttackTarget target p =

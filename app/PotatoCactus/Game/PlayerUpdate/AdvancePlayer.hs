@@ -64,5 +64,6 @@ clearTransientProperties_ :: Player -> Player
 clearTransientProperties_ p =
   p
     { chatMessage = Nothing,
-      updateMask = 0
+      updateMask = 0,
+      animation = Nothing
     }

@@ -4,6 +4,7 @@ import PotatoCactus.Config.Constants (entityViewingDistance)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc)
 import PotatoCactus.Game.Player (Player (serverIndex))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position, isWithin)
+import PotatoCactus.Game.Typing (IsEntityActive (isEntityActive))
 import PotatoCactus.Game.World (World (npcs, players))
 import PotatoCactus.Game.World.MobList (findAllByPredicate, findByPredicate)
 
@@ -21,7 +22,7 @@ localPlayers world refPlayer =
 
 localNpcs :: World -> Player -> [Npc]
 localNpcs world refPlayer =
-  findAllByPredicate (npcs world) (isViewableFrom_ refPlayer)
+  findAllByPredicate (npcs world) (\npc -> isViewableFrom_ refPlayer npc && isEntityActive npc)
 
 isNpcAt :: World -> Position -> Bool
 isNpcAt w pos =

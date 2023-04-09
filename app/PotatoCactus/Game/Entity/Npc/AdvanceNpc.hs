@@ -4,20 +4,25 @@ import PotatoCactus.Config.Constants (npcDisengageDistance)
 import PotatoCactus.Game.Combat.CombatEntity (CombatEntity (target), CombatTarget (None, NpcTarget, PlayerTarget), clearTarget)
 import PotatoCactus.Game.Definitions.NpcDefinitions (NpcDefinition (attackRange), npcDefinition)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc (..))
+import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Npc.NpcMovement (create, immediatelyQueueMovement)
+import PotatoCactus.Game.Entity.Npc.RespawnStrategy (restart, tryRespawn)
 import PotatoCactus.Game.Movement.PathPlanner (CollisionMap, findPath)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position), faraway, isNextTo, isWithin)
-import PotatoCactus.Game.Typing (advance)
+import PotatoCactus.Game.Typing (IsEntityActive (isEntityActive), advance)
 import PotatoCactus.Game.World.EntityPositionFinder (CombatTargetPosOrDefault)
 import PotatoCactus.Game.World.MobList (findByIndex)
 
 advanceNpc :: CombatTargetPosOrDefault -> Npc -> Npc
 advanceNpc targetPosOrDefault npc =
-  let withCombat = updateCombat targetPosOrDefault npc
-   in withCombat
-        { updateMask = 0,
-          animation = Nothing
-        }
+  if not . isEntityActive $ npc
+    then advanceRespawnProcess npc
+    else
+      let withCombat = updateCombat targetPosOrDefault npc
+       in withCombat
+            { updateMask = 0,
+              animation = Nothing
+            }
 
 updateCombat :: CombatTargetPosOrDefault -> Npc -> Npc
 updateCombat targetPosOrDefault npc =
@@ -58,3 +63,16 @@ canReachCombatTarget_ npc targetPosOrDefault =
 range_ :: Maybe NpcDefinition -> Int
 range_ Nothing = 1
 range_ (Just def) = attackRange def
+
+advanceRespawnProcess :: Npc -> Npc
+advanceRespawnProcess npc =
+  case tryRespawn . respawn $ npc of
+    Just pos ->
+      ( NPC.create
+          (definitionId npc)
+          pos
+          (restart . respawn $ npc)
+      )
+        { serverIndex = serverIndex npc
+        }
+    Nothing -> npc {respawn = advance . respawn $ npc}
