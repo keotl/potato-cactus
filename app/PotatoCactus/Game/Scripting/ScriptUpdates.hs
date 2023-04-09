@@ -24,4 +24,5 @@ data ScriptActionResult
   | DispatchAttackNpcToPlayer NpcIndex PlayerIndex Hit
   | NpcSetAnimation NpcIndex Animation
   | NpcMoveTowardsTarget Npc
+  | InternalRemoveNpcTargetReferences NpcIndex
   | UpdateNpc NpcIndex Npc -- deprecated

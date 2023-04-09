@@ -2,12 +2,13 @@ module PotatoCactus.Game.Player where
 
 import Data.Bits ((.&.), (.|.))
 import Data.Foldable (fold)
-import PotatoCactus.Game.Combat.CombatEntity (CombatEntity)
+import PotatoCactus.Game.Combat.CombatEntity (CombatEntity, CombatTarget (NpcTarget), clearTargetIfEngagedWith)
 import qualified PotatoCactus.Game.Combat.CombatEntity as CombatEntity
 import PotatoCactus.Game.Combat.Hit (Hit)
 import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction)
 import qualified PotatoCactus.Game.Entity.Interaction.Interaction as Interaction
+import PotatoCactus.Game.Entity.Npc.Npc (NpcIndex)
 import PotatoCactus.Game.ItemContainer (ItemContainer, playerEquipmentContainer, playerInventory)
 import PotatoCactus.Game.Movement.MovementEntity (playerWalkMovement)
 import qualified PotatoCactus.Game.Movement.MovementEntity as M (MovementEntity, issueWalkCommand)
@@ -105,3 +106,7 @@ setAnimation anim player =
     { animation = Anim.setAnimation (animation player) anim,
       updateMask = updateMask player .|. animationFlag
     }
+
+clearTargetIfEngagedWithNpc :: NpcIndex -> Player -> Player
+clearTargetIfEngagedWithNpc npcId p =
+  p {combat = clearTargetIfEngagedWith (NpcTarget npcId) (combat p)}

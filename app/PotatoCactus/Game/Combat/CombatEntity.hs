@@ -4,7 +4,7 @@ import PotatoCactus.Game.Combat.Hit (Hit (damage))
 import PotatoCactus.Game.Position (Position)
 import PotatoCactus.Game.Typing (Advance (advance))
 
-data CombatTarget = PlayerTarget Int | NpcTarget Int | None deriving (Show)
+data CombatTarget = PlayerTarget Int | NpcTarget Int | None deriving (Show, Eq)
 
 data CombatState = Alive | Dying | Dead deriving (Show)
 
@@ -61,3 +61,7 @@ setAttackCooldown c cooldown =
 setTarget :: CombatEntity -> CombatTarget -> CombatEntity
 setTarget c target =
   c {target = target}
+
+clearTargetIfEngagedWith :: CombatTarget -> CombatEntity -> CombatEntity
+clearTargetIfEngagedWith desiredTarget c =
+  if target c == desiredTarget then clearTarget c else c

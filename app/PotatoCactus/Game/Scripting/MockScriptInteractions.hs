@@ -18,7 +18,7 @@ import PotatoCactus.Game.Message.RegisterClientPayload (RegisterClientPayload (p
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
 import PotatoCactus.Game.Player (Player (serverIndex))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, z))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcCannotReachTargetEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, NpcMoveTowardsTarget, NpcSetAnimation, UpdateNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcCannotReachTargetEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalRemoveNpcTargetReferences, NpcMoveTowardsTarget, NpcSetAnimation, UpdateNpc))
 import PotatoCactus.Game.Typing (key)
 import PotatoCactus.Game.World (World (tick))
 
@@ -82,7 +82,8 @@ dispatchScriptEvent world (NpcDeadEvent npc) =
   trace
     "dispatched NPC dead event"
     ( return
-        [ NpcSetAnimation (NPC.serverIndex npc) (Animation 2607 0 High)
+        [ NpcSetAnimation (NPC.serverIndex npc) (Animation 2607 0 High),
+          InternalRemoveNpcTargetReferences (NPC.serverIndex npc)
         ]
     )
 

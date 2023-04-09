@@ -1,6 +1,6 @@
 module PotatoCactus.Game.Scripting.Events.ApplyScriptActionResult (applyScriptResult) where
 
-import PotatoCactus.Game.Combat.CombatEntity (CombatEntity (target), CombatTarget (NpcTarget, PlayerTarget))
+import PotatoCactus.Game.Combat.CombatEntity (CombatEntity (target), CombatTarget (NpcTarget, PlayerTarget), clearTarget)
 import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
 import PotatoCactus.Game.Entity.Interaction.Interaction (create)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc (respawn))
@@ -8,14 +8,14 @@ import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Npc.NpcMovement (immediatelyQueueMovement)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (addDynamicObject)
 import PotatoCactus.Game.Movement.PathPlanner (findPathNaive)
-import PotatoCactus.Game.Player (Player (interaction))
+import PotatoCactus.Game.Player (Player (interaction), clearTargetIfEngagedWithNpc)
 import qualified PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions as PAnim
 import PotatoCactus.Game.Position (GetPosition (getPosition))
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, NpcMoveTowardsTarget, NpcSetAnimation, UpdateNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalRemoveNpcTargetReferences, NpcMoveTowardsTarget, NpcSetAnimation, UpdateNpc))
 import PotatoCactus.Game.World (World (npcs, objects, players))
 import qualified PotatoCactus.Game.World as W
-import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAtIndex)
+import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAll, updateAtIndex)
 import PotatoCactus.Game.World.Selectors (isNpcAt)
 import PotatoCactus.Utils.Flow ((|>))
 
@@ -34,7 +34,7 @@ applyScriptResult world (UpdateNpc npcId npc) =
     }
 applyScriptResult world (ClearPlayerInteraction playerId) =
   world
-    { players = updateAtIndex (players world) playerId (\p -> p {interaction = create})
+    { players = updateAtIndex (players world) playerId (\p -> p {interaction = create, P.combat = clearTarget . P.combat $ p})
     }
 applyScriptResult world (DispatchAttackPlayerToNpc srcPlayer targetNpc hit) =
   world
@@ -100,3 +100,7 @@ applyScriptResult world (NpcMoveTowardsTarget npc) =
                     }
         Nothing -> world
     _ -> world
+applyScriptResult world (InternalRemoveNpcTargetReferences npcId) =
+  world
+    { players = updateAll (W.players world) (clearTargetIfEngagedWithNpc npcId)
+    }
