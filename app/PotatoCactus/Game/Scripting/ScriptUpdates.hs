@@ -25,4 +25,7 @@ data ScriptActionResult
   | NpcSetAnimation NpcIndex Animation
   | NpcMoveTowardsTarget Npc
   | InternalRemoveNpcTargetReferences NpcIndex
+  | InternalProcessingComplete -- Sentinel token to indicate script execution complete
+  | InternalNoop -- for testing
   | UpdateNpc NpcIndex Npc -- deprecated
+  deriving (Show)

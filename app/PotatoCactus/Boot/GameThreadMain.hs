@@ -1,7 +1,7 @@
 module PotatoCactus.Boot.GameThreadMain where
 
 import Control.Concurrent (Chan, forkFinally, readChan, threadDelay, writeChan)
-import Data.IORef
+import Data.IORef ( readIORef, writeIORef )
 import Data.Typeable (typeOf)
 import GHC.Clock (getMonotonicTimeNSec)
 import PotatoCactus.Boot.GameChannel (gameChannel)
