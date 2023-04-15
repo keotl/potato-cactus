@@ -12,7 +12,7 @@ import PotatoCactus.Game.Player (Player (interaction), clearTargetIfEngagedWithN
 import qualified PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions as PAnim
 import PotatoCactus.Game.Position (GetPosition (getPosition))
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, NpcMoveTowardsTarget, NpcSetAnimation, UpdateNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, NpcMoveTowardsTarget, NpcSetAnimation, UpdateNpc, DummyEvent))
 import PotatoCactus.Game.World (World (npcs, objects, players))
 import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAll, updateAtIndex)
@@ -106,3 +106,4 @@ applyScriptResult world (InternalRemoveNpcTargetReferences npcId) =
     }
 applyScriptResult world InternalNoop = world
 applyScriptResult world InternalProcessingComplete = world
+applyScriptResult world (DummyEvent message) = world

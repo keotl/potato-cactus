@@ -14,3 +14,6 @@ maxNpcs = 16000
 
 npcDisengageDistance :: Int
 npcDisengageDistance = 20
+
+scriptWorkers :: Int
+scriptWorkers = 4

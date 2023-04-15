@@ -20,7 +20,7 @@ dispatchScriptEvents world = do
   --     2. Add conflict resolution logic in the applyScriptResult function. Whichever
   --        action goes first would then be treated as right.
   -- A possible issue witch conflicting actions might be NPC pathing.
-  sendEventsAsync events
+  sendEventsAsync world events
   scriptResults <- mapM (dispatchScriptEvent world) events
   bridge <- getInstance
 

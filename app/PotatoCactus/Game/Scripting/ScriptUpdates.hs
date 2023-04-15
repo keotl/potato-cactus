@@ -27,5 +27,6 @@ data ScriptActionResult
   | InternalRemoveNpcTargetReferences NpcIndex
   | InternalProcessingComplete -- Sentinel token to indicate script execution complete
   | InternalNoop -- for testing
+  | DummyEvent String
   | UpdateNpc NpcIndex Npc -- deprecated
   deriving (Show)
