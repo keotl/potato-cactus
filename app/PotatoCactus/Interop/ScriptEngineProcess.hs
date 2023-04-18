@@ -1,4 +1,5 @@
 {-# LANGUAGE RankNTypes #-}
+
 module PotatoCactus.Interop.ScriptEngineProcess (ScriptEngineHandle, spawnScriptEngineProcess, send, recv, getInstance) where
 
 import Data.Aeson (ToJSON, encode)
@@ -11,7 +12,7 @@ import PotatoCactus.Game.Scripting.Bridge.BridgeMessage (BridgeMessage)
 import PotatoCactus.Game.Scripting.Bridge.ControlMessages (BridgeInitOptions (BridgeInitOptions), initializeBridgeMessage)
 import PotatoCactus.Utils.Logging (LogLevel (Info), logger)
 import System.IO (BufferMode (LineBuffering), Handle, hSetBuffering)
-import System.Process (CreateProcess (std_in, std_out), ProcessHandle, StdStream (CreatePipe), createProcess, proc)
+import System.Process (CreateProcess (env, std_in, std_out), ProcessHandle, StdStream (CreatePipe), createProcess, proc)
 
 data ScriptEngineHandle = ScriptEngineHandle
   { stdin_ :: Handle,
@@ -25,11 +26,11 @@ instance_ = unsafePerformIO $ newIORef Nothing
 
 spawnScriptEngineProcess :: IO ScriptEngineHandle
 spawnScriptEngineProcess = do
-  (Just stdin, Just stdout, _, p) <- createProcess (proc "/usr/bin/python3" ["-u", "script-engine/main.py"]) {std_out = CreatePipe, std_in = CreatePipe}
+  (Just stdin, Just stdout, _, p) <- createProcess (proc "/usr/bin/python3" ["-u", "script-engine/main.py"]) {std_out = CreatePipe, std_in = CreatePipe, env = Just [("PYTHONPATH", "scripts/")]}
   let handle = ScriptEngineHandle stdin stdout p
   hSetBuffering (stdin_ handle) LineBuffering
   hSetBuffering (stdout_ handle) LineBuffering
-  send handle $ initializeBridgeMessage (BridgeInitOptions 4)
+  send handle $ initializeBridgeMessage (BridgeInitOptions 4 ["scripts/"])
   writeIORef instance_ (Just handle)
   return handle
 

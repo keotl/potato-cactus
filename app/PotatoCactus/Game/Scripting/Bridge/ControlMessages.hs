@@ -11,7 +11,8 @@ import PotatoCactus.Game.Scripting.Bridge.Serialization.WorldDtoMapper (WorldDto
 import qualified PotatoCactus.Game.World as W
 
 data BridgeInitOptions = BridgeInitOptions
-  { workers :: Int
+  { workers :: Int,
+    scriptPaths :: [String]
   }
   deriving (Show, Generic)
 
