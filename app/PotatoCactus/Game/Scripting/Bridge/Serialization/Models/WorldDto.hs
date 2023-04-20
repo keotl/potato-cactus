@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module PotatoCactus.Game.Scripting.Bridge.Serialization.WorldDtoMapper (WorldDto, mapWorld) where
+module PotatoCactus.Game.Scripting.Bridge.Serialization.Models.WorldDto (WorldDto, worldToDto) where
 
 import Data.Aeson (ToJSON)
 import Data.IntMap (IntMap, empty)
@@ -23,8 +23,8 @@ data PlayerDto = PlayerDto
 
 instance ToJSON PlayerDto
 
-mapWorld :: W.World -> WorldDto
-mapWorld w =
+worldToDto :: W.World -> WorldDto
+worldToDto w =
   WorldDto
     { tick = W.tick w,
       players = empty

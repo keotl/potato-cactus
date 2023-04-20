@@ -7,7 +7,7 @@ import Data.Aeson.Types (ToJSON)
 import Data.ByteString.Lazy (ByteString, empty)
 import GHC.Generics (Generic)
 import PotatoCactus.Game.Scripting.Bridge.BridgeMessage (BridgeMessage, EmptyPayload (EmptyPayload), bridgeMessage)
-import PotatoCactus.Game.Scripting.Bridge.Serialization.WorldDtoMapper (WorldDto, mapWorld)
+import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.WorldDto (WorldDto, worldToDto)
 import qualified PotatoCactus.Game.World as W
 
 data BridgeInitOptions = BridgeInitOptions
@@ -26,4 +26,4 @@ doneSendingEventsMessage = bridgeMessage "doneSendingEvents" EmptyPayload
 
 updateWorldContextMessage :: W.World -> BridgeMessage WorldDto
 updateWorldContextMessage world =
-  bridgeMessage "updateWorld" (mapWorld world)
+  bridgeMessage "updateWorld" (worldToDto world)
