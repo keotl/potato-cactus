@@ -25,7 +25,7 @@ interactionToDto :: I.Interaction -> Value
 interactionToDto I.Interaction {I.target = None} =
   object
     [ "target" .= Null,
-      "state" .= String "Pending"
+      "state" .= String "pending"
     ]
 interactionToDto I.Interaction {I.target = (ObjectTarget (GameObjectKey id position) actionIndex), I.state = s} =
   object

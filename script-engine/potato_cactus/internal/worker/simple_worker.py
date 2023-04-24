@@ -5,7 +5,7 @@ import potato_cactus
 from . import OutboundMessageSender, WorkerHandle
 from potato_cactus.internal.messages.inbound import InboundMessage
 from potato_cactus.internal.messages.outbound import internal_processingComplete
-from potato_cactus.api.world import World
+from potato_cactus.api.dto.world import World
 from potato_cactus.internal.impl.context_impl import ContextImpl
 
 
@@ -13,7 +13,7 @@ class SimpleWorker(WorkerHandle):
 
     def __init__(self, sender: OutboundMessageSender, scriptPaths: List[str]):
         self._sender = sender
-        self._discover_scripts([x for x in scriptPaths])
+        self._discover_scripts(scriptPaths)
         ContextImpl.INSTANCE = ContextImpl()
         potato_cactus.context = ContextImpl.INSTANCE
 
@@ -25,6 +25,9 @@ class SimpleWorker(WorkerHandle):
         if message.op == "doneSendingEvents":
             self._sender.send(internal_processingComplete())
 
-        if message.op == "updateWorld":
+        elif message.op == "updateWorld":
             world = cast(World, message.body)
             ContextImpl.INSTANCE.set_world(world)
+
+        # elif message.op == "gameEvent":
+        #

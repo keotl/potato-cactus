@@ -1,5 +1,5 @@
 from potato_cactus.api.context import Context
-from potato_cactus.api.world import World
+from potato_cactus.api.dto.world import World
 
 class ContextImpl(Context):
     INSTANCE: "ContextImpl" = None  # type: ignore

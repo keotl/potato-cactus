@@ -9,7 +9,7 @@ import Data.Aeson.Types (Object, parse)
 import Data.ByteString (ByteString)
 import Data.ByteString.Lazy (fromStrict)
 import GHC.Generics (Generic)
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (DummyEvent, InternalNoop, InternalProcessingComplete))
+import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (ClearPlayerInteraction, DummyEvent, InternalNoop, InternalProcessingComplete))
 
 mapResult :: ByteString -> ScriptActionResult
 mapResult bytes =
@@ -20,6 +20,15 @@ mapResult bytes =
 decodeBody :: String -> Object -> ScriptActionResult
 decodeBody "internal_processingComplete" _ =
   InternalProcessingComplete
+decodeBody "clearPlayerInteraction" body =
+  case parse
+    ( \obj -> do
+        playerIndex <- obj .: "playerIndex"
+        return (ClearPlayerInteraction playerIndex)
+    )
+    body of
+    Error msg -> InternalNoop
+    Success decoded -> decoded
 decodeBody "dummyEvent" body =
   case parse
     ( \obj -> do

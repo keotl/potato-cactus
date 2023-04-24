@@ -16,22 +16,22 @@ import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, Npc
 mapEvent :: GameEvent -> BridgeMessage (GameEventDto Value)
 mapEvent (PlayerInteractionEvent p i) =
   bridgeMessage "gameEvent" $
-    GameEventDto "playerInteraction" (playerInteractionToDto p i)
+    GameEventDto "PlayerInteractionEvent" (playerInteractionToDto p i)
 mapEvent (PlayerAttackEvent p t) =
   bridgeMessage "gameEvent" $
-    GameEventDto "playerAttack" (playerAttackToDto p t)
+    GameEventDto "PlayerAttackEvent" (playerAttackToDto p t)
 mapEvent (NpcAttackEvent npc t) =
   bridgeMessage "gameEvent" $
-    GameEventDto "npcAttack" (npcAttackDto npc t)
+    GameEventDto "NpcAttackEvent" (npcAttackDto npc t)
 mapEvent (NpcCannotReachTargetEvent npc t) =
   bridgeMessage "gameEvent" $
     GameEventDto "noop" Null
 mapEvent (NpcDeadEvent npc) =
   bridgeMessage "gameEvent" $
-    GameEventDto "npcDead" (npcReferenceDto npc)
+    GameEventDto "NpcDeadEvent" (npcReferenceDto npc)
 mapEvent (NpcEntityTickEvent npc) =
   bridgeMessage "gameEvent" $
-    GameEventDto "npcEntityTick" (npcReferenceDto npc)
+    GameEventDto "NpcEntityTickEvent" (npcReferenceDto npc)
 
 data GameEventDto b = GameEventDto
   { event :: String,
