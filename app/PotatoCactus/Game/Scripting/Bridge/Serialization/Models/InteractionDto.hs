@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module PotatoCactus.Game.Scripting.Bridge.Serialization.Models.InteractionDto (playerInteractionToDto) where
+module PotatoCactus.Game.Scripting.Bridge.Serialization.Models.InteractionDto (playerInteractionToDto, interactionToDto) where
 
 import Data.Aeson (Object, ToJSON, Value (Null), object, (.=))
 import Data.Aeson.KeyMap (empty)
@@ -18,16 +18,16 @@ playerInteractionToDto :: Player -> I.Interaction -> Value
 playerInteractionToDto p i =
   object
     [ "playerIndex" .= P.serverIndex p,
-      "interaction" .= toDto i
+      "interaction" .= interactionToDto i
     ]
 
-toDto :: I.Interaction -> Value
-toDto I.Interaction {I.target = None} =
+interactionToDto :: I.Interaction -> Value
+interactionToDto I.Interaction {I.target = None} =
   object
     [ "target" .= Null,
       "state" .= String "Pending"
     ]
-toDto I.Interaction {I.target = (ObjectTarget (GameObjectKey id position) actionIndex), I.state = s} =
+interactionToDto I.Interaction {I.target = (ObjectTarget (GameObjectKey id position) actionIndex), I.state = s} =
   object
     [ "target"
         .= object
@@ -38,7 +38,7 @@ toDto I.Interaction {I.target = (ObjectTarget (GameObjectKey id position) action
           ],
       "state" .= mapState s
     ]
-toDto I.Interaction {I.target = (NpcTarget npcId (NpcAttack)), I.state = s} =
+interactionToDto I.Interaction {I.target = (NpcTarget npcId (NpcAttack)), I.state = s} =
   object
     [ "target"
         .= object
@@ -47,7 +47,7 @@ toDto I.Interaction {I.target = (NpcTarget npcId (NpcAttack)), I.state = s} =
           ],
       "state" .= mapState s
     ]
-toDto I.Interaction {I.target = (NpcTarget npcId (NpcAction actionIndex)), I.state = s} =
+interactionToDto I.Interaction {I.target = (NpcTarget npcId (NpcAction actionIndex)), I.state = s} =
   object
     [ "target"
         .= object

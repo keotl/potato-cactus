@@ -133,11 +133,16 @@ executable potato-cactus
                    PotatoCactus.Game.Scripting.Bridge.ControlMessages
                    PotatoCactus.Game.Scripting.Bridge.Serialization.ActionResultMapper
                    PotatoCactus.Game.Scripting.Bridge.Serialization.GameEventMapper
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CombatDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CombatTargetDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.InteractionDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.ItemContainerDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.MovementDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.NpcAttackDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.NpcDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.NpcReferenceDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PlayerAttackDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PlayerDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PositionDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.WorldDto
                    PotatoCactus.Game.Scripting.Events.ApplyScriptActionResult
