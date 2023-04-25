@@ -6,13 +6,16 @@ import PotatoCactus.Game.Entity.Interaction.Interaction (create)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc (respawn))
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Npc.NpcMovement (immediatelyQueueMovement)
+import qualified PotatoCactus.Game.Entity.Npc.NpcMovement as NM
+import PotatoCactus.Game.Entity.Npc.RespawnStrategy (RespawnStrategy (Never), respawning)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (addDynamicObject)
-import PotatoCactus.Game.Movement.PathPlanner (findPathNaive)
+import PotatoCactus.Game.Movement.PathPlanner (findPath, findPathNaive)
 import PotatoCactus.Game.Player (Player (interaction), clearTargetIfEngagedWithNpc)
 import qualified PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions as PAnim
 import PotatoCactus.Game.Position (GetPosition (getPosition))
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, NpcMoveTowardsTarget, NpcSetAnimation, UpdateNpc, DummyEvent))
+import qualified PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest as SpawnReq
+import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, DummyEvent, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, SpawnNpc, UpdateNpc))
 import PotatoCactus.Game.World (World (npcs, objects, players))
 import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAll, updateAtIndex)
@@ -103,6 +106,26 @@ applyScriptResult world (NpcMoveTowardsTarget npc) =
 applyScriptResult world (InternalRemoveNpcTargetReferences npcId) =
   world
     { players = updateAll (W.players world) (clearTargetIfEngagedWithNpc npcId)
+    }
+applyScriptResult world (SpawnNpc options) =
+  let respawn = case SpawnReq.respawnDelay options of
+        -1 -> Never
+        delay -> respawning (SpawnReq.position options) delay
+   in W.addNpc world (NPC.create (SpawnReq.npcId options) (SpawnReq.position options) respawn)
+applyScriptResult world (NpcQueueWalk npcIndex pos) =
+  world
+    { npcs =
+        updateAtIndex
+          (W.npcs world)
+          npcIndex
+          ( \npc ->
+              npc
+                { NPC.movement =
+                    NM.immediatelyQueueMovement
+                      (NPC.movement npc)
+                      (findPath 666 (getPosition npc) pos)
+                }
+          )
     }
 applyScriptResult world InternalNoop = world
 applyScriptResult world InternalProcessingComplete = world

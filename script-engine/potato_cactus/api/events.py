@@ -6,6 +6,7 @@ from potato_cactus.api.dto.interaction import PlayerInteraction
 
 
 class GameEvent(str, Enum):
+    ServerInitEvent = "ServerInitEvent"
     NpcEntityTickEvent = "NpcEntityTickEvent"
     PlayerInteractionEvent = "PlayerInteractionEvent"
     PlayerAttackEvent = "PlayerAttackEvent"

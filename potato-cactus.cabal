@@ -128,6 +128,7 @@ executable potato-cactus
                    PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions
                    PotatoCactus.Game.PlayerUpdate.ProcessPlayerUpdate
                    PotatoCactus.Game.Position
+                   PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest
                    PotatoCactus.Game.Scripting.Bridge.BridgeMessage
                    PotatoCactus.Game.Scripting.Bridge.Communication
                    PotatoCactus.Game.Scripting.Bridge.ControlMessages
@@ -135,6 +136,7 @@ executable potato-cactus
                    PotatoCactus.Game.Scripting.Bridge.Serialization.GameEventMapper
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CombatDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CombatTargetDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.GameObjectDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.InteractionDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.ItemContainerDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.MovementDto

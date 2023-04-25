@@ -11,9 +11,12 @@ import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.InteractionDto (p
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.NpcAttackDto (npcAttackDto)
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.NpcReferenceDto (npcReferenceDto)
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PlayerAttackDto (playerAttackToDto)
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcCannotReachTargetEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcCannotReachTargetEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent, ServerInitEvent))
 
 mapEvent :: GameEvent -> BridgeMessage (GameEventDto Value)
+mapEvent ServerInitEvent =
+  bridgeMessage "gameEvent" $
+    GameEventDto "ServerInitEvent" Null
 mapEvent (PlayerInteractionEvent p i) =
   bridgeMessage "gameEvent" $
     GameEventDto "PlayerInteractionEvent" (playerInteractionToDto p i)
