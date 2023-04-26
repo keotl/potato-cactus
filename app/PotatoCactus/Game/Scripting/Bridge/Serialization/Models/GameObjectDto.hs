@@ -4,6 +4,7 @@ module PotatoCactus.Game.Scripting.Bridge.Serialization.Models.GameObjectDto (Ga
 
 import Data.Aeson (ToJSON)
 import GHC.Generics (Generic)
+import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as D
 import qualified PotatoCactus.Game.Entity.Object.GameObject as O
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PositionDto (PositionDto, toDto)
 import Prelude hiding (id)
@@ -18,11 +19,13 @@ data GameObjectDto = GameObjectDto
 
 instance ToJSON GameObjectDto
 
-gameObjectToDto :: O.GameObject -> GameObjectDto
-gameObjectToDto obj =
-  GameObjectDto
-    { id = O.id obj,
-      position = toDto . O.position $ obj,
-      objectType = O.objectType obj,
-      facingDirection = O.facingDirection obj
-    }
+gameObjectToDto :: D.DynamicObject -> Maybe GameObjectDto
+gameObjectToDto (D.Added obj) =
+  Just $
+    GameObjectDto
+      { id = O.id obj,
+        position = toDto . O.position $ obj,
+        objectType = O.objectType obj,
+        facingDirection = O.facingDirection obj
+      }
+gameObjectToDto _ = Nothing

@@ -30,4 +30,5 @@ class SimpleWorker(WorkerHandle):
             ContextImpl.INSTANCE.set_world(world)
 
         # elif message.op == "gameEvent":
-        #
+        # TODO enrich payloads for npc references, e.g. interaction
+

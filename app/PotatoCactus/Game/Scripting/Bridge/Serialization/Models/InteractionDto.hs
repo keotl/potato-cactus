@@ -9,6 +9,7 @@ import GHC.Generics (Generic)
 import qualified PotatoCactus.Game.Entity.Interaction.Interaction as I
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (InProgress, Pending, PendingPathing))
 import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (None, NpcTarget, ObjectTarget), NpcInteractionType (NpcAction, NpcAttack))
+import PotatoCactus.Game.Entity.Npc.Npc (Npc (definitionId))
 import PotatoCactus.Game.Entity.Object.GameObjectKey (GameObjectKey (GameObjectKey, position))
 import PotatoCactus.Game.Player (Player)
 import qualified PotatoCactus.Game.Player as P
@@ -38,12 +39,12 @@ interactionToDto I.Interaction {I.target = (ObjectTarget (GameObjectKey id posit
           ],
       "state" .= mapState s
     ]
-interactionToDto I.Interaction {I.target = (NpcTarget npcId (NpcAttack)), I.state = s} =
+interactionToDto I.Interaction {I.target = (NpcTarget npcIndex NpcAttack), I.state = s} =
   object
     [ "target"
         .= object
           [ "type" .= String "npcAttack",
-            "npcIndex" .= npcId
+            "npcIndex" .= npcIndex
           ],
       "state" .= mapState s
     ]
