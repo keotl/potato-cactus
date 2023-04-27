@@ -10,6 +10,7 @@ import PotatoCactus.Game.Definitions.NpcDefinitions (initializeNpcDb)
 import PotatoCactus.Game.Definitions.StaticGameObjectSet (initializeStaticGameSet)
 import PotatoCactus.Interop.ScriptEngineProcess (spawnScriptEngineProcess)
 import PotatoCactus.Utils.Logging (LogLevel (Info), logger)
+import PotatoCactus.Game.Scripting.Bridge.InitializeScriptEngineContext (initializeScriptEngineContext)
 
 initializeServer :: IO ()
 initializeServer = do
@@ -35,6 +36,9 @@ initializeServer = do
 
   spawnScriptEngineProcess
   logger_ Info "Spawned script engine process."
+
+  initializeScriptEngineContext
+  logger_ Info "Initialized script engine context."
 
   endTime <- getCurrentTime
   logger_ Info $ "Server initialization completed in " ++ show (diffUTCTime endTime startTime)

@@ -54,6 +54,12 @@ def NpcSetAnimation(npcIndex: int, animationId: int, delay: int = 0,
         "priority": priority
     })
 
+def SpawnNpc(npcId: int, position: Position, respawnDelay=None) -> ScriptAction:
+    return ScriptAction("spawnNpc", {
+        "npcId": npcId,
+        "position": _map_position(position),
+        "respawnDelay": respawnDelay or -1
+    })
 
 def _map_position(position: Position) -> dict:
     return {"x": position.x, "y": position.y, "z": position.z}

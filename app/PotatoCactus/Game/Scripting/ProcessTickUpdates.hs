@@ -1,4 +1,4 @@
-module PotatoCactus.Game.Scripting.ProcessTickUpdates (dispatchScriptEvents) where
+module PotatoCactus.Game.Scripting.ProcessTickUpdates (dispatchScriptEvents, readBridgeEventsUntilDone) where
 
 import PotatoCactus.Game.Scripting.Bridge.Communication (readScriptResult, sendEventsAsync)
 import PotatoCactus.Game.Scripting.Events.ApplyScriptActionResult (applyScriptResult)
@@ -25,16 +25,16 @@ dispatchScriptEvents world = do
   bridge <- getInstance
 
   let withBuiltinScriptResults = foldl applyScriptResult world (concat scriptResults)
-  readBridgeEventsUntilDone_ withBuiltinScriptResults bridge
+  readBridgeEventsUntilDone withBuiltinScriptResults bridge
 
 dispatchAndApply_ :: World -> GameEvent -> IO World
 dispatchAndApply_ world event = do
   scriptResult <- dispatchScriptEvent world event
   return (foldl applyScriptResult world scriptResult)
 
-readBridgeEventsUntilDone_ :: World -> ScriptEngineHandle -> IO World
-readBridgeEventsUntilDone_ world bridge = do
+readBridgeEventsUntilDone :: World -> ScriptEngineHandle -> IO World
+readBridgeEventsUntilDone world bridge = do
   message <- readScriptResult bridge
   case message of
     InternalProcessingComplete -> return world
-    action -> readBridgeEventsUntilDone_ (applyScriptResult world action) bridge
+    action -> readBridgeEventsUntilDone (applyScriptResult world action) bridge

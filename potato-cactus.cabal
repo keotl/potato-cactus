@@ -132,6 +132,7 @@ executable potato-cactus
                    PotatoCactus.Game.Scripting.Bridge.BridgeMessage
                    PotatoCactus.Game.Scripting.Bridge.Communication
                    PotatoCactus.Game.Scripting.Bridge.ControlMessages
+                   PotatoCactus.Game.Scripting.Bridge.InitializeScriptEngineContext
                    PotatoCactus.Game.Scripting.Bridge.Serialization.ActionResultMapper
                    PotatoCactus.Game.Scripting.Bridge.Serialization.GameEventMapper
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CombatDto
