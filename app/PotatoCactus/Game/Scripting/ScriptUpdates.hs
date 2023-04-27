@@ -13,7 +13,7 @@ import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest)
 
 data GameEvent
   = ServerInitEvent
-  | PlayerInteractionEvent Player Interaction
+  | PlayerInteractionEvent Player Interaction -- maps to NpcInteractionEvent, ObjectInteractionEvent and NpcAttackInteractionEvent
   | PlayerAttackEvent Player CombatTarget
   | NpcAttackEvent Npc CombatTarget
   | NpcCannotReachTargetEvent Npc CombatTarget

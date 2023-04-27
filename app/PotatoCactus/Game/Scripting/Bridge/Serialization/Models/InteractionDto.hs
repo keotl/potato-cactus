@@ -15,12 +15,20 @@ import PotatoCactus.Game.Player (Player)
 import qualified PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PositionDto as Pos
 
-playerInteractionToDto :: Player -> I.Interaction -> Value
+playerInteractionToDto :: Player -> I.Interaction -> (String, Value)
 playerInteractionToDto p i =
-  object
-    [ "playerIndex" .= P.serverIndex p,
-      "interaction" .= interactionToDto i
-    ]
+  ( eventName i,
+    object
+      [ "playerIndex" .= P.serverIndex p,
+        "interaction" .= interactionToDto i
+      ]
+  )
+
+eventName :: I.Interaction -> String
+eventName I.Interaction {I.target = None} = "Noop"
+eventName I.Interaction {I.target = (ObjectTarget _ _)} = "ObjectInteractionEvent"
+eventName I.Interaction {I.target = (NpcTarget _ NpcAttack)} = "NpcAttackInteractionEvent" -- TODO - Can this be consolidated with NpcAttackEvent?  - keotl 2023-04-27
+eventName I.Interaction {I.target = (NpcTarget _ _)} = "NpcInteractionEvent"
 
 interactionToDto :: I.Interaction -> Value
 interactionToDto I.Interaction {I.target = None} =

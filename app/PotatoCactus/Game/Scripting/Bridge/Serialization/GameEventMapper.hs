@@ -18,8 +18,8 @@ mapEvent ServerInitEvent =
   bridgeMessage "gameEvent" $
     GameEventDto "ServerInitEvent" Null
 mapEvent (PlayerInteractionEvent p i) =
-  bridgeMessage "gameEvent" $
-    GameEventDto "PlayerInteractionEvent" (playerInteractionToDto p i)
+  let (eventName, body) = playerInteractionToDto p i
+   in bridgeMessage "gameEvent" $ GameEventDto eventName body
 mapEvent (PlayerAttackEvent p t) =
   bridgeMessage "gameEvent" $
     GameEventDto "PlayerAttackEvent" (playerAttackToDto p t)

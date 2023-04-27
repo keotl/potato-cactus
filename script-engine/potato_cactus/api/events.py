@@ -2,21 +2,34 @@ from enum import Enum
 from typing import Optional
 
 from potato_cactus.api.dto.combat import CombatTarget
-from potato_cactus.api.dto.interaction import PlayerInteraction
+from potato_cactus.api.dto.interaction import NpcAttackInteractionTarget, NpcInteractionTarget, ObjectInteractionTarget, \
+    PlayerInteraction
 
 
 class GameEvent(str, Enum):
     ServerInitEvent = "ServerInitEvent"
     NpcEntityTickEvent = "NpcEntityTickEvent"
-    PlayerInteractionEvent = "PlayerInteractionEvent"
+    NpcInteractionEvent = "NpcInteractionEvent"
+    ObjectInteractionEvent = "ObjectInteractionEvent"
+    NpcAttackInteractionEvent = "NpcAttackInteractionEvent"  # TODO - Can this be consolidated with NpcAttackEvent?  - keotl 2023-04-27
     PlayerAttackEvent = "PlayerAttackEvent"
     NpcAttackEvent = "NpcAttackEvent"
     NpcDeadEvent = "NpcDeadEvent"
 
 
-class PlayerInteractionEventPayload(object):
+class ObjectInteractionEventPayload(object):
     playerIndex: int
-    interaction: PlayerInteraction
+    interaction: PlayerInteraction[ObjectInteractionTarget]
+
+
+class NpcInteractionEventPayload(object):
+    playerIndex: int
+    interaction: PlayerInteraction[NpcInteractionTarget]
+
+
+class NpcAttackInteractionEventPayload(object):
+    playerIndex: int
+    interaction: PlayerInteraction[NpcAttackInteractionTarget]
 
 
 class PlayerAttackEventPayload(object):
