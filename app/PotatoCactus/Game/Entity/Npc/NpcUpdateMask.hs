@@ -12,3 +12,6 @@ npcSecondaryHealthUpdateFlag = 8
 
 npcAnimationUpdateFlag :: Word16
 npcAnimationUpdateFlag = 16
+
+npcForcedChatUpdateFlag :: Word16
+npcForcedChatUpdateFlag = 1

@@ -8,9 +8,12 @@ import PotatoCactus.Game.Entity.Npc.Npc (Npc, NpcIndex)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Player (Player, PlayerIndex)
+import PotatoCactus.Game.Position (Position (Position))
+import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest)
 
 data GameEvent
-  = PlayerInteractionEvent Player Interaction
+  = ServerInitEvent
+  | PlayerInteractionEvent Player Interaction -- maps to NpcInteractionEvent, ObjectInteractionEvent and NpcAttackInteractionEvent
   | PlayerAttackEvent Player CombatTarget
   | NpcAttackEvent Npc CombatTarget
   | NpcCannotReachTargetEvent Npc CombatTarget
@@ -23,6 +26,13 @@ data ScriptActionResult
   | DispatchAttackPlayerToNpc PlayerIndex NpcIndex Hit
   | DispatchAttackNpcToPlayer NpcIndex PlayerIndex Hit
   | NpcSetAnimation NpcIndex Animation
+  | NpcQueueWalk NpcIndex Position
   | NpcMoveTowardsTarget Npc
+  | NpcSetForcedChat NpcIndex String
+  | SpawnNpc SpawnNpcRequest
   | InternalRemoveNpcTargetReferences NpcIndex
+  | InternalProcessingComplete -- Sentinel token to indicate script execution complete
+  | InternalNoop
+  | ServerPrintMessage String -- for testing
   | UpdateNpc NpcIndex Npc -- deprecated
+  deriving (Show)

@@ -12,13 +12,17 @@ Takes some inspiration from
 - [x] Players can walk around the world and load the map around them
 - [x] Players can chat to each other
 - [x] Players can equip armour and weapons
+- [x] Players can seen and interact with NPCs
+- [x] Players can seen and interact with game objects
+- [-] The world can be configured using Python scripts
 
 ## Priorities
-- [ ] Handle NPC updates and game objects
-- [ ] Implement combat mechanics
-- [ ] Define a scripting API
+- [ ] Augment scripting API actions and events
+- [ ] Game data loading
+  - [ ] Item, NPC, Object definitions
+  - [ ] Collision map and pathing
+  - [ ] Static object set
 - [ ] Persistence mechanism
-
 ## Running requirements
 - Revision-317 cache files
 - Revision-317 client with encryption disabled

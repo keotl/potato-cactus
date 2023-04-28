@@ -2,7 +2,7 @@ module PotatoCactus.Game.Entity.Object.DynamicObjectCollection where
 
 import Data.IntMap (IntMap, delete, empty, toList)
 import Data.IntMap.Lazy (insert)
-import PotatoCactus.Game.Entity.Object.GameObject (GameObject (position, objectType), GameObjectType)
+import PotatoCactus.Game.Entity.Object.GameObject (GameObject (objectType, position), GameObjectType)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position, x, y, z), chunkX, chunkY)
 import Prelude hiding (id)
 
@@ -34,7 +34,6 @@ key_ :: DynamicObject -> Int
 key_ (Added object) = rawKey_ (position object, objectType object)
 key_ (Removed object) = rawKey_ (position object, objectType object)
 
-
 rawKey_ :: (Position, GameObjectType) -> Int
 rawKey_ (position, objectType) =
   x position
@@ -53,3 +52,8 @@ findByChunkXY x y collection =
           == (x, y)
     )
     (map snd $ toList . elements_ $ collection)
+
+-- For serialization
+iter :: DynamicObjectCollection -> [DynamicObject]
+iter collection =
+  map snd $ toList . elements_ $ collection

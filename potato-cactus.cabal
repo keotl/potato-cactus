@@ -34,6 +34,7 @@ executable potato-cactus
                    PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateDiff
                    PotatoCactus.Client.LocalEntityList
                    PotatoCactus.Client.PlayerInit
+                   PotatoCactus.Interop.ScriptEngineProcess
                    PotatoCactus.Network.Encoding.ChatMessageEncoding
                    PotatoCactus.Network.SocketHandler
                    PotatoCactus.Network.InboundPacketMapper
@@ -60,6 +61,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Out.UpdateSkillPacket
                    PotatoCactus.Network.Packets.Out.NpcUpdate.NpcUpdatePacket
                    PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeNpcAnimationBlock
+                   PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeNpcForcedChatBlock
                    PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeNpcMovement
                    PotatoCactus.Network.Packets.Out.NpcUpdate.EncodePrimaryNpcHitUpdateBlock
                    PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeSecondaryNpcHitUpdateBlock
@@ -127,6 +129,26 @@ executable potato-cactus
                    PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions
                    PotatoCactus.Game.PlayerUpdate.ProcessPlayerUpdate
                    PotatoCactus.Game.Position
+                   PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest
+                   PotatoCactus.Game.Scripting.Bridge.BridgeMessage
+                   PotatoCactus.Game.Scripting.Bridge.Communication
+                   PotatoCactus.Game.Scripting.Bridge.ControlMessages
+                   PotatoCactus.Game.Scripting.Bridge.InitializeScriptEngineContext
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.ActionResultMapper
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.GameEventMapper
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CombatDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CombatTargetDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.GameObjectDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.InteractionDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.ItemContainerDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.MovementDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.NpcAttackDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.NpcDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.NpcReferenceDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PlayerAttackDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PlayerDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PositionDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.WorldDto
                    PotatoCactus.Game.Scripting.Events.ApplyScriptActionResult
                    PotatoCactus.Game.Scripting.Events.CreateGameEvents
                    PotatoCactus.Game.Scripting.Events.NpcEvents
@@ -149,7 +171,7 @@ executable potato-cactus
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
-    build-depends:    base ^>=4.14.3.0, network, bytestring, utf8-string, binary, binary-strict, time, containers
+    build-depends:    base ^>=4.14.3.0, network, bytestring, utf8-string, binary, binary-strict, time, containers, aeson, process
     hs-source-dirs:   app
     default-language: Haskell2010
     ghc-options:

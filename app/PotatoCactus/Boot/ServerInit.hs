@@ -1,13 +1,16 @@
 module PotatoCactus.Boot.ServerInit where
 
+import Control.Concurrent (threadDelay)
 import Data.Time (diffUTCTime, getCurrentTime)
 import PotatoCactus.Boot.WorldInit (initializeWorld)
 import PotatoCactus.Game.Definitions.EquipmentDefinitions (initializeEquipmentDefs)
 import PotatoCactus.Game.Definitions.GameObjectDefinitions (initializeObjectDb)
 import PotatoCactus.Game.Definitions.ItemDefinitions (initializeDb)
-import PotatoCactus.Game.Definitions.StaticGameObjectSet (initializeStaticGameSet)
-import PotatoCactus.Utils.Logging (LogLevel (Info), logger)
 import PotatoCactus.Game.Definitions.NpcDefinitions (initializeNpcDb)
+import PotatoCactus.Game.Definitions.StaticGameObjectSet (initializeStaticGameSet)
+import PotatoCactus.Interop.ScriptEngineProcess (spawnScriptEngineProcess)
+import PotatoCactus.Utils.Logging (LogLevel (Info), logger)
+import PotatoCactus.Game.Scripting.Bridge.InitializeScriptEngineContext (initializeScriptEngineContext)
 
 initializeServer :: IO ()
 initializeServer = do
@@ -30,6 +33,12 @@ initializeServer = do
 
   initializeWorld
   logger_ Info "Loaded world."
+
+  spawnScriptEngineProcess
+  logger_ Info "Spawned script engine process."
+
+  initializeScriptEngineContext
+  logger_ Info "Initialized script engine context."
 
   endTime <- getCurrentTime
   logger_ Info $ "Server initialization completed in " ++ show (diffUTCTime endTime startTime)

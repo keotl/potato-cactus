@@ -5,8 +5,8 @@
 # -*- mode: gitignore; -*-
 *~
 \#*\#
-/.emacs.desktop
-/.emacs.desktop.lock
+.emacs.desktop
+.emacs.desktop.lock
 *.elc
 auto-save-list
 tramp
@@ -78,3 +78,7 @@ cabal.project.local~
 .ghc.environment.*
 
 # End of https://www.toptal.com/developers/gitignore/api/haskell,emacs
+
+**/.idea
+.pyc
+__pycache__

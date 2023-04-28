@@ -13,7 +13,7 @@ import qualified Data.ByteString.Lazy as Data.Binary
 import Data.List (find)
 import PotatoCactus.Client.LocalEntityList (LocalEntity (LocalEntity), LocalEntityList, LocalEntityStatus (Added, Removed, Retained), clientKnownEntities)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc (Npc, definitionId, serverIndex, updateMask))
-import PotatoCactus.Game.Entity.Npc.NpcUpdateMask (NpcUpdateMask, npcAnimationUpdateFlag, npcPrimaryHealthUpdateFlag, npcSecondaryHealthUpdateFlag)
+import PotatoCactus.Game.Entity.Npc.NpcUpdateMask (NpcUpdateMask, npcAnimationUpdateFlag, npcForcedChatUpdateFlag, npcPrimaryHealthUpdateFlag, npcSecondaryHealthUpdateFlag)
 import PotatoCactus.Game.Player (Player)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, y))
 import PotatoCactus.Game.World as W
@@ -22,6 +22,7 @@ import PotatoCactus.Game.World as W
   )
 import PotatoCactus.Network.Binary (encodeToBase37, toByte, toShortLE_, toShort_, toWord_)
 import PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeNpcAnimationBlock (encodeNpcAnimationBlock)
+import PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeNpcForcedChatBlock (encodeNpcForcedChatBlock)
 import PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeNpcMovement (encodeNpcMovement)
 import PotatoCactus.Network.Packets.Out.NpcUpdate.EncodePrimaryNpcHitUpdateBlock (encodePrimaryNpcHitUpdateBlock)
 import PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeSecondaryNpcHitUpdateBlock (encodeSecondaryNpcHitUpdateBlock)
@@ -120,6 +121,7 @@ npcBlockSet_ npc world = do
       (\x -> x (updateMask npc) npc world)
       [ addBlockIfRequired npcAnimationUpdateFlag encodeNpcAnimationBlock,
         addBlockIfRequired npcSecondaryHealthUpdateFlag encodeSecondaryNpcHitUpdateBlock,
+        addBlockIfRequired npcForcedChatUpdateFlag encodeNpcForcedChatBlock,
         addBlockIfRequired npcPrimaryHealthUpdateFlag encodePrimaryNpcHitUpdateBlock
       ]
 

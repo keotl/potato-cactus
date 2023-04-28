@@ -36,27 +36,11 @@ dispatchScriptEvent world (PlayerInteractionEvent player interaction) =
             [ DispatchAttackPlayerToNpc (serverIndex player) npcId (Hit 0 MeleeAttack),
               ClearPlayerInteraction (serverIndex player)
             ]
-        _ -> return [ClearPlayerInteraction (serverIndex player)]
+        _ -> return []
     )
 dispatchScriptEvent world (NpcCannotReachTargetEvent npc target) =
   return [NpcMoveTowardsTarget npc]
-dispatchScriptEvent world (NpcEntityTickEvent npc) =
-  return
-    ( case definitionId npc of
-        0 ->
-          [ UpdateNpc
-              (NPC.serverIndex npc)
-              ( npc
-                  { NPC.movement =
-                      doMovement
-                        (NPC.movement npc)
-                        ((getPosition npc) {x = x (getPosition npc) + 1})
-                  }
-              )
-            | tick world `mod` 8 == 0
-          ]
-        _ -> []
-    )
+
 dispatchScriptEvent world (PlayerAttackEvent player target) =
   trace
     "dispatched attack event"
@@ -86,6 +70,7 @@ dispatchScriptEvent world (NpcDeadEvent npc) =
           InternalRemoveNpcTargetReferences (NPC.serverIndex npc)
         ]
     )
+dispatchScriptEvent _ _ = return []
 
 -- dispatchScriptEvent world (NpcSe)
 

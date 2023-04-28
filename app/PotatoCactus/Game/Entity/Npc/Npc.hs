@@ -7,7 +7,7 @@ import PotatoCactus.Game.Combat.Hit (Hit)
 import PotatoCactus.Game.Definitions.NpcDefinitions (NpcDefinition (hitpoints), NpcDefinitionId, npcDefinition)
 import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
 import PotatoCactus.Game.Entity.Npc.NpcMovement (NpcMovement, create)
-import PotatoCactus.Game.Entity.Npc.NpcUpdateMask (NpcUpdateMask, npcAnimationUpdateFlag, npcPrimaryHealthUpdateFlag, npcSecondaryHealthUpdateFlag)
+import PotatoCactus.Game.Entity.Npc.NpcUpdateMask (NpcUpdateMask, npcAnimationUpdateFlag, npcForcedChatUpdateFlag, npcPrimaryHealthUpdateFlag, npcSecondaryHealthUpdateFlag)
 import PotatoCactus.Game.Entity.Npc.RespawnStrategy (RespawnStrategy (Never), respawning, shouldDiscardEntity)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position)
 import PotatoCactus.Game.Typing (Advance (advance), IsEntityActive (isEntityActive), Keyable (key), ShouldDiscard (shouldDiscard))
@@ -21,6 +21,7 @@ data Npc = Npc
     updateMask :: NpcUpdateMask,
     definitionId :: NpcDefinitionId,
     animation :: Maybe Anim.Animation,
+    forcedChat :: Maybe String,
     combat :: CombatEntity,
     respawn :: RespawnStrategy,
     canReachTarget :: Bool -- whether to send script event for pathing
@@ -43,6 +44,7 @@ create definitionId pos respawnStrategy =
             definitionId = definitionId,
             combat = CombatEntity.create 1,
             animation = Nothing,
+            forcedChat = Nothing,
             respawn = respawnStrategy,
             canReachTarget = True
           }
@@ -78,6 +80,13 @@ setAnimation npc anim =
   npc
     { animation = Anim.setAnimation (animation npc) anim,
       updateMask = updateMask npc .|. npcAnimationUpdateFlag
+    }
+
+setForcedChat :: Npc -> String -> Npc
+setForcedChat npc msg =
+  npc
+    { forcedChat = Just msg,
+      updateMask = updateMask npc .|. npcForcedChatUpdateFlag
     }
 
 instance IsEntityActive Npc where
