@@ -1,6 +1,6 @@
 import functools
 from collections import defaultdict
-from typing import Tuple
+from typing import Tuple, Optional, Union
 
 from potato_cactus.api.events import GameEvent
 
@@ -24,17 +24,31 @@ class Registry(object):
     def __init__(self):
         self._content = defaultdict(lambda: [])
 
-    def register(self, event: GameEvent, options, handler):
-        self._content[event].append(handler)
+    def register(self, event: GameEvent, options: dict, handler):
+        self._content[self.key(event, options)].append(handler)
+
+    def get_handlers(self, key_elems:  Tuple[Optional[Union[str, int]], ...]):
+        return self._content.get(key_elems) or []
 
     @staticmethod
-    def key(event: GameEvent, options) -> Tuple[str]:
+    def key(event: GameEvent, options: dict) -> Tuple[Optional[Union[str, int]], ...]:
         if event == GameEvent.ServerInitEvent:
             return event,
-        if event == GameEvent.NpcEntityTickEvent:
+        elif event == GameEvent.NpcEntityTickEvent:
             return event, options.get("npcId")
-        if event == GameEvent.PlayerInteractionEvent:
+        elif event == GameEvent.ObjectInteractionEvent:
             return event, options.get("objectId")
+        elif event == GameEvent.NpcInteractionEvent:
+            return event, options.get("npcId")
+        elif event == GameEvent.NpcAttackInteractionEvent:
+            return event, options.get("npcId")
+        elif event == GameEvent.PlayerAttackEvent:
+            return event,
+        elif event == GameEvent.NpcAttackEvent:
+            return event, options.get("npcId")
+        elif event == GameEvent.NpcDeadEvent:
+            return event, options.get("npcId")
+        return "unassigned",
 
 Registry.INSTANCE = Registry()
 

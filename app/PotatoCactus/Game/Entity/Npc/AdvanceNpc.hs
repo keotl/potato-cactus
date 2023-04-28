@@ -20,8 +20,10 @@ advanceNpc targetPosOrDefault npc =
     else
       let withCombat = updateCombat targetPosOrDefault npc
        in withCombat
-            { updateMask = 0,
-              animation = Nothing
+            { -- Clear transient properties
+              updateMask = 0,
+              animation = Nothing,
+              forcedChat = Nothing
             }
 
 updateCombat :: CombatTargetPosOrDefault -> Npc -> Npc

@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Tuple, Union
 from potato_cactus.api.dto.position import Position
 from potato_cactus.api.dto.object import GameObject
 
@@ -16,11 +16,11 @@ def ClearPlayerInteraction(playerIndex: int) -> ScriptAction:
     return ScriptAction("clearPlayerInteraction", {"playerIndex": playerIndex})
 
 
-def DummyEvent(key: str) -> ScriptAction:
-    return ScriptAction("dummyEvent", {"key": key})
+def ServerPrintMessage(msg: str) -> ScriptAction:
+    return ScriptAction("serverPrintMessage", {"msg": msg})
 
 
-def NpcQueueWalk(npcIndex: int, position: Position) -> ScriptAction:
+def NpcQueueWalk(npcIndex: int, position: Union[Position, Tuple[int, int, int]]) -> ScriptAction:
     return ScriptAction("npcQueueWalk", {"npcIndex": npcIndex,
                                          "position": _map_position(position)})
 
@@ -54,12 +54,20 @@ def NpcSetAnimation(npcIndex: int, animationId: int, delay: int = 0,
         "priority": priority
     })
 
-def SpawnNpc(npcId: int, position: Position, respawnDelay=None) -> ScriptAction:
+def NpcSetForcedChat(npcIndex: int, message: str) -> ScriptAction:
+    return ScriptAction("npcSetForcedChat", {
+        "npcIndex": npcIndex,
+        "message": message
+    })
+
+def SpawnNpc(npcId: int, position: Union[Position, Tuple[int,int,int]], respawnDelay=None) -> ScriptAction:
     return ScriptAction("spawnNpc", {
         "npcId": npcId,
         "position": _map_position(position),
         "respawnDelay": respawnDelay or -1
     })
 
-def _map_position(position: Position) -> dict:
-    return {"x": position.x, "y": position.y, "z": position.z}
+def _map_position(position: Union[Position, Tuple[int, int, int]]) -> dict:
+    if isinstance(position, Position):
+        return {"x": position.x, "y": position.y, "z": position.z}
+    return {"x": position[0], "y": position[1], "z": position[2]}

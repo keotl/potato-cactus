@@ -16,4 +16,4 @@ npcDisengageDistance :: Int
 npcDisengageDistance = 20
 
 scriptWorkers :: Int
-scriptWorkers = 4
+scriptWorkers = 1

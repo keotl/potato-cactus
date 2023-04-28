@@ -61,6 +61,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Out.UpdateSkillPacket
                    PotatoCactus.Network.Packets.Out.NpcUpdate.NpcUpdatePacket
                    PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeNpcAnimationBlock
+                   PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeNpcForcedChatBlock
                    PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeNpcMovement
                    PotatoCactus.Network.Packets.Out.NpcUpdate.EncodePrimaryNpcHitUpdateBlock
                    PotatoCactus.Network.Packets.Out.NpcUpdate.EncodeSecondaryNpcHitUpdateBlock

@@ -28,10 +28,11 @@ data ScriptActionResult
   | NpcSetAnimation NpcIndex Animation
   | NpcQueueWalk NpcIndex Position
   | NpcMoveTowardsTarget Npc
+  | NpcSetForcedChat NpcIndex String
   | SpawnNpc SpawnNpcRequest
   | InternalRemoveNpcTargetReferences NpcIndex
   | InternalProcessingComplete -- Sentinel token to indicate script execution complete
   | InternalNoop
-  | DummyEvent String -- for testing
+  | ServerPrintMessage String -- for testing
   | UpdateNpc NpcIndex Npc -- deprecated
   deriving (Show)

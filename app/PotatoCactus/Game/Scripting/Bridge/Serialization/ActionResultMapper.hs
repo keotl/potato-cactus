@@ -15,7 +15,7 @@ import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject (A
 import qualified PotatoCactus.Game.Entity.Object.GameObject as O
 import PotatoCactus.Game.Position (Position (Position))
 import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest (SpawnNpcRequest))
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, DummyEvent, InternalNoop, InternalProcessingComplete, NpcQueueWalk, NpcSetAnimation, SpawnNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, InternalNoop, InternalProcessingComplete, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SpawnNpc, ServerPrintMessage))
 
 mapResult :: ByteString -> ScriptActionResult
 mapResult bytes =
@@ -111,11 +111,25 @@ decodeBody "npcSetAnimation" body =
     body of
     Error msg -> InternalNoop
     Success decoded -> decoded
-decodeBody "dummyEvent" body =
+decodeBody "npcSetForcedChat" body =
   case parse
     ( \obj -> do
-        key <- obj .: "key"
-        return (DummyEvent key)
+        npcIndex <- obj .: "npcIndex"
+        message <- obj .: "message"
+        return
+          ( NpcSetForcedChat
+              npcIndex
+              message
+          )
+    )
+    body of
+    Error msg -> InternalNoop
+    Success decoded -> decoded
+decodeBody "serverPrintMessage" body =
+  case parse
+    ( \obj -> do
+        msg <- obj .: "msg"
+        return (ServerPrintMessage msg)
     )
     body of
     Error msg -> InternalNoop
