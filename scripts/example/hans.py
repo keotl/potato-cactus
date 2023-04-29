@@ -1,5 +1,4 @@
-import potato_cactus
-from potato_cactus import EventHandler, GameEvent
+from potato_cactus import EventHandler, GameEvent, Context
 from potato_cactus.api.actions import SpawnNpc, NpcSetForcedChat, ClearPlayerInteraction
 from potato_cactus.api.dto.position import Position
 from potato_cactus.api.events import NpcEntityTickEventPayload, NpcInteractionEventPayload
@@ -11,14 +10,10 @@ def onNpcTick(e: NpcEntityTickEventPayload):
 
 
 @EventHandler(GameEvent.NpcInteractionEvent, npcId=0)
-def onNpcInteraction(e: NpcInteractionEventPayload):
-    try:
-        context = potato_cactus.get_context()
-        player = next(filter(lambda p: p.serverIndex == e.playerIndex, context.world.players))
-        return [NpcSetForcedChat(e.interaction.target.npcIndex, f"Hello {player.username}!"),
-                ClearPlayerInteraction(e.playerIndex)]
-    except StopIteration:
-        return []
+def onNpcInteraction(e: NpcInteractionEventPayload, context: Context):
+    player = context.find_player_by_index(e.playerIndex)
+    return [NpcSetForcedChat(e.interaction.target.npcIndex, f"Hello {player.username}!"),
+            ClearPlayerInteraction(e.playerIndex)]
 
 
 @EventHandler(GameEvent.ServerInitEvent)

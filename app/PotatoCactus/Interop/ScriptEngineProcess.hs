@@ -13,6 +13,7 @@ import PotatoCactus.Game.Scripting.Bridge.ControlMessages (BridgeInitOptions (Br
 import PotatoCactus.Utils.Logging (LogLevel (Info), logger)
 import System.IO (BufferMode (LineBuffering), Handle, hSetBuffering)
 import System.Process (CreateProcess (env, std_in, std_out), ProcessHandle, StdStream (CreatePipe), createProcess, proc)
+import PotatoCactus.Config.Constants (scriptWorkers)
 
 data ScriptEngineHandle = ScriptEngineHandle
   { stdin_ :: Handle,
@@ -30,7 +31,7 @@ spawnScriptEngineProcess = do
   let handle = ScriptEngineHandle stdin stdout p
   hSetBuffering (stdin_ handle) LineBuffering
   hSetBuffering (stdout_ handle) LineBuffering
-  send handle $ initializeBridgeMessage (BridgeInitOptions 4 ["scripts/"])
+  send handle $ initializeBridgeMessage (BridgeInitOptions scriptWorkers ["scripts/"])
   writeIORef instance_ (Just handle)
   return handle
 

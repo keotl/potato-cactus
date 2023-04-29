@@ -10,12 +10,12 @@ import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.GameObjectDto (Ga
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.NpcDto (NpcDto, npcDto)
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PlayerDto (PlayerDto, playerDto)
 import qualified PotatoCactus.Game.World as W
-import PotatoCactus.Game.World.MobList (iter)
+import PotatoCactus.Game.World.MobList (iter, serialize)
 
 data WorldDto = WorldDto
   { tick :: Int,
-    players :: [PlayerDto],
-    npcs :: [NpcDto],
+    players :: [Maybe PlayerDto],
+    npcs :: [Maybe NpcDto],
     objects :: [GameObjectDto]
   }
   deriving (Show, Generic)
@@ -26,7 +26,7 @@ worldToDto :: W.World -> WorldDto
 worldToDto w =
   WorldDto
     { tick = W.tick w,
-      players = map playerDto (iter . W.players $ w),
-      npcs = map npcDto (iter . W.npcs $ w),
+      players = fmap playerDto <$> (serialize . W.players $ w),
+      npcs = fmap npcDto <$> (serialize . W.npcs $ w),
       objects = mapMaybe gameObjectToDto (O.iter . W.objects $ w)
     }

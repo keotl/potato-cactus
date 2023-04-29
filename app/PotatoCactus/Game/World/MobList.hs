@@ -1,8 +1,8 @@
 {-# LANGUAGE LambdaCase #-}
 
-module PotatoCactus.Game.World.MobList (MobList (mobs), create, add, remove, updateAll, updateAtIndex, findByIndex, findIndexByPredicate, findByPredicate, updateByPredicate, findAllByPredicate, iter, enumerate, removeByPredicate) where
+module PotatoCactus.Game.World.MobList (MobList (mobs), create, add, remove, updateAll, updateAtIndex, findByIndex, findIndexByPredicate, findByPredicate, updateByPredicate, findAllByPredicate, iter, enumerate, removeByPredicate, serialize) where
 
-import Data.List (find, findIndex)
+import Data.List (dropWhileEnd, find, findIndex)
 import Data.Maybe (catMaybes, fromMaybe, isJust, isNothing, mapMaybe)
 import PotatoCactus.Utils.Iterable (replaceAtIndex)
 
@@ -111,3 +111,8 @@ updateByPredicate list predicate transform =
 iter :: MobList a -> [a]
 iter list =
   catMaybes (mobs list)
+
+-- Returns array of elements, skipping trailing nulls
+serialize :: MobList a -> [Maybe a]
+serialize list =
+  dropWhileEnd isNothing (mobs list)
