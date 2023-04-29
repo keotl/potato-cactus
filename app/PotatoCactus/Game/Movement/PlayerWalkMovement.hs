@@ -81,3 +81,7 @@ shouldUpdateRegion_ lastUpdate currentPos =
 
 isStopped :: PlayerWalkMovement -> Bool
 isStopped = null . queue_
+
+setPosition :: PlayerWalkMovement -> Position -> PlayerWalkMovement
+setPosition m pos =
+  m {position_ = pos, isTeleporting = True, shouldUpdateRegion = True, lastRegionUpdate_ = pos}

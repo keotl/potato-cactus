@@ -10,7 +10,7 @@ import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction)
 import qualified PotatoCactus.Game.Entity.Interaction.Interaction as Interaction
 import PotatoCactus.Game.Entity.Npc.Npc (NpcIndex)
 import PotatoCactus.Game.ItemContainer (ItemContainer, playerEquipmentContainer, playerInventory)
-import PotatoCactus.Game.Movement.MovementEntity (playerWalkMovement)
+import PotatoCactus.Game.Movement.MovementEntity (immediatelySetPosition, playerWalkMovement)
 import qualified PotatoCactus.Game.Movement.MovementEntity as M (MovementEntity, issueWalkCommand)
 import PotatoCactus.Game.Movement.PositionXY (PositionXY)
 import PotatoCactus.Game.Movement.WalkingStep (WalkingStep)
@@ -116,3 +116,9 @@ clearTargetIfEngagedWithNpc npcId p =
 sendChatboxMessage :: Player -> String -> Player
 sendChatboxMessage p msg =
   p {chatboxMessages = msg : chatboxMessages p}
+
+setPosition :: Player -> Position -> Player
+setPosition p pos =
+  p
+    { movement = immediatelySetPosition (movement p) pos
+    }

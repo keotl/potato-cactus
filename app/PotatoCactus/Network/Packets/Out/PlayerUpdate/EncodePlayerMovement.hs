@@ -33,9 +33,10 @@ encode_ (PlayerWalkMovement_ m) updateType needsUpdate =
           putNBits 2 $ toWord_ 3
           putNBits 2 $ toWord_ (z (getPosition m)) -- position.z
           putBit $ not (shouldUpdateRegion m)
-          putBit True -- needs update
+          putBit needsUpdate -- needs update
           putNBits 7 $ toWord_ (localY (getPosition m)) -- local Y
           putNBits 7 $ toWord_ (localX (getPosition m)) -- local X
+          -- putBit needsUpdate
         UpdateOther -> do
           putBit False
           -- if needsUpdate

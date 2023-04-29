@@ -73,6 +73,12 @@ def SendMessage(playerIndex: int, text: str) -> ScriptAction:
         "text": text
     })
 
+def SetPlayerPosition(playerIndex: int, position: Union[Position, Tuple[int, int, int]]) -> ScriptAction:
+    return ScriptAction("setPlayerPosition", {
+        "playerIndex": playerIndex,
+        "position": _map_position(position)
+    })
+
 def _map_position(position: Union[Position, Tuple[int, int, int]]) -> dict:
     if isinstance(position, Position):
         return {"x": position.x, "y": position.y, "z": position.z}

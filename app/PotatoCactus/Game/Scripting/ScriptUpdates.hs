@@ -33,6 +33,7 @@ data ScriptActionResult
   | NpcSetForcedChat NpcIndex String
   | SpawnNpc SpawnNpcRequest
   | SendMessage PlayerIndex String
+  | SetPlayerPosition PlayerIndex Position
   | InternalRemoveNpcTargetReferences NpcIndex
   | InternalProcessingComplete -- Sentinel token to indicate script execution complete
   | InternalNoop

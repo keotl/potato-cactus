@@ -18,4 +18,4 @@ def onNpcInteraction(e: NpcInteractionEventPayload, context: Context):
 
 @EventHandler(GameEvent.ServerInitEvent)
 def onServerInit(e):
-    return [SpawnNpc(0, Position(3093, 3250, 0))]
+    return [SpawnNpc(0, Position(3219, 3223, 0))]

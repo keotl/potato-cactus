@@ -1,9 +1,10 @@
 module PotatoCactus.Game.Movement.MovementEntity where
 
-import PotatoCactus.Game.Movement.PlayerWalkMovement
+import PotatoCactus.Game.Movement.PlayerWalkMovement (PlayerWalkMovement (isRunning, queue_, shouldUpdateRegion), queueWalk)
 import qualified PotatoCactus.Game.Movement.PlayerWalkMovement as PlayerWalkMovement
 import PotatoCactus.Game.Movement.PositionXY (PositionXY)
 import PotatoCactus.Game.Movement.StaticMovement (StaticMovement)
+import qualified PotatoCactus.Game.Movement.StaticMovement as S
 import PotatoCactus.Game.Movement.WalkingStep (WalkingStep)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position)
 import PotatoCactus.Game.Typing (Advance (advance))
@@ -47,3 +48,9 @@ immediatelyQueueMovement :: MovementEntity -> [Position] -> MovementEntity
 immediatelyQueueMovement (PlayerWalkMovement_ m) path =
   PlayerWalkMovement_ $ advance m {queue_ = path}
 immediatelyQueueMovement m _ = m
+
+immediatelySetPosition :: MovementEntity -> Position -> MovementEntity
+immediatelySetPosition (PlayerWalkMovement_ m) pos =
+  PlayerWalkMovement_ $ PlayerWalkMovement.setPosition m pos
+immediatelySetPosition (StaticMovement_ m) pos =
+  StaticMovement_ $ m {S.position_ = pos}
