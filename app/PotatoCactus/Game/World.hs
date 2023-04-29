@@ -14,6 +14,7 @@ import PotatoCactus.Game.Player (PlayerIndex)
 import qualified PotatoCactus.Game.Player as P (Player (serverIndex), create, username)
 import PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer)
 import PotatoCactus.Game.Position (Position (Position))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent)
 import PotatoCactus.Game.Typing (Advance (advance), ShouldDiscard (shouldDiscard))
 import PotatoCactus.Game.World.EntityPositionFinder (combatTargetPosOrDefault)
 import PotatoCactus.Game.World.MobList (MobList, add, create, findByIndex, findByPredicate, remove, removeByPredicate, updateAll, updateAtIndex, updateByPredicate)
@@ -34,7 +35,9 @@ data World = World
     players :: MobList P.Player,
     npcs :: MobList NPC.Npc,
     clients :: [ClientHandle],
-    objects :: DynamicObjectCollection
+    objects :: DynamicObjectCollection,
+    triggeredEvents :: [GameEvent], -- Additional events to dispatch on this tick. For events not tied to a specific entity.
+    pendingEvents_ :: [GameEvent] -- Additional events to dispatch on the next tick.
   }
   deriving (Show)
 
@@ -48,7 +51,9 @@ instance Advance World where
      in w
           { tick = tick w + 1,
             players = updateAll (players w) (advancePlayer (findByIndex newNpcs)),
-            npcs = removeByPredicate newNpcs shouldDiscard
+            npcs = removeByPredicate newNpcs shouldDiscard,
+            triggeredEvents = pendingEvents_ w,
+            pendingEvents_ = []
           }
 
 defaultWorldValue :: World
@@ -58,7 +63,9 @@ defaultWorldValue =
       players = PotatoCactus.Game.World.MobList.create maxPlayers,
       npcs = PotatoCactus.Game.World.MobList.create maxNpcs,
       clients = [],
-      objects = PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create
+      objects = PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create,
+      triggeredEvents = [],
+      pendingEvents_ = []
     }
 
 worldInstance = unsafePerformIO $ newIORef defaultWorldValue
@@ -103,3 +110,7 @@ addNpc world npc =
     Left (newNpcs, index) ->
       world {npcs = updateAtIndex newNpcs index (\n -> n {NPC.serverIndex = index})}
     Right _ -> world
+
+queueEvent :: World -> GameEvent -> World
+queueEvent w e =
+  w {pendingEvents_ = e : pendingEvents_ w}

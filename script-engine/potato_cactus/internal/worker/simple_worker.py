@@ -18,7 +18,6 @@ class SimpleWorker(WorkerHandle):
         self._sender = sender
         self._discover_scripts(scriptPaths)
         ContextImpl.INSTANCE = ContextImpl()
-        self._logger = Logger("ScriptWorker")
 
     def _discover_scripts(self, paths: List[str]):
         for importer, modname, ispkg in pkgutil.walk_packages(paths):
@@ -49,7 +48,7 @@ class SimpleWorker(WorkerHandle):
                 except KeyboardInterrupt as e:
                     raise e
                 except Exception as e:
-                    self._logger.error(f"Unhandled exception while running script {message.body.event}. {e}")
+                    _logger.error(f"Unhandled exception while running script {message.body.event}. {e}")
 
 
 def _event_key(payload) -> Tuple[Optional[Union[str, int]], ...]:
@@ -69,7 +68,10 @@ def _event_key(payload) -> Tuple[Optional[Union[str, int]], ...]:
         return GameEvent.NpcDeadEvent, payload.body.npcId
     if payload.event == GameEvent.NpcEntityTickEvent:
         return GameEvent.NpcEntityTickEvent, payload.body.npcId
+    if payload.event == GameEvent.PlayerCommandEvent:
+        return GameEvent.PlayerCommandEvent, payload.body.command
 
+    _logger.warning(f"Got event '{payload.event}' with an unconfigured key. No script will be invoked.")
     return "unassined",
 
 
@@ -96,3 +98,5 @@ def _find_npc_id(context: ContextImpl, npc_index: int) -> int:
     if npc:
         return npc.definitionId
     return 0
+
+_logger = Logger("ScriptWorker")

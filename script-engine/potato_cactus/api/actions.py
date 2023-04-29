@@ -67,6 +67,12 @@ def SpawnNpc(npcId: int, position: Union[Position, Tuple[int,int,int]], respawnD
         "respawnDelay": respawnDelay or -1
     })
 
+def SendMessage(playerIndex: int, text: str) -> ScriptAction:
+    return ScriptAction("sendMessage", {
+        "playerIndex": playerIndex,
+        "text": text
+    })
+
 def _map_position(position: Union[Position, Tuple[int, int, int]]) -> dict:
     if isinstance(position, Position):
         return {"x": position.x, "y": position.y, "z": position.z}

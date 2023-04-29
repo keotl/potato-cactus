@@ -45,6 +45,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.In.NpcActionPacket
                    PotatoCactus.Network.Packets.In.NpcAttackPacket
                    PotatoCactus.Network.Packets.In.ObjectActionPacket
+                   PotatoCactus.Network.Packets.In.PlayerCommandPacket
                    PotatoCactus.Network.Packets.In.PlayerWalkPacket
                    PotatoCactus.Network.Packets.Packet
                    PotatoCactus.Network.Packets.Reader
@@ -138,6 +139,7 @@ executable potato-cactus
                    PotatoCactus.Game.Scripting.Bridge.Serialization.GameEventMapper
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CombatDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CombatTargetDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CommandDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.GameObjectDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.InteractionDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.ItemContainerDto

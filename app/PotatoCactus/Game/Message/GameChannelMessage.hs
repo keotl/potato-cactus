@@ -14,6 +14,7 @@ data GameChannelMessage
   = RegisterClientMessage RegisterClientPayload
   | UnregisterClientMessage String
   | PlayerWalkMessage String PositionXY Bool [WalkingStep]
+  | PlayerCommandMessage PlayerIndex String [String]
   | InterfaceButtonClickMessage String Int
   | PlayerChatMessage String ChatMessage
   | EquipItemMessage String EquipItemMessagePayload

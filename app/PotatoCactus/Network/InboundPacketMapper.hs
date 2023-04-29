@@ -9,6 +9,7 @@ import PotatoCactus.Network.Packets.In.ItemContainerClickPacket (itemContainerCl
 import PotatoCactus.Network.Packets.In.NpcActionPacket (npcActionPacket)
 import PotatoCactus.Network.Packets.In.NpcAttackPacket (npcAttackPacket)
 import PotatoCactus.Network.Packets.In.ObjectActionPacket (objectActionPacket)
+import PotatoCactus.Network.Packets.In.PlayerCommandPacket (commandPacket)
 import PotatoCactus.Network.Packets.In.PlayerWalkPacket (playerMapWalk, playerWalkMessage)
 import PotatoCactus.Network.Packets.Opcodes (socketClosedOpcode)
 import PotatoCactus.Network.Packets.Reader (InboundPacket (opcode))
@@ -24,6 +25,7 @@ mapPacket playerId clientIdentifier packet =
     72 -> Just $ npcAttackPacket playerId packet
     73 -> Just $ objectActionPacket playerId packet
     98 -> Just $ playerWalkMessage clientIdentifier packet -- Red X walk
+    103 -> Just $ commandPacket playerId packet
     132 -> Just $ objectActionPacket playerId packet
     145 -> itemContainerClickPacket clientIdentifier packet
     155 -> npcActionPacket playerId packet

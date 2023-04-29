@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional
+from typing import List, Optional
 
 from potato_cactus.api.dto.combat import CombatTarget
 from potato_cactus.api.dto.interaction import NpcAttackInteractionTarget, NpcInteractionTarget, ObjectInteractionTarget, \
@@ -13,6 +13,7 @@ class GameEvent(str, Enum):
     ObjectInteractionEvent = "ObjectInteractionEvent"
     NpcAttackInteractionEvent = "NpcAttackInteractionEvent"  # TODO - Can this be consolidated with NpcAttackEvent?  - keotl 2023-04-27
     PlayerAttackEvent = "PlayerAttackEvent"
+    PlayerCommandEvent = "PlayerCommandEvent"
     NpcAttackEvent = "NpcAttackEvent"
     NpcDeadEvent = "NpcDeadEvent"
 
@@ -36,6 +37,10 @@ class PlayerAttackEventPayload(object):
     playerIndex: int
     target: Optional[CombatTarget]
 
+class PlayerCommandEventPayload(object):
+    playerIndex: int
+    command: str
+    args: List[str]
 
 class NpcAttackEventPayload(object):
     npcIndex: int

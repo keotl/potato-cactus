@@ -19,6 +19,8 @@ data GameEvent
   | NpcCannotReachTargetEvent Npc CombatTarget
   | NpcDeadEvent Npc
   | NpcEntityTickEvent Npc
+  | PlayerCommandEvent PlayerIndex String [String]
+  deriving(Show)
 
 data ScriptActionResult
   = AddGameObject DynamicObject
@@ -30,6 +32,7 @@ data ScriptActionResult
   | NpcMoveTowardsTarget Npc
   | NpcSetForcedChat NpcIndex String
   | SpawnNpc SpawnNpcRequest
+  | SendMessage PlayerIndex String
   | InternalRemoveNpcTargetReferences NpcIndex
   | InternalProcessingComplete -- Sentinel token to indicate script execution complete
   | InternalNoop

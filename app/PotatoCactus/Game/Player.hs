@@ -32,12 +32,13 @@ data Player = Player
     movement :: M.MovementEntity,
     updateMask :: PlayerUpdateMask,
     pendingUpdates :: [PlayerUpdate],
-    chatMessage :: Maybe ChatMessage,
+    chatMessage :: Maybe ChatMessage, -- Overhead text
     inventory :: ItemContainer,
     equipment :: Equipment,
     interaction :: Interaction,
     combat :: CombatEntity,
     animation :: Maybe Anim.Animation,
+    chatboxMessages :: [String],
     skipUpdate_ :: Bool
   }
   deriving (Show)
@@ -70,6 +71,7 @@ create username position =
       interaction = Interaction.create,
       combat = CombatEntity.create 10,
       animation = Nothing,
+      chatboxMessages = [],
       skipUpdate_ = True
     }
 
@@ -110,3 +112,7 @@ setAnimation anim player =
 clearTargetIfEngagedWithNpc :: NpcIndex -> Player -> Player
 clearTargetIfEngagedWithNpc npcId p =
   p {combat = clearTargetIfEngagedWith (NpcTarget npcId) (combat p)}
+
+sendChatboxMessage :: Player -> String -> Player
+sendChatboxMessage p msg =
+  p {chatboxMessages = msg : chatboxMessages p}

@@ -9,8 +9,9 @@ import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload (objectI
 import qualified PotatoCactus.Game.Message.RegisterClientPayload as C
 import qualified PotatoCactus.Game.Player as P
 import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (EquipItem, InteractWithNpc, InteractWithObject, SayChatMessage, UnequipItem))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (PlayerCommandEvent))
 import PotatoCactus.Game.Typing (advance)
-import PotatoCactus.Game.World (ClientHandle (username), World (World, clients, players, tick), addPlayer, removePlayerByUsername, updatePlayer, updatePlayerByIndex)
+import PotatoCactus.Game.World (ClientHandle (username), World (World, clients, players, tick), addPlayer, queueEvent, removePlayerByUsername, updatePlayer, updatePlayerByIndex)
 
 reduceWorld :: World -> GameChannelMessage -> World
 reduceWorld world (RegisterClientMessage message) =
@@ -33,6 +34,8 @@ reduceWorld world (NpcAttackMessage playerId npcIndex) =
   updatePlayerByIndex world playerId (\p -> P.queueUpdate p (InteractWithNpc npcIndex NpcAttack))
 reduceWorld world (NpcClickMessage playerId npcIndex actionIndex) =
   updatePlayerByIndex world playerId (\p -> P.queueUpdate p (InteractWithNpc npcIndex (NpcAction actionIndex)))
+reduceWorld world (PlayerCommandMessage playerId cmd args) =
+  queueEvent world $ PlayerCommandEvent playerId cmd args
 reduceWorld world UpdateWorldMessage =
   advance world
 

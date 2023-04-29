@@ -16,6 +16,7 @@ Event names and payload types can be imported from
 | NpcInteractionEvent       | `npcId`    | Sent on the tick when the player triggers the interaction.          |
 | NpcAttackInteractionEvent | `npcId`    | TODO is this still necessary?                                       |
 | PlayerAttackEvent         |            |                                                                     |
+| PlayerCommandEvent        | `command`  | Sent when a client command is issued. (e.g. `::position`            |
 | NpcAttackEvent            |            |                                                                     |
 | NpcDeadEvent              |            |                                                                     |
 
@@ -45,4 +46,5 @@ Action constructors are imported from `potato_cactus.api.actions`.
 | RemoveGameObject       | Adds a "removed" dynamic game object, which can be used to subtract an object from the static object set. |
 | ServerPrintMessage     | Prints to the server console. For testing.                                                                |
 | SpawnNpc               | Spawns an NPC at a point.                                                                                 |
+| SendMessage            | Sends a server message to the player's chatbox                                                            |
 

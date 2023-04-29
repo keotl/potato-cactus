@@ -65,5 +65,6 @@ clearTransientProperties_ p =
   p
     { chatMessage = Nothing,
       updateMask = 0,
-      animation = Nothing
+      animation = Nothing,
+      chatboxMessages = []
     }

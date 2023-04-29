@@ -7,11 +7,12 @@ import Data.Aeson.Text (encodeToTextBuilder)
 import GHC.Generics (Generic)
 import PotatoCactus.Game.Scripting.Bridge.BridgeMessage (BridgeMessage, EmptyPayload, bridgeMessage)
 import PotatoCactus.Game.Scripting.Bridge.ControlMessages (doneSendingEventsMessage)
+import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CommandDto (commandDto)
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.InteractionDto (playerInteractionToDto)
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.NpcAttackDto (npcAttackDto)
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.NpcReferenceDto (npcReferenceDto)
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PlayerAttackDto (playerAttackToDto)
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcCannotReachTargetEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent, ServerInitEvent))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcCannotReachTargetEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerCommandEvent, PlayerInteractionEvent, ServerInitEvent))
 
 mapEvent :: GameEvent -> BridgeMessage (GameEventDto Value)
 mapEvent ServerInitEvent =
@@ -35,6 +36,8 @@ mapEvent (NpcDeadEvent npc) =
 mapEvent (NpcEntityTickEvent npc) =
   bridgeMessage "gameEvent" $
     GameEventDto "NpcEntityTickEvent" (npcReferenceDto npc)
+mapEvent (PlayerCommandEvent playerIndex cmd args) =
+  bridgeMessage "gameEvent" $ GameEventDto "PlayerCommandEvent" (commandDto playerIndex cmd args)
 
 data GameEventDto b = GameEventDto
   { event :: String,

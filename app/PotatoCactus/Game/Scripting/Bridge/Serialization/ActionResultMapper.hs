@@ -15,7 +15,7 @@ import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject (A
 import qualified PotatoCactus.Game.Entity.Object.GameObject as O
 import PotatoCactus.Game.Position (Position (Position))
 import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest (SpawnNpcRequest))
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, InternalNoop, InternalProcessingComplete, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SpawnNpc, ServerPrintMessage))
+import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, InternalNoop, InternalProcessingComplete, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SpawnNpc))
 
 mapResult :: ByteString -> ScriptActionResult
 mapResult bytes =
@@ -130,6 +130,16 @@ decodeBody "serverPrintMessage" body =
     ( \obj -> do
         msg <- obj .: "msg"
         return (ServerPrintMessage msg)
+    )
+    body of
+    Error msg -> InternalNoop
+    Success decoded -> decoded
+decodeBody "sendMessage" body =
+  case parse
+    ( \obj -> do
+        playerIndex <- obj .: "playerIndex"
+        text <- obj .: "text"
+        return (SendMessage playerIndex text)
     )
     body of
     Error msg -> InternalNoop

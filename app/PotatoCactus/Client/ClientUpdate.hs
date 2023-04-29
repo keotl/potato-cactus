@@ -2,6 +2,7 @@
 
 module PotatoCactus.Client.ClientUpdate (updateClient, defaultState, ClientLocalState_ (localPlayerIndex)) where
 
+import Control.Monad (forM_)
 import Data.Binary.BitPut (runBitPut)
 import Data.ByteString (pack)
 import Data.ByteString.Lazy (toStrict)
@@ -19,12 +20,14 @@ import PotatoCactus.Game.Movement.MovementEntity (MovementEntity (PlayerWalkMove
 import PotatoCactus.Game.Movement.PlayerWalkMovement (PlayerWalkMovement (lastRegionUpdate_))
 import PotatoCactus.Game.Movement.PositionXY (fromXY, toXY)
 import PotatoCactus.Game.Player (Player (Player, equipment, inventory, movement, serverIndex, username))
+import qualified PotatoCactus.Game.Player as P
 import PotatoCactus.Game.PlayerUpdate.Equipment (Equipment (container))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position, x, y))
 import qualified PotatoCactus.Game.World as W (ClientHandle, ClientHandleMessage (CloseClientConnectionMessage, WorldUpdatedMessage), World (players, tick), username, worldInstance)
 import PotatoCactus.Game.World.MobList (findByIndex, findByPredicate)
 import qualified PotatoCactus.Game.World.Selectors as WS
 import PotatoCactus.Network.Packets.Out.AddObjectPacket (addObjectPacket)
+import PotatoCactus.Network.Packets.Out.ChatboxMessagePacket (chatboxMessagePacket)
 import PotatoCactus.Network.Packets.Out.ClearChunkObjectsPacket (clearChunkObjectsPacket, clearChunksAroundPlayer)
 import PotatoCactus.Network.Packets.Out.LoadMapRegionPacket (loadMapRegionPacket)
 import PotatoCactus.Network.Packets.Out.NpcUpdate.NpcUpdatePacket (npcUpdatePacket)
@@ -68,6 +71,7 @@ updateClient sock client localState W.WorldUpdatedMessage = do
            in do
                 sendAll sock (playerUpdatePacket p newLocalPlayers world)
                 sendAll sock (npcUpdatePacket p newLocalNpcs world)
+                forM_ (P.chatboxMessages p) (sendAll sock . chatboxMessagePacket)
 
                 sendAll sock (updateItemContainerPacket (inventory p))
                 sendAll sock (updateItemContainerPacket (container (equipment p)))

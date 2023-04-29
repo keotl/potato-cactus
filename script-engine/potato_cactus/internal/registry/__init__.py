@@ -48,6 +48,8 @@ class Registry(object):
             return event, options.get("npcId")
         elif event == GameEvent.NpcDeadEvent:
             return event, options.get("npcId")
+        elif event == GameEvent.PlayerCommandEvent:
+            return event, options.get("command")
         return "unassigned",
 
 Registry.INSTANCE = Registry()

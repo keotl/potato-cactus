@@ -1,5 +1,6 @@
 module PotatoCactus.Game.Scripting.Events.ApplyScriptActionResult (applyScriptResult) where
 
+import Debug.Trace (trace)
 import PotatoCactus.Game.Combat.CombatEntity (CombatEntity (target), CombatTarget (NpcTarget, PlayerTarget), clearTarget)
 import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
 import PotatoCactus.Game.Entity.Interaction.Interaction (create)
@@ -15,13 +16,12 @@ import qualified PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions as PAnim
 import PotatoCactus.Game.Position (GetPosition (getPosition))
 import qualified PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest as SpawnReq
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SpawnNpc, UpdateNpc, ServerPrintMessage))
+import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SpawnNpc, UpdateNpc))
 import PotatoCactus.Game.World (World (npcs, objects, players))
 import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAll, updateAtIndex)
 import PotatoCactus.Game.World.Selectors (isNpcAt)
 import PotatoCactus.Utils.Flow ((|>))
-import Debug.Trace (trace)
 
 applyScriptResult :: World -> ScriptActionResult -> World
 applyScriptResult world (AddGameObject obj) =
@@ -139,3 +139,7 @@ applyScriptResult world (NpcSetForcedChat npcIndex msg) =
 applyScriptResult world InternalNoop = world
 applyScriptResult world InternalProcessingComplete = world
 applyScriptResult world (ServerPrintMessage message) = trace message world
+applyScriptResult world (SendMessage playerIndex message) =
+  world
+    { players = updateAtIndex (players world) playerIndex (`P.sendChatboxMessage` message)
+    }
