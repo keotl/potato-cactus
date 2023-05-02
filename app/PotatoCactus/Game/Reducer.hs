@@ -36,6 +36,8 @@ reduceWorld world (NpcClickMessage playerId npcIndex actionIndex) =
   updatePlayerByIndex world playerId (\p -> P.queueUpdate p (InteractWithNpc npcIndex (NpcAction actionIndex)))
 reduceWorld world (PlayerCommandMessage playerId cmd args) =
   queueEvent world $ PlayerCommandEvent playerId cmd args
+reduceWorld world (PlayerContinueDialogueMessage playerId _) =
+  world -- TODO - Implement  - keotl 2023-05-01
 reduceWorld world UpdateWorldMessage =
   advance world
 

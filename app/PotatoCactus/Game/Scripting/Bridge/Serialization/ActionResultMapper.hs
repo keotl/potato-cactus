@@ -8,14 +8,18 @@ import Data.Aeson (FromJSON, Result (Error, Success), Value (Object, String), de
 import Data.Aeson.Types (Object, parse)
 import Data.ByteString (ByteString)
 import Data.ByteString.Lazy (fromStrict)
+import Data.Maybe (catMaybes, mapMaybe)
 import Data.Time.Format.ISO8601 (iso8601ParseM)
 import GHC.Generics (Generic)
 import PotatoCactus.Game.Entity.Animation.Animation (Animation (Animation), AnimationPriority (High, Low, Normal))
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject (Added, Removed))
 import qualified PotatoCactus.Game.Entity.Object.GameObject as O
 import PotatoCactus.Game.Position (Position (Position))
+import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest (CreateInterfaceRequest))
+import qualified PotatoCactus.Game.Scripting.Actions.CreateInterface as I
+import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation (ScriptInvocation))
 import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest (SpawnNpcRequest))
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, InternalNoop, InternalProcessingComplete, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerPosition, SpawnNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, CreateInterface, InternalNoop, InternalProcessingComplete, InvokeScript, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerPosition, SpawnNpc))
 
 mapResult :: ByteString -> ScriptActionResult
 mapResult bytes =
@@ -154,6 +158,26 @@ decodeBody "setPlayerPosition" body =
     body of
     Error msg -> InternalNoop
     Success decoded -> decoded
+decodeBody "invokeScript" body =
+  maybe InternalNoop InvokeScript (decodeScriptInvocation_ body)
+decodeBody "createInterface" body =
+  case parse
+    ( \obj -> do
+        elements <- obj .: "elements"
+        onClose <- obj .: "onClose"
+        return
+          ( CreateInterface $
+              I.CreateInterfaceRequest
+                ( mapMaybe
+                    decodeInterfaceElement_
+                    elements
+                )
+                (decodeScriptInvocation_ onClose)
+          )
+    )
+    body of
+    Error msg -> InternalNoop
+    Success decoded -> decoded
 decodeBody _ _ = InternalNoop
 
 data DecodedMessage = DecodedMessage
@@ -179,3 +203,58 @@ decodeAnimationPriority_ :: String -> AnimationPriority
 decodeAnimationPriority_ "high" = High
 decodeAnimationPriority_ "low" = Low
 decodeAnimationPriority_ _ = Normal
+
+decodeInterfaceElement_ :: Object -> Maybe I.InterfaceElement
+decodeInterfaceElement_ body =
+  case parse
+    ( \obj -> do
+        elementType <- obj .: "type"
+        return $ mapInterfaceElement_ elementType body
+    )
+    body of
+    Error msg -> Nothing
+    Success decoded -> decoded
+
+mapInterfaceElement_ :: String -> Object -> Maybe I.InterfaceElement
+mapInterfaceElement_ "text" body =
+  case parse
+    ( \obj -> do
+        widgetId <- obj .: "widgetId"
+        msg <- obj .: "msg"
+        return (I.TextElement widgetId msg)
+    )
+    body of
+    Error msg -> Nothing
+    Success decoded -> Just decoded
+mapInterfaceElement_ "chatboxRoot" body =
+  case parse
+    ( \obj -> do
+        widgetId <- obj .: "widgetId"
+        return (I.ChatboxRootWindowElement widgetId)
+    )
+    body of
+    Error msg -> Nothing
+    Success decoded -> Just decoded
+mapInterfaceElement_ "npcChathead" body =
+  case parse
+    ( \obj -> do
+        widgetId <- obj .: "widgetId"
+        npcId <- obj .: "npcId"
+        return (I.NpcChatheadElement widgetId npcId)
+    )
+    body of
+    Error msg -> Nothing
+    Success decoded -> Just decoded
+mapInterfaceElement_ _ _ = Nothing
+
+decodeScriptInvocation_ :: Object -> Maybe ScriptInvocation
+decodeScriptInvocation_ body =
+  case parse
+    ( \obj -> do
+        f <- obj .: "f"
+        args <- obj .: "args"
+        return (ScriptInvocation f args)
+    )
+    body of
+    Error msg -> Nothing
+    Success decoded -> Just decoded

@@ -1,5 +1,6 @@
 module PotatoCactus.Game.Scripting.ScriptUpdates where
 
+import Data.Aeson (Value)
 import PotatoCactus.Game.Combat.CombatEntity (CombatTarget)
 import PotatoCactus.Game.Combat.Hit (Hit)
 import PotatoCactus.Game.Entity.Animation.Animation (Animation)
@@ -10,6 +11,8 @@ import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Player (Player, PlayerIndex)
 import PotatoCactus.Game.Position (Position (Position))
 import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest)
+import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation)
+import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest)
 
 data GameEvent
   = ServerInitEvent
@@ -20,7 +23,8 @@ data GameEvent
   | NpcDeadEvent Npc
   | NpcEntityTickEvent Npc
   | PlayerCommandEvent PlayerIndex String [String]
-  deriving(Show)
+  | ScriptInvokedEvent ScriptInvocation
+  deriving (Show)
 
 data ScriptActionResult
   = AddGameObject DynamicObject
@@ -36,6 +40,8 @@ data ScriptActionResult
   | SetPlayerPosition PlayerIndex Position
   | InternalRemoveNpcTargetReferences NpcIndex
   | InternalProcessingComplete -- Sentinel token to indicate script execution complete
+  | InvokeScript ScriptInvocation
+  | CreateInterface CreateInterfaceRequest
   | InternalNoop
   | ServerPrintMessage String -- for testing
   | UpdateNpc NpcIndex Npc -- deprecated

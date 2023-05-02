@@ -1,3 +1,4 @@
+import importlib
 import pkgutil
 from inspect import signature
 from typing import List, cast, Tuple, Optional, Union
@@ -30,7 +31,15 @@ class SimpleWorker(WorkerHandle):
         elif message.op == "updateWorld":
             world = cast(World, message.body)
             ContextImpl.INSTANCE.set_world(world)
-
+        elif message.op == "invokeScript":
+            try:
+                modulename, function = message.body.event.rsplit(".", 1)
+                module = importlib.import_module(modulename)
+                getattr(module, function)(*message.body.body)
+            except KeyboardInterrupt as e:
+                raise e
+            except Exception as e:
+                _logger.error(f"Error while invoking script {message.body.event}. {e}")
         elif message.op == "gameEvent":
             _enrich_message(ContextImpl.INSTANCE, message.body)  # type: ignore
             handlers = Registry.INSTANCE.get_handlers(_event_key(message.body))

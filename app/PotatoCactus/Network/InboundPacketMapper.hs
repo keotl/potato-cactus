@@ -4,6 +4,7 @@ import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (Unregis
 import PotatoCactus.Game.Player (PlayerIndex)
 import PotatoCactus.Network.Packets.In.ButtonClickPacket (buttonClickMessage)
 import PotatoCactus.Network.Packets.In.ChatMessagePacket (playerChatMessage)
+import PotatoCactus.Network.Packets.In.ContinueDialoguePacket (continueDialoguePacket)
 import PotatoCactus.Network.Packets.In.EquipItemPacket (equipItemPacket)
 import PotatoCactus.Network.Packets.In.ItemContainerClickPacket (itemContainerClickPacket)
 import PotatoCactus.Network.Packets.In.NpcActionPacket (npcActionPacket)
@@ -21,6 +22,7 @@ mapPacket playerId clientIdentifier packet =
     17 -> npcActionPacket playerId packet
     18 -> npcActionPacket playerId packet
     21 -> npcActionPacket playerId packet
+    40 -> Just $ continueDialoguePacket playerId packet
     41 -> Just $ equipItemPacket clientIdentifier packet
     72 -> Just $ npcAttackPacket playerId packet
     73 -> Just $ objectActionPacket playerId packet

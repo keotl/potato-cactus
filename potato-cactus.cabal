@@ -40,6 +40,7 @@ executable potato-cactus
                    PotatoCactus.Network.InboundPacketMapper
                    PotatoCactus.Network.Packets.In.ButtonClickPacket
                    PotatoCactus.Network.Packets.In.ChatMessagePacket
+                   PotatoCactus.Network.Packets.In.ContinueDialoguePacket
                    PotatoCactus.Network.Packets.In.EquipItemPacket
                    PotatoCactus.Network.Packets.In.ItemContainerClickPacket
                    PotatoCactus.Network.Packets.In.NpcActionPacket
@@ -52,9 +53,14 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Opcodes
                    PotatoCactus.Network.Packets.PacketLengths
                    PotatoCactus.Network.Packets.Out.AddObjectPacket
+                   PotatoCactus.Network.Packets.Out.ChatboxInterfacePacket
                    PotatoCactus.Network.Packets.Out.ChatboxMessagePacket
                    PotatoCactus.Network.Packets.Out.ClearChunkObjectsPacket
                    PotatoCactus.Network.Packets.Out.InitializePlayerPacket
+                   PotatoCactus.Network.Packets.Out.InterfaceAnimationPacket
+                   PotatoCactus.Network.Packets.Out.InterfaceChatheadPacket
+                   PotatoCactus.Network.Packets.Out.InterfacePacket
+                   PotatoCactus.Network.Packets.Out.InterfaceTextPacket
                    PotatoCactus.Network.Packets.Out.LoadMapRegionPacket
                    PotatoCactus.Network.Packets.Out.UpdateFriendsListStatusPacket
                    PotatoCactus.Network.Packets.Out.UpdateItemContainerPacket
@@ -79,6 +85,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Out.RemoveObjectPacket
                    PotatoCactus.Network.Packets.Out.SetPlacementReferencePacket
                    PotatoCactus.Network.Packets.Out.TabInterfacePacket
+                   PotatoCactus.Network.Packets.Out.WalkableInterfacePacket
                    PotatoCactus.Network.ClientHandler
                    PotatoCactus.Network.Binary
                    PotatoCactus.Login.LoginHandler
@@ -105,6 +112,7 @@ executable potato-cactus
                    PotatoCactus.Game.Interface.FriendsList
                    PotatoCactus.Game.Interface.GameTabs
                    PotatoCactus.Game.Interface.InterfaceButtonDispatch
+                   PotatoCactus.Game.Interface.InterfaceController
                    PotatoCactus.Game.Interface.PlayerInteraction
                    PotatoCactus.Game.Interface.PlayerSettings
                    PotatoCactus.Game.ItemContainer
@@ -130,6 +138,8 @@ executable potato-cactus
                    PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions
                    PotatoCactus.Game.PlayerUpdate.ProcessPlayerUpdate
                    PotatoCactus.Game.Position
+                   PotatoCactus.Game.Scripting.Actions.CreateInterface
+                   PotatoCactus.Game.Scripting.Actions.ScriptInvocation
                    PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest
                    PotatoCactus.Game.Scripting.Bridge.BridgeMessage
                    PotatoCactus.Game.Scripting.Bridge.Communication

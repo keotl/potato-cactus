@@ -37,10 +37,12 @@ class PlayerAttackEventPayload(object):
     playerIndex: int
     target: Optional[CombatTarget]
 
+
 class PlayerCommandEventPayload(object):
     playerIndex: int
     command: str
     args: List[str]
+
 
 class NpcAttackEventPayload(object):
     npcIndex: int

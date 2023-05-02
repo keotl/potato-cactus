@@ -2,8 +2,9 @@
 
 module PotatoCactus.Network.Binary where
 
-import Data.Binary (Word16, Word32, Word64, Word8)
+import Data.Binary (Put, Word16, Word32, Word64, Word8, putWord8)
 import Data.Binary.BitPut (BitPut, putByteString, putNBits, runBitPut)
+import Data.Binary.Put (runPut)
 import Data.Binary.Strict.Get (getWord16be, getWord32be, getWord32le, getWord8, runGet)
 import Data.Bits (Bits (rotateL, shiftR, (.&.)))
 import Data.ByteString (length, pack, tail)
@@ -82,14 +83,14 @@ toIntME_ x =
 encodeStr :: String -> ByteString
 encodeStr input =
   toStrict $
-    runBitPut
+    runPut
       ( do
           mapM_ mapChar_ input
-          putNBits 8 $ toWord_ 10
+          putWord8 10
       )
 
-mapChar_ :: Char -> BitPut
-mapChar_ c = putNBits 8 $ toWord_ (ord c)
+mapChar_ :: Char -> Put
+mapChar_ c = putWord8 . fromIntegral $ ord c
 
 nibbles :: [Word8] -> [Word8]
 nibbles = Prelude.foldr (\x -> (++) [x `shiftR` 4, x .&. 0xf]) []

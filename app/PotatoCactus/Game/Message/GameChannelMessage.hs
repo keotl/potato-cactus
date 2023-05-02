@@ -17,6 +17,7 @@ data GameChannelMessage
   | PlayerCommandMessage PlayerIndex String [String]
   | InterfaceButtonClickMessage String Int
   | PlayerChatMessage String ChatMessage
+  | PlayerContinueDialogueMessage PlayerIndex Int
   | EquipItemMessage String EquipItemMessagePayload
   | UnequipItemMessage String EquipmentSlot
   | ObjectClickMessage PlayerIndex ObjectClickPayload
