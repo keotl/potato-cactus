@@ -9,6 +9,8 @@ import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction)
 import qualified PotatoCactus.Game.Entity.Interaction.Interaction as Interaction
 import PotatoCactus.Game.Entity.Npc.Npc (NpcIndex)
+import PotatoCactus.Game.Interface.InterfaceController (InterfaceController, configureInterface)
+import qualified PotatoCactus.Game.Interface.InterfaceController as IC
 import PotatoCactus.Game.ItemContainer (ItemContainer, playerEquipmentContainer, playerInventory)
 import PotatoCactus.Game.Movement.MovementEntity (immediatelySetPosition, playerWalkMovement)
 import qualified PotatoCactus.Game.Movement.MovementEntity as M (MovementEntity, issueWalkCommand)
@@ -21,6 +23,7 @@ import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate)
 import PotatoCactus.Game.PlayerUpdate.UpdateMask (PlayerUpdateMask, animationFlag, appearanceFlag, primaryHealthUpdateFlag, secondaryHealthUpdateFlag)
 import qualified PotatoCactus.Game.PlayerUpdate.UpdateMask as Mask
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
+import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest)
 import PotatoCactus.Game.Typing (Keyable (key))
 
 type PlayerIndex = Int
@@ -39,6 +42,7 @@ data Player = Player
     combat :: CombatEntity,
     animation :: Maybe Anim.Animation,
     chatboxMessages :: [String],
+    interfaces :: InterfaceController,
     skipUpdate_ :: Bool
   }
   deriving (Show)
@@ -72,6 +76,7 @@ create username position =
       combat = CombatEntity.create 10,
       animation = Nothing,
       chatboxMessages = [],
+      interfaces = IC.create,
       skipUpdate_ = True
     }
 
@@ -121,4 +126,10 @@ setPosition :: Player -> Position -> Player
 setPosition p pos =
   p
     { movement = immediatelySetPosition (movement p) pos
+    }
+
+createInterface :: Player -> CreateInterfaceRequest -> Player
+createInterface p req =
+  p
+    { interfaces = configureInterface (interfaces p) req
     }

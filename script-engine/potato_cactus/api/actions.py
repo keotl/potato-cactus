@@ -89,8 +89,10 @@ def SetPlayerPosition(playerIndex: int, position: Union[Position, Tuple[int, int
 def InvokeScript(callback: ScriptInvocation) -> ScriptAction:
     return ScriptAction("invokeScript", callback.__dict__)
 
-def CreateInterface(elements: List[InterfaceElement], onClose : Optional[ScriptInvocation] = None) -> ScriptAction:
+def CreateInterface(playerIndex: int, type: Literal["standard", "chatbox", "walkable"], elements: List[InterfaceElement], onClose : Optional[ScriptInvocation] = None) -> ScriptAction:
     return ScriptAction("createInterface", {
+        "type": type,
+        "playerIndex": playerIndex,
         "elements": list(map(lambda e: e.serialize(), elements)),
         "onClose" : onClose.__dict__ if onClose else None
     })

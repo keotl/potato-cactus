@@ -32,6 +32,7 @@ executable potato-cactus
                    PotatoCactus.Client.ClientUpdate
                    PotatoCactus.Client.GameObjectUpdate.EncodeGameObjectUpdate
                    PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateDiff
+                   PotatoCactus.Client.Interface.EncodeInterfaceUpdate
                    PotatoCactus.Client.LocalEntityList
                    PotatoCactus.Client.PlayerInit
                    PotatoCactus.Interop.ScriptEngineProcess

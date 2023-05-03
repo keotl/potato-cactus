@@ -30,3 +30,11 @@ class NpcChatheadElement(InterfaceElement):
         self.npcId = npcId
     def serialize(self) -> dict:
         return {"type": "npcChathead", "widgetId": self.widgetId, "npcId": self.npcId}
+
+class ModelAnimationElement(InterfaceElement):
+    def __init__(self, widgetId: int, animationId: int) -> None:
+        self.widgetId = widgetId
+        self.animationId = animationId
+
+    def serialize(self) -> dict:
+        return {"type": "modelAnimation", "widgetId": self.widgetId, "animationId": self.animationId}

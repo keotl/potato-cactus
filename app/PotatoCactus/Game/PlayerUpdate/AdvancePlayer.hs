@@ -12,6 +12,7 @@ import PotatoCactus.Game.Player (Player (..))
 import PotatoCactus.Game.PlayerUpdate.ProcessPlayerUpdate (processPlayerUpdate)
 import PotatoCactus.Game.Position (getPosition)
 import PotatoCactus.Game.Typing (Advance (advance))
+import PotatoCactus.Utils.Flow ((|>))
 
 advancePlayer :: (NpcIndex -> Maybe Npc) -> Player -> Player
 advancePlayer findNpc p =
@@ -19,10 +20,8 @@ advancePlayer findNpc p =
     then p {skipUpdate_ = False}
     else
       let updated =
-            foldl
-              processPlayerUpdate
-              (clearTransientProperties_ p)
-              (pendingUpdates p)
+            p |> processPendingUpdates_
+              |> commonUpdates_
        in let updatedInteraction =
                 advanceInteraction
                   findNpc
@@ -34,9 +33,6 @@ advancePlayer findNpc p =
                     Nothing ->
                       updated
                         { movement = advance (movement updated),
-                          inventory = advance (inventory updated),
-                          equipment = advance (equipment updated),
-                          combat = advance . combat $ p,
                           interaction = create,
                           pendingUpdates = []
                         }
@@ -44,18 +40,12 @@ advancePlayer findNpc p =
                       let desiredPath = findPathNaive 666 (getPosition p) (getPosition npc)
                        in updated
                             { movement = Movement.immediatelyQueueMovement (movement updated) desiredPath,
-                              inventory = advance (inventory updated),
-                              equipment = advance (equipment updated),
-                              combat = advance . combat $ p,
                               interaction = updatedInteraction,
                               pendingUpdates = []
                             }
                 _ ->
                   updated
                     { movement = advance (movement updated),
-                      inventory = advance (inventory updated),
-                      equipment = advance (equipment updated),
-                      combat = advance . combat $ p,
                       interaction = updatedInteraction,
                       pendingUpdates = []
                     }
@@ -67,4 +57,20 @@ clearTransientProperties_ p =
       updateMask = 0,
       animation = Nothing,
       chatboxMessages = []
+    }
+
+processPendingUpdates_ :: Player -> Player
+processPendingUpdates_ p =
+  foldl
+    processPlayerUpdate
+    (clearTransientProperties_ p)
+    (pendingUpdates p)
+
+commonUpdates_ :: Player -> Player
+commonUpdates_ p =
+  p
+    { inventory = advance . inventory $ p,
+      equipment = advance . equipment $ p,
+      interfaces = advance . interfaces $ p,
+      combat = advance . combat $ p
     }

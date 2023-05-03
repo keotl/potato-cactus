@@ -4,12 +4,13 @@
 
 module PotatoCactus.Game.Scripting.Bridge.Serialization.ActionResultMapper (mapResult) where
 
-import Data.Aeson (FromJSON, Result (Error, Success), Value (Object, String), decode, decodeStrict, (.:))
+import Data.Aeson (FromJSON, Result (Error, Success), Value (Object, String), decode, decodeStrict, (.:), (.:?))
 import Data.Aeson.Types (Object, parse)
 import Data.ByteString (ByteString)
 import Data.ByteString.Lazy (fromStrict)
 import Data.Maybe (catMaybes, mapMaybe)
 import Data.Time.Format.ISO8601 (iso8601ParseM)
+import Debug.Trace (trace)
 import GHC.Generics (Generic)
 import PotatoCactus.Game.Entity.Animation.Animation (Animation (Animation), AnimationPriority (High, Low, Normal))
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject (Added, Removed))
@@ -159,15 +160,19 @@ decodeBody "setPlayerPosition" body =
     Error msg -> InternalNoop
     Success decoded -> decoded
 decodeBody "invokeScript" body =
-  maybe InternalNoop InvokeScript (decodeScriptInvocation_ body)
+  maybe InternalNoop InvokeScript (decodeScriptInvocation_ $ Just body)
 decodeBody "createInterface" body =
   case parse
     ( \obj -> do
+        interfaceType <- obj .: "type"
+        playerIndex <- obj .: "playerIndex"
         elements <- obj .: "elements"
-        onClose <- obj .: "onClose"
+        onClose <- obj .:? "onClose"
         return
-          ( CreateInterface $
-              I.CreateInterfaceRequest
+          ( CreateInterface
+              playerIndex
+              $ I.CreateInterfaceRequest
+                (decodeInterfaceType_ interfaceType)
                 ( mapMaybe
                     decodeInterfaceElement_
                     elements
@@ -176,7 +181,7 @@ decodeBody "createInterface" body =
           )
     )
     body of
-    Error msg -> InternalNoop
+    Error msg -> trace msg InternalNoop
     Success decoded -> decoded
 decodeBody _ _ = InternalNoop
 
@@ -245,10 +250,21 @@ mapInterfaceElement_ "npcChathead" body =
     body of
     Error msg -> Nothing
     Success decoded -> Just decoded
+mapInterfaceElement_ "modelAnimation" body =
+  case parse
+    ( \obj -> do
+        widgetId <- obj .: "widgetId"
+        animationId <- obj .: "animationId"
+        return (I.ModelAnimationElement widgetId animationId)
+    )
+    body of
+    Error msg -> Nothing
+    Success decoded -> Just decoded
 mapInterfaceElement_ _ _ = Nothing
 
-decodeScriptInvocation_ :: Object -> Maybe ScriptInvocation
-decodeScriptInvocation_ body =
+decodeScriptInvocation_ :: Maybe Object -> Maybe ScriptInvocation
+decodeScriptInvocation_ Nothing = Nothing
+decodeScriptInvocation_ (Just body) =
   case parse
     ( \obj -> do
         f <- obj .: "f"
@@ -258,3 +274,9 @@ decodeScriptInvocation_ body =
     body of
     Error msg -> Nothing
     Success decoded -> Just decoded
+
+decodeInterfaceType_ :: String -> I.InterfaceType
+decodeInterfaceType_ "standard" = I.Standard
+decodeInterfaceType_ "walkable" = I.Walkable
+decodeInterfaceType_ "chatbox" = I.Chatbox
+decodeInterfaceType_ _ = I.Standard

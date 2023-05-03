@@ -1,5 +1,7 @@
 from potato_cactus import EventHandler, GameEvent, Context
-from potato_cactus.api.actions import SpawnNpc, NpcSetForcedChat, ClearPlayerInteraction
+from potato_cactus.api.actions import SpawnNpc, NpcSetForcedChat, ClearPlayerInteraction, InvokeScript, CreateInterface
+from potato_cactus.api.dto.interface import ChatboxRootWindowElement, TextElement, NpcChatheadElement, \
+    ModelAnimationElement
 from potato_cactus.api.dto.position import Position
 from potato_cactus.api.events import NpcEntityTickEventPayload, NpcInteractionEventPayload
 
@@ -9,13 +11,32 @@ def onNpcTick(e: NpcEntityTickEventPayload):
     return []
 
 
+def invoked(playerIndex: int, arg1: str):
+    return []
+
+
 @EventHandler(GameEvent.NpcInteractionEvent, npcId=0)
 def onNpcInteraction(e: NpcInteractionEventPayload, context: Context):
     player = context.find_player_by_index(e.playerIndex)
-    return [NpcSetForcedChat(e.interaction.target.npcIndex, f"Hello {player.username}!"),
-            ClearPlayerInteraction(e.playerIndex)]
+    return [
+        CreateInterface(e.playerIndex, "chatbox", [
+            NpcChatheadElement(4883, 0),
+            ModelAnimationElement(4883, 591),
+            TextElement(4884, "Hans"),
+            TextElement(4885, "Hello world"),
+            ChatboxRootWindowElement(4882)]),
+        ClearPlayerInteraction(e.playerIndex)]
+    # return [NpcSetForcedChat(e.interaction.target.npcIndex, f"Hello {player.username}!"),
+    #         ClearPlayerInteraction(e.playerIndex)]
 
 
 @EventHandler(GameEvent.ServerInitEvent)
 def onServerInit(e):
     return [SpawnNpc(0, Position(3219, 3223, 0))]
+
+
+def dialogue_example():
+    root = DialogueBuilder("Hans", "surprised", "Hello!") \
+        .addNode("Hans", "surprised", "This text is on the second screen.")
+
+    return [ShowInterface()]

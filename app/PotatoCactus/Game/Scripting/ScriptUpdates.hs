@@ -41,7 +41,7 @@ data ScriptActionResult
   | InternalRemoveNpcTargetReferences NpcIndex
   | InternalProcessingComplete -- Sentinel token to indicate script execution complete
   | InvokeScript ScriptInvocation
-  | CreateInterface CreateInterfaceRequest
+  | CreateInterface PlayerIndex CreateInterfaceRequest
   | InternalNoop
   | ServerPrintMessage String -- for testing
   | UpdateNpc NpcIndex Npc -- deprecated

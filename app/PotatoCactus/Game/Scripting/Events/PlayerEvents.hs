@@ -5,8 +5,9 @@ import PotatoCactus.Game.Combat.CombatEntity (CombatEntity (cooldown), CombatTar
 import qualified PotatoCactus.Game.Combat.CombatEntity as Combat
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction (state))
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (InProgress))
-import PotatoCactus.Game.Player (Player (combat, interaction))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (PlayerAttackEvent, PlayerInteractionEvent))
+import qualified PotatoCactus.Game.Interface.InterfaceController as IC
+import PotatoCactus.Game.Player (Player (Player, combat, interaction, interfaces))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (PlayerAttackEvent, PlayerInteractionEvent, ScriptInvokedEvent))
 
 createPlayerEvents :: Player -> [GameEvent]
 createPlayerEvents player =
@@ -29,3 +30,7 @@ attackEvent_ p =
       if 0 == (cooldown . combat $ p)
         then Just $ PlayerAttackEvent p target
         else Nothing
+
+interfaceEvents_ :: Player -> [GameEvent]
+interfaceEvents_ Player {interfaces = ic} =
+  map ScriptInvokedEvent (IC.triggeredCallbacks ic)
