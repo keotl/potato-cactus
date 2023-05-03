@@ -6,7 +6,7 @@ import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation)
 
 type WidgetId = Int
 
-data InterfaceType = Standard | Chatbox | Walkable deriving (Show)
+data InterfaceType = Standard | Input | Walkable deriving (Show)
 
 data CreateInterfaceRequest = CreateInterfaceRequest
   { -- interfaceId :: Int,

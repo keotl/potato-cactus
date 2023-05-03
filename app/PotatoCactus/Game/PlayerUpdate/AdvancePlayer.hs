@@ -71,6 +71,6 @@ commonUpdates_ p =
   p
     { inventory = advance . inventory $ p,
       equipment = advance . equipment $ p,
-      interfaces = advance . interfaces $ p,
-      combat = advance . combat $ p
+      combat = advance . combat $ p,
+      interfaces = advance . interfaces $ p
     }

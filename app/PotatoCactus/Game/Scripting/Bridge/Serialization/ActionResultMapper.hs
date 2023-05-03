@@ -278,5 +278,5 @@ decodeScriptInvocation_ (Just body) =
 decodeInterfaceType_ :: String -> I.InterfaceType
 decodeInterfaceType_ "standard" = I.Standard
 decodeInterfaceType_ "walkable" = I.Walkable
-decodeInterfaceType_ "chatbox" = I.Chatbox
+decodeInterfaceType_ "input" = I.Input
 decodeInterfaceType_ _ = I.Standard

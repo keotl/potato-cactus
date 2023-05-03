@@ -1,15 +1,20 @@
 module PotatoCactus.Game.Interface.InterfaceController (InterfaceController (..), create, clearStandardInterfaces, Interface (..), configureInterface, closeInterface) where
 
 import Data.Maybe (catMaybes, mapMaybe)
-import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest (CreateInterfaceRequest), InterfaceElement, InterfaceType (Chatbox, Standard, Walkable))
+import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest (CreateInterfaceRequest), InterfaceElement, InterfaceType (Input, Standard, Walkable))
 import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation)
 import PotatoCactus.Game.Typing (Advance, advance)
+import PotatoCactus.Utils.Flow ((|>))
 
 data InterfaceController = InterfaceController
   { mainInterface :: Maybe Interface, -- main open window. e.g. bank interface
-    chatboxInterface :: Maybe Interface,
+    inputInterface :: Maybe Interface,
     walkableInterface :: Maybe Interface, -- interfaces kept open on movement, e.g. Tutorial island progress
-    triggeredCallbacks :: [ScriptInvocation]
+    triggeredCallbacks :: [ScriptInvocation],
+    pendingCallbacks_ :: [ScriptInvocation],
+    shouldCloseInterfaces :: Bool,
+    pendingClosingInterfaces_ :: Bool
+    -- TODO - shouldClose for walkable interface  - keotl 2023-05-03
   }
   deriving (Show)
 
@@ -17,8 +22,12 @@ instance Advance InterfaceController where
   advance ic =
     ic
       { mainInterface = advanceMaybe_ (mainInterface ic),
-        chatboxInterface = advanceMaybe_ (chatboxInterface ic),
-        walkableInterface = advanceMaybe_ (walkableInterface ic)
+        inputInterface = advanceMaybe_ (inputInterface ic),
+        walkableInterface = advanceMaybe_ (walkableInterface ic),
+        triggeredCallbacks = pendingCallbacks_ ic,
+        pendingCallbacks_ = [],
+        shouldCloseInterfaces = pendingClosingInterfaces_ ic,
+        pendingClosingInterfaces_ = False
       }
 
 advanceMaybe_ :: Maybe Interface -> Maybe Interface
@@ -41,44 +50,60 @@ create :: InterfaceController
 create =
   InterfaceController
     { mainInterface = Nothing,
-      chatboxInterface = Nothing,
+      inputInterface = Nothing,
       walkableInterface = Nothing,
-      triggeredCallbacks = []
+      triggeredCallbacks = [],
+      pendingCallbacks_ = [],
+      shouldCloseInterfaces = False,
+      pendingClosingInterfaces_ = True
     }
 
 clearStandardInterfaces :: InterfaceController -> InterfaceController
 clearStandardInterfaces c =
   c
     { mainInterface = Nothing,
-      chatboxInterface = Nothing
+      inputInterface = Nothing,
+      pendingClosingInterfaces_ = True
     }
 
 configureInterface :: InterfaceController -> CreateInterfaceRequest -> InterfaceController
 configureInterface c (CreateInterfaceRequest Standard elements onClose) =
   c
-    { mainInterface = Just $ Interface elements onClose
+    { mainInterface = Just $ Interface elements onClose,
+      shouldCloseInterfaces = False,
+      pendingClosingInterfaces_ = False
     }
-configureInterface c (CreateInterfaceRequest Chatbox elements onClose) =
+configureInterface c (CreateInterfaceRequest Input elements onClose) =
   c
-    { chatboxInterface = Just $ Interface elements onClose
+    { inputInterface = Just $ Interface elements onClose,
+      shouldCloseInterfaces = False,
+      pendingClosingInterfaces_ = False
     }
 configureInterface c (CreateInterfaceRequest Walkable elements onClose) =
   c
-    { walkableInterface = Just $ Interface elements onClose
+    { walkableInterface = Just $ Interface elements onClose,
+      shouldCloseInterfaces = False,
+      pendingClosingInterfaces_ = False
     }
 
 closeInterface :: InterfaceController -> InterfaceType -> InterfaceController
 closeInterface c Standard =
-  enqueueCallback_ (c {mainInterface = Nothing}) (mainInterface c)
+  c
+    |> (\x -> enqueueCallback_ x (mainInterface x))
+    |> (\x -> x {pendingClosingInterfaces_ = True, mainInterface = Nothing})
 closeInterface c Walkable =
-  enqueueCallback_ (c {walkableInterface = Nothing}) (walkableInterface c)
-closeInterface c Chatbox =
-  enqueueCallback_ (c {chatboxInterface = Nothing}) (chatboxInterface c)
+  c
+    |> (\x -> enqueueCallback_ x (walkableInterface x))
+    |> (\x -> x {walkableInterface = Nothing})
+closeInterface c Input =
+  c
+    |> (\x -> enqueueCallback_ x (inputInterface x))
+    |> (\x -> x {pendingClosingInterfaces_ = True, inputInterface = Nothing})
 
 enqueueCallback_ :: InterfaceController -> Maybe Interface -> InterfaceController
 enqueueCallback_ c Nothing = c
 enqueueCallback_ c (Just Interface {onClose = Nothing}) = c
 enqueueCallback_ c (Just Interface {onClose = Just script}) =
   c
-    { triggeredCallbacks = script : triggeredCallbacks c
+    { pendingCallbacks_ = script : triggeredCallbacks c
     }

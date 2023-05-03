@@ -8,7 +8,8 @@ import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (..))
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload (objectId))
 import qualified PotatoCactus.Game.Message.RegisterClientPayload as C
 import qualified PotatoCactus.Game.Player as P
-import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (EquipItem, InteractWithNpc, InteractWithObject, SayChatMessage, UnequipItem))
+import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (ContinueDialogue, EquipItem, InteractWithNpc, InteractWithObject, SayChatMessage, UnequipItem))
+import PotatoCactus.Game.Scripting.Actions.CreateInterface (InterfaceType (Standard))
 import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (PlayerCommandEvent))
 import PotatoCactus.Game.Typing (advance)
 import PotatoCactus.Game.World (ClientHandle (username), World (World, clients, players, tick), addPlayer, queueEvent, removePlayerByUsername, updatePlayer, updatePlayerByIndex)
@@ -37,7 +38,7 @@ reduceWorld world (NpcClickMessage playerId npcIndex actionIndex) =
 reduceWorld world (PlayerCommandMessage playerId cmd args) =
   queueEvent world $ PlayerCommandEvent playerId cmd args
 reduceWorld world (PlayerContinueDialogueMessage playerId _) =
-  world -- TODO - Implement  - keotl 2023-05-01
+  updatePlayerByIndex world playerId (`P.queueUpdate` ContinueDialogue)
 reduceWorld world UpdateWorldMessage =
   advance world
 

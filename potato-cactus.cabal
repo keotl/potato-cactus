@@ -57,6 +57,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Out.ChatboxInterfacePacket
                    PotatoCactus.Network.Packets.Out.ChatboxMessagePacket
                    PotatoCactus.Network.Packets.Out.ClearChunkObjectsPacket
+                   PotatoCactus.Network.Packets.Out.CloseInterfacesPacket
                    PotatoCactus.Network.Packets.Out.InitializePlayerPacket
                    PotatoCactus.Network.Packets.Out.InterfaceAnimationPacket
                    PotatoCactus.Network.Packets.Out.InterfaceChatheadPacket

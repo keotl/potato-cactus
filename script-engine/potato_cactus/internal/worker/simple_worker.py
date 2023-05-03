@@ -35,7 +35,9 @@ class SimpleWorker(WorkerHandle):
             try:
                 modulename, function = message.body.event.rsplit(".", 1)
                 module = importlib.import_module(modulename)
-                getattr(module, function)(*message.body.body)
+                res = getattr(module, function)(*message.body.body)
+                for action in res:
+                    self._sender.send(action.__dict__)
             except KeyboardInterrupt as e:
                 raise e
             except Exception as e:
