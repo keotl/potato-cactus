@@ -1,7 +1,6 @@
 module PotatoCactus.Game.Scripting.Events.PlayerEvents (createPlayerEvents) where
 
 import Data.Maybe (catMaybes)
-import Debug.Trace (trace)
 import PotatoCactus.Game.Combat.CombatEntity (CombatEntity (cooldown), CombatTarget (None))
 import qualified PotatoCactus.Game.Combat.CombatEntity as Combat
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction (state))

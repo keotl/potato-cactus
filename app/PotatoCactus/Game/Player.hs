@@ -58,6 +58,7 @@ issueWalkCommand (startPos, isRunning, steps) p =
   p
     { movement = M.issueWalkCommand (movement p) startPos steps,
       combat = CombatEntity.clearTarget . combat $ p,
+      interaction = Interaction.create,
       interfaces = clearStandardInterfaces . interfaces $ p
     }
 
