@@ -20,5 +20,6 @@ data InterfaceElement
   = ChatboxRootWindowElement WidgetId
   | TextElement WidgetId String
   | NpcChatheadElement WidgetId NpcDefinitionId
+  | PlayerChatheadElement WidgetId
   | ModelAnimationElement WidgetId AnimationId
   deriving (Show)

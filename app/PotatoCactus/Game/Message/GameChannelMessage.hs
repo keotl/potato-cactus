@@ -15,7 +15,7 @@ data GameChannelMessage
   | UnregisterClientMessage String
   | PlayerWalkMessage String PositionXY Bool [WalkingStep]
   | PlayerCommandMessage PlayerIndex String [String]
-  | InterfaceButtonClickMessage String Int
+  | InterfaceButtonClickMessage PlayerIndex Int
   | PlayerChatMessage String ChatMessage
   | PlayerContinueDialogueMessage PlayerIndex Int
   | EquipItemMessage String EquipItemMessagePayload

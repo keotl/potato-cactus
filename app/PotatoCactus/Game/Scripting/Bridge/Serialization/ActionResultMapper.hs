@@ -10,6 +10,7 @@ import Data.ByteString (ByteString)
 import Data.ByteString.Lazy (fromStrict)
 import Data.Maybe (catMaybes, mapMaybe)
 import Data.Time.Format.ISO8601 (iso8601ParseM)
+import Debug.Trace (trace)
 import GHC.Generics (Generic)
 import PotatoCactus.Game.Entity.Animation.Animation (Animation (Animation), AnimationPriority (High, Low, Normal))
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject (Added, Removed))
@@ -20,7 +21,6 @@ import qualified PotatoCactus.Game.Scripting.Actions.CreateInterface as I
 import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation (ScriptInvocation))
 import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest (SpawnNpcRequest))
 import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, CreateInterface, InternalNoop, InternalProcessingComplete, InvokeScript, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerPosition, SpawnNpc))
-import Debug.Trace (trace)
 
 mapResult :: ByteString -> ScriptActionResult
 mapResult bytes =
@@ -246,6 +246,15 @@ mapInterfaceElement_ "npcChathead" body =
         widgetId <- obj .: "widgetId"
         npcId <- obj .: "npcId"
         return (I.NpcChatheadElement widgetId npcId)
+    )
+    body of
+    Error msg -> Nothing
+    Success decoded -> Just decoded
+mapInterfaceElement_ "playerChathead" body =
+  case parse
+    ( \obj -> do
+        widgetId <- obj .: "widgetId"
+        return (I.PlayerChatheadElement widgetId)
     )
     body of
     Error msg -> Nothing

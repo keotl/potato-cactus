@@ -32,7 +32,7 @@ mapPacket playerId clientIdentifier packet =
     145 -> itemContainerClickPacket clientIdentifier packet
     155 -> npcActionPacket playerId packet
     164 -> Just $ playerWalkMessage clientIdentifier packet -- Yellow X walk
-    185 -> Just $ buttonClickMessage clientIdentifier packet -- Interface button
+    185 -> Just $ buttonClickMessage playerId packet -- Interface button
     248 -> Just $ playerMapWalk clientIdentifier packet -- Minimap walk
     252 -> Just $ objectActionPacket playerId packet
     254 -> Just $ UnregisterClientMessage clientIdentifier
