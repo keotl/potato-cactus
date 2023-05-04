@@ -1,0 +1,36 @@
+{
+  "include": [
+    "script"
+  ],
+
+  "exclude": [
+    "**/__pycache__"
+  ],
+
+  "defineConstant": {
+    "DEBUG": true
+  },
+
+  // "stubPath": "src/stubs",
+  "venv": "venv",
+
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+
+  "pythonVersion": "3.10",
+  "pythonPlatform": "Linux",
+
+  "executionEnvironments": [
+    {
+      "root": "scripts",
+      "pythonVersion": "3.10",
+      "pythonPlatform": "Linux",
+      "extraPaths": [
+        "script-engine/"
+      ]
+    },
+    {
+      "root": "."
+    }
+  ]
+}

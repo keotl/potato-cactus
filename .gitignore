@@ -82,3 +82,4 @@ cabal.project.local~
 **/.idea
 .pyc
 __pycache__
+venv
