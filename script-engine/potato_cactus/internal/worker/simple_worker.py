@@ -1,16 +1,18 @@
 import importlib
 import pkgutil
 from inspect import signature
-from typing import List, cast, Tuple, Optional, Union
+from typing import List, Optional, Tuple, Union, cast
 
 from potato_cactus.api.dto.world import World
 from potato_cactus.api.events import GameEvent
 from potato_cactus.internal.impl.context_impl import ContextImpl
 from potato_cactus.internal.messages.inbound import InboundMessage
-from potato_cactus.internal.messages.outbound import internal_processingComplete
+from potato_cactus.internal.messages.outbound import \
+    internal_processingComplete
 from potato_cactus.internal.registry import Registry
-from . import OutboundMessageSender, WorkerHandle
+
 from ..util.stderr_logger import Logger
+from . import OutboundMessageSender, WorkerHandle
 
 
 class SimpleWorker(WorkerHandle):
@@ -36,12 +38,14 @@ class SimpleWorker(WorkerHandle):
                 modulename, function = message.body.event.rsplit(".", 1)
                 module = importlib.import_module(modulename)
                 res = getattr(module, function)(*message.body.body)
-                for action in res:
+                for action in res or []:
                     self._sender.send(action.__dict__)
             except KeyboardInterrupt as e:
                 raise e
             except Exception as e:
-                _logger.error(f"Error while invoking script {message.body.event}. {e}")
+                _logger.error(
+                    f"Unhandled exception while invoking script {message.body.event}. {e}"
+                )
         elif message.op == "gameEvent":
             _enrich_message(ContextImpl.INSTANCE, message.body)  # type: ignore
             handlers = Registry.INSTANCE.get_handlers(_event_key(message.body))
@@ -54,12 +58,14 @@ class SimpleWorker(WorkerHandle):
                         res = h(message.body.body)
                     else:
                         res = h()
-                    for action in res:
+                    for action in res or []:
                         self._sender.send(action.__dict__)
                 except KeyboardInterrupt as e:
                     raise e
                 except Exception as e:
-                    _logger.error(f"Unhandled exception while running script {message.body.event}. {e}")
+                    _logger.error(
+                        f"Unhandled exception while invoking script {message.body.event}. {e}"
+                    )
 
 
 def _event_key(payload) -> Tuple[Optional[Union[str, int]], ...]:
@@ -82,17 +88,21 @@ def _event_key(payload) -> Tuple[Optional[Union[str, int]], ...]:
     if payload.event == GameEvent.PlayerCommandEvent:
         return GameEvent.PlayerCommandEvent, payload.body.command
 
-    _logger.warning(f"Got event '{payload.event}' with an unconfigured key. No script will be invoked.")
+    _logger.warning(
+        f"Got event '{payload.event}' with an unconfigured key. No script will be invoked."
+    )
     return "unassined",
 
 
 def _enrich_message(context: ContextImpl, payload):
     if payload.event == GameEvent.NpcInteractionEvent:
         # payload.body: NpcInteractionEventPayload
-        payload.body.interaction.target["npcId"] = _find_npc_id(context, payload.body.interaction.target.npcIndex)
+        payload.body.interaction.target["npcId"] = _find_npc_id(
+            context, payload.body.interaction.target.npcIndex)
     if payload.event == GameEvent.NpcAttackInteractionEvent:
         # payload.body: NpcAttackInteractionEventPayload
-        payload.body.interaction.target["npcId"] = _find_npc_id(context, payload.body.interaction.target.npcIndex)
+        payload.body.interaction.target["npcId"] = _find_npc_id(
+            context, payload.body.interaction.target.npcIndex)
     if payload.event == GameEvent.NpcAttackEvent:
         # payload.body: NpcAttackEventPayload
         payload.body["npcId"] = _find_npc_id(context, payload.body.npcIndex)
@@ -109,5 +119,6 @@ def _find_npc_id(context: ContextImpl, npc_index: int) -> int:
     if npc:
         return npc.definitionId
     return 0
+
 
 _logger = Logger("ScriptWorker")
