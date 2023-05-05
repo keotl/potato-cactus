@@ -168,6 +168,7 @@ decodeBody "createInterface" body =
         playerIndex <- obj .: "playerIndex"
         elements <- obj .: "elements"
         onClose <- obj .:? "onClose"
+        callbacks <- obj .: "callbacks"
         return
           ( CreateInterface
               playerIndex
@@ -178,6 +179,7 @@ decodeBody "createInterface" body =
                     elements
                 )
                 (decodeScriptInvocation_ onClose)
+                callbacks
           )
     )
     body of

@@ -4,7 +4,9 @@ from potato_cactus.api.actions import (ClearPlayerInteraction, CreateInterface,
                                        SpawnNpc)
 from potato_cactus.api.dto.interface import (ChatboxRootWindowElement,
                                              ModelAnimationElement,
-                                             NpcChatheadElement, TextElement, PlayerChatheadElement)
+                                             NpcChatheadElement,
+                                             PlayerChatheadElement,
+                                             TextElement)
 from potato_cactus.api.dto.position import Position
 from potato_cactus.api.dto.script_invocation import ScriptInvocation
 from potato_cactus.api.events import (NpcEntityTickEventPayload,
@@ -33,7 +35,12 @@ def onNpcInteraction(e: NpcInteractionEventPayload, context: Context):
                             ChatboxRootWindowElement(4882)
                         ],
                         onClose=ScriptInvocation(on_dialogue_screen,
-                                                 (e.playerIndex, 2))),
+                                                 (e.playerIndex, 2)),
+                        callbacks={
+                            1234:
+                                ScriptInvocation(on_dialogue_screen,
+                                                 (e.playerIndex, 666))
+                        }),
         ClearPlayerInteraction(e.playerIndex)
     ]
     # return [NpcSetForcedChat(e.interaction.target.npcIndex, f"Hello {player.username}!"),

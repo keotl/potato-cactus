@@ -1,7 +1,7 @@
 module PotatoCactus.Boot.GameThreadMain where
 
 import Control.Concurrent (Chan, forkFinally, readChan, threadDelay, writeChan)
-import Data.IORef ( readIORef, writeIORef )
+import Data.IORef (readIORef, writeIORef)
 import Data.Typeable (typeOf)
 import GHC.Clock (getMonotonicTimeNSec)
 import PotatoCactus.Boot.GameChannel (gameChannel)
@@ -32,7 +32,7 @@ mainLoop = do
   newWorld <- reduceUntilNextTick_ world gameChannel
   newWorld2 <- dispatchScriptEvents newWorld
 
-  -- logger_ Info $ (show  newWorld2)
+  -- logger_ Info $ (show newWorld2)
 
   writeIORef worldInstance newWorld2
   -- TODO - Investigate blocking IO for freeze on player disconnect bug  - keotl 2023-03-27

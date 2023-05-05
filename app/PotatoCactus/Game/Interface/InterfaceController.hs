@@ -1,5 +1,6 @@
-module PotatoCactus.Game.Interface.InterfaceController (InterfaceController (..), create, clearStandardInterfaces, Interface (..), configureInterface, closeInterface) where
+module PotatoCactus.Game.Interface.InterfaceController (InterfaceController (..), create, clearStandardInterfaces, Interface (..), configureInterface, closeInterface, dispatchButtonClick) where
 
+import Data.IntMap (IntMap, (!?))
 import Data.Maybe (catMaybes, mapMaybe)
 import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest (CreateInterfaceRequest), InterfaceElement, InterfaceType (Input, Standard, Walkable))
 import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation)
@@ -36,7 +37,8 @@ advanceMaybe_ (Just i) = Just $ advance i
 
 data Interface = Interface
   { configuredElements :: [InterfaceElement], -- Elements to configure on this tick
-    onClose :: Maybe ScriptInvocation -- Script to invoke when dismissed gracefully.
+    onClose :: Maybe ScriptInvocation, -- Script to invoke when dismissed gracefully.
+    callbacks :: IntMap ScriptInvocation
   }
   deriving (Show)
 
@@ -67,21 +69,21 @@ clearStandardInterfaces c =
     }
 
 configureInterface :: InterfaceController -> CreateInterfaceRequest -> InterfaceController
-configureInterface c (CreateInterfaceRequest Standard elements onClose) =
+configureInterface c (CreateInterfaceRequest Standard elements onClose callbacks) =
   c
-    { mainInterface = Just $ Interface elements onClose,
+    { mainInterface = Just $ Interface elements onClose callbacks,
       shouldCloseInterfaces = False,
       pendingClosingInterfaces_ = False
     }
-configureInterface c (CreateInterfaceRequest Input elements onClose) =
+configureInterface c (CreateInterfaceRequest Input elements onClose callbacks) =
   c
-    { inputInterface = Just $ Interface elements onClose,
+    { inputInterface = Just $ Interface elements onClose callbacks,
       shouldCloseInterfaces = False,
       pendingClosingInterfaces_ = False
     }
-configureInterface c (CreateInterfaceRequest Walkable elements onClose) =
+configureInterface c (CreateInterfaceRequest Walkable elements onClose callbacks) =
   c
-    { walkableInterface = Just $ Interface elements onClose,
+    { walkableInterface = Just $ Interface elements onClose callbacks,
       shouldCloseInterfaces = False,
       pendingClosingInterfaces_ = False
     }
@@ -89,21 +91,35 @@ configureInterface c (CreateInterfaceRequest Walkable elements onClose) =
 closeInterface :: InterfaceController -> InterfaceType -> InterfaceController
 closeInterface c Standard =
   c
-    |> (\x -> enqueueCallback_ x (mainInterface x))
+    |> (\x -> enqueueOnCloseCallback_ x (mainInterface x))
     |> (\x -> x {pendingClosingInterfaces_ = True, mainInterface = Nothing})
 closeInterface c Walkable =
   c
-    |> (\x -> enqueueCallback_ x (walkableInterface x))
+    |> (\x -> enqueueOnCloseCallback_ x (walkableInterface x))
     |> (\x -> x {walkableInterface = Nothing})
 closeInterface c Input =
   c
-    |> (\x -> enqueueCallback_ x (inputInterface x))
+    |> (\x -> enqueueOnCloseCallback_ x (inputInterface x))
     |> (\x -> x {pendingClosingInterfaces_ = True, inputInterface = Nothing})
 
-enqueueCallback_ :: InterfaceController -> Maybe Interface -> InterfaceController
-enqueueCallback_ c Nothing = c
-enqueueCallback_ c (Just Interface {onClose = Nothing}) = c
-enqueueCallback_ c (Just Interface {onClose = Just script}) =
+enqueueOnCloseCallback_ :: InterfaceController -> Maybe Interface -> InterfaceController
+enqueueOnCloseCallback_ c Nothing = c
+enqueueOnCloseCallback_ c (Just Interface {onClose = Nothing}) = c
+enqueueOnCloseCallback_ c (Just Interface {onClose = Just script}) =
   c
-    { pendingCallbacks_ = script : triggeredCallbacks c
+    { pendingCallbacks_ = script : pendingCallbacks_ c
     }
+
+dispatchButtonClick :: InterfaceController -> Int -> InterfaceController
+dispatchButtonClick c buttonId =
+  let invoked =
+        [ invokedCallback_ (mainInterface c) buttonId,
+          invokedCallback_ (inputInterface c) buttonId,
+          invokedCallback_ (walkableInterface c) buttonId
+        ]
+   in c {pendingCallbacks_ = pendingCallbacks_ c ++ catMaybes invoked}
+
+invokedCallback_ :: Maybe Interface -> Int -> Maybe ScriptInvocation
+invokedCallback_ Nothing _ = Nothing
+invokedCallback_ (Just Interface {callbacks = c}) buttonId =
+  c !? buttonId
