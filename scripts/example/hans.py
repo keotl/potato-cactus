@@ -1,7 +1,5 @@
 from potato_cactus import Context, EventHandler, GameEvent, get_context
-from potato_cactus.api.actions import (ClearPlayerInteraction, CreateInterface,
-                                       InvokeScript, NpcSetForcedChat,
-                                       SpawnNpc)
+from potato_cactus.api.actions import CreateInterface, SpawnNpc
 from potato_cactus.api.dto.interface import (ChatboxRootWindowElement,
                                              ModelAnimationElement,
                                              NpcChatheadElement,
@@ -9,60 +7,31 @@ from potato_cactus.api.dto.interface import (ChatboxRootWindowElement,
                                              TextElement)
 from potato_cactus.api.dto.position import Position
 from potato_cactus.api.dto.script_invocation import ScriptInvocation
-from potato_cactus.api.events import (NpcEntityTickEventPayload,
-                                      NpcInteractionEventPayload)
+from potato_cactus.api.events import NpcInteractionEventPayload
 from potato_cactus.helper.dialogue import (DialogueNode, NpcDialogueScreen,
                                            OptionsDialogueScreen,
-                                           PlayerDialogueScreen)
+                                           PlayerDialogueScreen,
+                                           start_dialogue)
 
+intimidation_dialogue_node = DialogueNode(
+    __name__, "intimidation_dialogue_node", [
+        PlayerDialogueScreen(["I'm here to kill everyone in this castle!"],
+                             "angry_laughing"),
+        NpcDialogueScreen(0, "Hans", ["Oh no!"], "worried")
+    ])
 
-@EventHandler(GameEvent.NpcEntityTickEvent, npcId=0)
-def onNpcTick(e: NpcEntityTickEventPayload):
-    return []
-
-
-def invoked(playerIndex: int, arg1: str):
-    return []
-
-
-intimidation_dialogue_node = DialogueNode([
-    PlayerDialogueScreen(["I'm here to kill everyone in this castle!"],
-                         "angry_laughing"),
-    NpcDialogueScreen(0, "Hans", ["Oh no!"], "worried")
-])
-
-dialogue_root = DialogueNode([
-    NpcDialogueScreen(0, "Hans", ["Hello there!"]),
-    PlayerDialogueScreen(["Hello, what can you do for me?"]),
-    OptionsDialogueScreen([("I'm here to kill everyone in this castle!",
-                            intimidation_dialogue_node),
-                           ("repeat", dialogue_root)])
-])
+dialogue_root = DialogueNode(__name__, "dialogue_root")
+dialogue_root.add(NpcDialogueScreen(0, "Hans", ["Hello there!"])) \
+    .add(PlayerDialogueScreen(["Hello!"])) \
+    .add(NpcDialogueScreen(0, "Hans", ["What can I do for you?"])) \
+    .add(OptionsDialogueScreen([
+    ("I'm here to kill everyone in this castle!", intimidation_dialogue_node.ref),
+    ("Could you say that again?", dialogue_root.ref)]))
 
 
 @EventHandler(GameEvent.NpcInteractionEvent, npcId=0)
 def onNpcInteraction(e: NpcInteractionEventPayload, context: Context):
-    player = context.find_player_by_index(e.playerIndex)
-    return [
-        CreateInterface(e.playerIndex,
-                        "standard", [
-                            NpcChatheadElement(4883, 0),
-                            ModelAnimationElement(4883, 591),
-                            TextElement(4884, "Hans"),
-                            TextElement(4885, "Hello world"),
-                            ChatboxRootWindowElement(4882)
-                        ],
-                        onClose=ScriptInvocation(on_dialogue_screen,
-                                                 (e.playerIndex, 2)),
-                        callbacks={
-                            1234:
-                                ScriptInvocation(on_dialogue_screen,
-                                                 (e.playerIndex, 666))
-                        }),
-        ClearPlayerInteraction(e.playerIndex)
-    ]
-    # return [NpcSetForcedChat(e.interaction.target.npcIndex, f"Hello {player.username}!"),
-    #         ClearPlayerInteraction(e.playerIndex)]
+    return start_dialogue(dialogue_root.ref, e.playerIndex)
 
 
 def on_dialogue_screen(playerIndex: int, step: int):
@@ -97,10 +66,3 @@ def on_dialogue_screen(playerIndex: int, step: int):
 @EventHandler(GameEvent.ServerInitEvent)
 def onServerInit(e):
     return [SpawnNpc(0, Position(3219, 3223, 0))]
-
-
-def dialogue_example():
-    root = DialogueBuilder("Hans", "surprised", "Hello!") \
-        .addNode("Hans", "surprised", "This text is on the second screen.")
-
-    return [ShowInterface()]
