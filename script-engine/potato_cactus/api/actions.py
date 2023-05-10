@@ -1,7 +1,6 @@
 from typing import Dict, List, Literal, Optional, Tuple, Union
 
 from potato_cactus.api.dto.interface import InterfaceElement
-from potato_cactus.api.dto.object import GameObject
 from potato_cactus.api.dto.position import Position
 from potato_cactus.api.dto.script_invocation import ScriptInvocation
 

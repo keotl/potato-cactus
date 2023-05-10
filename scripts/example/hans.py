@@ -11,6 +11,9 @@ from potato_cactus.api.dto.position import Position
 from potato_cactus.api.dto.script_invocation import ScriptInvocation
 from potato_cactus.api.events import (NpcEntityTickEventPayload,
                                       NpcInteractionEventPayload)
+from potato_cactus.helper.dialogue import (DialogueNode, NpcDialogueScreen,
+                                           OptionsDialogueScreen,
+                                           PlayerDialogueScreen)
 
 
 @EventHandler(GameEvent.NpcEntityTickEvent, npcId=0)
@@ -20,6 +23,21 @@ def onNpcTick(e: NpcEntityTickEventPayload):
 
 def invoked(playerIndex: int, arg1: str):
     return []
+
+
+intimidation_dialogue_node = DialogueNode([
+    PlayerDialogueScreen(["I'm here to kill everyone in this castle!"],
+                         "angry_laughing"),
+    NpcDialogueScreen(0, "Hans", ["Oh no!"], "worried")
+])
+
+dialogue_root = DialogueNode([
+    NpcDialogueScreen(0, "Hans", ["Hello there!"]),
+    PlayerDialogueScreen(["Hello, what can you do for me?"]),
+    OptionsDialogueScreen([("I'm here to kill everyone in this castle!",
+                            intimidation_dialogue_node),
+                           ("repeat", dialogue_root)])
+])
 
 
 @EventHandler(GameEvent.NpcInteractionEvent, npcId=0)

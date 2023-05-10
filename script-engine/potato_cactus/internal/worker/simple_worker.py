@@ -44,7 +44,7 @@ class SimpleWorker(WorkerHandle):
                 raise e
             except Exception as e:
                 _logger.error(
-                    f"Unhandled exception while invoking script {message.body.event}. {e}"
+                    f"Unhandled exception while invoking script '{message.body.event}'. {e}"
                 )
         elif message.op == "gameEvent":
             _enrich_message(ContextImpl.INSTANCE, message.body)  # type: ignore
