@@ -12,7 +12,7 @@ synopsis: A 2005-era Runescape server engine.
 -- bug-reports:
 
 -- The license under which the package is released.
--- license: GPLv3
+license: GPL-3.0-only
 author:             Kento Lauzon
 maintainer:         kento.lauzon@ligature.ca
 
@@ -95,6 +95,7 @@ executable potato-cactus
                    PotatoCactus.Game.Combat.CombatEntity
                    PotatoCactus.Game.Combat.Hit
                    PotatoCactus.Game.Entity.Animation.Animation
+                   PotatoCactus.Game.Entity.EntityData
                    PotatoCactus.Game.Entity.Interaction.Interaction
                    PotatoCactus.Game.Entity.Interaction.State
                    PotatoCactus.Game.Entity.Interaction.Target
@@ -152,6 +153,7 @@ executable potato-cactus
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CombatDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CombatTargetDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CommandDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.EntityDataDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.GameObjectDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.InteractionDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.ItemContainerDto

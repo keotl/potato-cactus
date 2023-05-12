@@ -105,6 +105,15 @@ def CreateInterface(
         })
 
 
+def SetPlayerEntityData(playerIndex: int, key: str,
+                        val: Union[int, str, bool]) -> ScriptAction:
+    return ScriptAction("setPlayerEntityData", {
+        "playerIndex": playerIndex,
+        "key": key,
+        "val": val
+    })
+
+
 def _map_position(position: Union[Position, Tuple[int, int, int]]) -> dict:
     if isinstance(position, Position):
         return {"x": position.x, "y": position.y, "z": position.z}

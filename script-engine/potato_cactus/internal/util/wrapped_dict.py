@@ -11,6 +11,12 @@ class WrappedDict(object):
             return WrappedList(raw)
         return raw
 
+    def __getitem__(self, key: str):
+        return self._content[key]
+
+    def get(self, *args, **kwargs):
+        return self._content.get(*args, **kwargs)
+
     def __setitem__(self, __name: str, __value) -> None:
         self._content[__name] = __value
 
@@ -22,6 +28,7 @@ class WrappedDict(object):
 
 
 class WrappedList(object):
+
     def __init__(self, content: list):
         self._content = content
 

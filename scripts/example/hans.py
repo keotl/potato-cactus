@@ -1,12 +1,6 @@
-from potato_cactus import Context, EventHandler, GameEvent, get_context
-from potato_cactus.api.actions import CreateInterface, SpawnNpc
-from potato_cactus.api.dto.interface import (ChatboxRootWindowElement,
-                                             ModelAnimationElement,
-                                             NpcChatheadElement,
-                                             PlayerChatheadElement,
-                                             TextElement)
+from potato_cactus import Context, EventHandler, GameEvent
+from potato_cactus.api.actions import SpawnNpc
 from potato_cactus.api.dto.position import Position
-from potato_cactus.api.dto.script_invocation import ScriptInvocation
 from potato_cactus.api.events import NpcInteractionEventPayload
 from potato_cactus.helper.dialogue import (DialogueNode, NpcDialogueScreen,
                                            OptionsDialogueScreen,
@@ -32,35 +26,6 @@ dialogue_root.add(NpcDialogueScreen(0, "Hans", ["Hello there!"])) \
 @EventHandler(GameEvent.NpcInteractionEvent, npcId=0)
 def onNpcInteraction(e: NpcInteractionEventPayload, context: Context):
     return start_dialogue(dialogue_root.ref, e.playerIndex)
-
-
-def on_dialogue_screen(playerIndex: int, step: int):
-    player = get_context().find_player_by_index(playerIndex)
-    if player is None:
-        return []
-    if step == 2:
-        return [
-            CreateInterface(playerIndex,
-                            "standard", [
-                                PlayerChatheadElement(969),
-                                ModelAnimationElement(969, 591),
-                                TextElement(970, player.username),
-                                TextElement(971, "Second screen!"),
-                                ChatboxRootWindowElement(968)
-                            ],
-                            onClose=ScriptInvocation(on_dialogue_screen,
-                                                     (playerIndex, 3)))
-        ]
-    if step == 3:
-        return [
-            CreateInterface(playerIndex, "standard", [
-                NpcChatheadElement(4883, 1),
-                ModelAnimationElement(4883, 591),
-                TextElement(4884, "some npc"),
-                TextElement(4885, "Okay, this is the third screen"),
-                ChatboxRootWindowElement(4882)
-            ])
-        ]
 
 
 @EventHandler(GameEvent.ServerInitEvent)

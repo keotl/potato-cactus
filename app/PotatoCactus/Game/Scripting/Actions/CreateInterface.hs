@@ -10,7 +10,7 @@ type WidgetId = Int
 data InterfaceType = Standard | Input | Walkable deriving (Show)
 
 data CreateInterfaceRequest = CreateInterfaceRequest
-  { -- interfaceId :: Int,
+  {
     interfaceType :: InterfaceType,
     elements :: [InterfaceElement],
     onClose :: Maybe ScriptInvocation,

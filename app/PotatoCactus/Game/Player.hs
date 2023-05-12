@@ -6,6 +6,7 @@ import PotatoCactus.Game.Combat.CombatEntity (CombatEntity, CombatTarget (NpcTar
 import qualified PotatoCactus.Game.Combat.CombatEntity as CombatEntity
 import PotatoCactus.Game.Combat.Hit (Hit)
 import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
+import qualified PotatoCactus.Game.Entity.EntityData as EntityData
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction)
 import qualified PotatoCactus.Game.Entity.Interaction.Interaction as Interaction
 import PotatoCactus.Game.Entity.Npc.Npc (NpcIndex)
@@ -43,6 +44,7 @@ data Player = Player
     animation :: Maybe Anim.Animation,
     chatboxMessages :: [String],
     interfaces :: InterfaceController,
+    entityData :: EntityData.EntityData,
     skipUpdate_ :: Bool
   }
   deriving (Show)
@@ -79,6 +81,7 @@ create username position =
       animation = Nothing,
       chatboxMessages = [],
       interfaces = IC.create,
+      entityData = EntityData.create,
       skipUpdate_ = True
     }
 
@@ -134,4 +137,10 @@ createInterface :: Player -> CreateInterfaceRequest -> Player
 createInterface p req =
   p
     { interfaces = configureInterface (interfaces p) req
+    }
+
+updateEntityData :: Player -> (EntityData.EntityData -> EntityData.EntityData) -> Player
+updateEntityData p transform =
+  p
+    { entityData = transform (entityData p)
     }
