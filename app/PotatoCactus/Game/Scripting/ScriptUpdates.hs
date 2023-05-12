@@ -42,6 +42,7 @@ data ScriptActionResult
   | InternalProcessingComplete -- Sentinel token to indicate script execution complete
   | InvokeScript ScriptInvocation
   | CreateInterface PlayerIndex CreateInterfaceRequest
+  | ClearStandardInterface PlayerIndex
   | SetPlayerEntityData PlayerIndex String Value
   | InternalNoop
   | ServerPrintMessage String -- for testing

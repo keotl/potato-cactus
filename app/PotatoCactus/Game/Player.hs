@@ -139,6 +139,12 @@ createInterface p req =
     { interfaces = configureInterface (interfaces p) req
     }
 
+clearStandardInterface :: Player -> Player
+clearStandardInterface p =
+  p
+    { interfaces = clearStandardInterfaces $ interfaces p
+    }
+
 updateEntityData :: Player -> (EntityData.EntityData -> EntityData.EntityData) -> Player
 updateEntityData p transform =
   p

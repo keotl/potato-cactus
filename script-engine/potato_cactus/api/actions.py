@@ -105,6 +105,10 @@ def CreateInterface(
         })
 
 
+def ClearStandardInterface(playerIndex: int) -> ScriptAction:
+    return ScriptAction("clearStandardInterface", {"playerIndex": playerIndex})
+
+
 def SetPlayerEntityData(playerIndex: int, key: str,
                         val: Union[int, str, bool]) -> ScriptAction:
     return ScriptAction("setPlayerEntityData", {

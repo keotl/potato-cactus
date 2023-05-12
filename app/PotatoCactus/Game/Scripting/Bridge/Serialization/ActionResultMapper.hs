@@ -20,7 +20,7 @@ import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceReque
 import qualified PotatoCactus.Game.Scripting.Actions.CreateInterface as I
 import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation (ScriptInvocation))
 import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest (SpawnNpcRequest))
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, CreateInterface, InternalNoop, InternalProcessingComplete, InvokeScript, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerEntityData, SetPlayerPosition, SpawnNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, InternalNoop, InternalProcessingComplete, InvokeScript, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerEntityData, SetPlayerPosition, SpawnNpc))
 
 mapResult :: ByteString -> ScriptActionResult
 mapResult bytes =
@@ -181,6 +181,15 @@ decodeBody "createInterface" body =
                 (decodeScriptInvocation_ onClose)
                 callbacks
           )
+    )
+    body of
+    Error msg -> trace msg InternalNoop
+    Success decoded -> decoded
+decodeBody "clearStandardInterface" body =
+  case parse
+    ( \obj -> do
+        playerIndex <- obj .: "playerIndex"
+        return (ClearStandardInterface playerIndex)
     )
     body of
     Error msg -> trace msg InternalNoop

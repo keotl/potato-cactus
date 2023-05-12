@@ -3,7 +3,8 @@ from abc import ABC, abstractmethod
 from typing import Callable, Dict, List, Literal, Optional, Tuple, Union
 
 from potato_cactus import get_context
-from potato_cactus.api.actions import (ClearPlayerInteraction, CreateInterface,
+from potato_cactus.api.actions import (ClearPlayerInteraction,
+                                       ClearStandardInterface, CreateInterface,
                                        ScriptAction, ScriptInvocation)
 from potato_cactus.api.dto.interface import (ChatboxRootWindowElement,
                                              ModelAnimationElement,
@@ -25,7 +26,7 @@ class DialogueScreen(ABC):
         return None
 
 
-class DialogueNodeRef(object):
+class DialogueCallbackRef(object):
     """Describes a callable with the playerIndex as the sole argument.
        Use to chain dialogue nodes or circumvent circular reference between dialogue nodes."""
 
@@ -49,8 +50,8 @@ class DialogueNode(object):
         return self
 
     @property
-    def ref(self) -> DialogueNodeRef:
-        return DialogueNodeRef(self._script_ref)
+    def ref(self) -> DialogueCallbackRef:
+        return DialogueCallbackRef(self._script_ref)
 
     def __call__(self, playerIndex: int, stage: int = 0) -> List[ScriptAction]:
         actions: List[ScriptAction] = []
@@ -202,7 +203,7 @@ class OptionsDialogueScreen(DialogueScreen):
 
     def __init__(self, choices: List[Tuple[str, Union[Callable[[], None],
                                                       ScriptInvocation,
-                                                      DialogueNodeRef]]]):
+                                                      DialogueCallbackRef]]]):
         self._choices = choices
 
     def configure(self, playerIndex: int,
@@ -232,7 +233,9 @@ class OptionsDialogueScreen(DialogueScreen):
         try:
             button_ids = _OPTIONS_BUTTON_IDS[len(self._choices)]
             return {
-                k: self._callback(playerIndex, script_ref)
+                k:
+                    ScriptInvocation(_close_and_invoke_script, (self._callback(
+                        playerIndex, script_ref).f, playerIndex))
                 for k, (_, script_ref) in zip(button_ids, self._choices)
             }
         except KeyError:
@@ -242,13 +245,20 @@ class OptionsDialogueScreen(DialogueScreen):
     def _callback(
         self, playerIndex: int, callbackRef: Union[Callable[[], None],
                                                    ScriptInvocation,
-                                                   DialogueNodeRef]
+                                                   DialogueCallbackRef]
     ) -> ScriptInvocation:
         if isinstance(callbackRef, ScriptInvocation):
             return callbackRef
-        if isinstance(callbackRef, DialogueNodeRef):
+        if isinstance(callbackRef, DialogueCallbackRef):
             return ScriptInvocation(callbackRef.f, (playerIndex, ))
         return ScriptInvocation(callbackRef)
+
+
+def _close_and_invoke_script(script_descriptor: str, playerIndex: int):
+    return [
+        ClearStandardInterface(playerIndex),
+        *invoke_script(ScriptInvocation(script_descriptor, (playerIndex, )))
+    ]
 
 
 _OPTIONS_ROOT_WINDOW_ID = {2: 14443, 3: 2469, 4: 8207, 5: 8219}
@@ -260,7 +270,7 @@ _OPTIONS_BUTTON_IDS = {
 }
 
 
-def start_dialogue(node_ref: DialogueNodeRef,
+def start_dialogue(node_ref: DialogueCallbackRef,
                    playerIndex: int) -> List[ScriptAction]:
     return [
         *invoke_script(ScriptInvocation(node_ref.f, (playerIndex, ))),

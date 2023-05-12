@@ -17,7 +17,7 @@ import qualified PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions as PAnim
 import PotatoCactus.Game.Position (GetPosition (getPosition))
 import qualified PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest as SpawnReq
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, CreateInterface, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, InvokeScript, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerEntityData, SetPlayerPosition, SpawnNpc, UpdateNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, InvokeScript, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerEntityData, SetPlayerPosition, SpawnNpc, UpdateNpc))
 import PotatoCactus.Game.World (World (npcs, objects, players))
 import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAll, updateAtIndex)
@@ -153,6 +153,10 @@ applyScriptResult world (InvokeScript invocation) =
 applyScriptResult world (CreateInterface playerIndex request) =
   world
     { players = updateAtIndex (players world) playerIndex (`P.createInterface` request)
+    }
+applyScriptResult world (ClearStandardInterface playerIndex) =
+  world
+    { players = updateAtIndex (players world) playerIndex P.clearStandardInterface
     }
 applyScriptResult world (SetPlayerEntityData playerIndex key val) =
   world

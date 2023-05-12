@@ -24,6 +24,7 @@ mapPacket playerId clientIdentifier packet =
     21 -> npcActionPacket playerId packet
     40 -> Just $ continueDialoguePacket playerId packet
     41 -> Just $ equipItemPacket clientIdentifier packet
+    70 -> Just $ objectActionPacket playerId packet
     72 -> Just $ npcAttackPacket playerId packet
     73 -> Just $ objectActionPacket playerId packet
     98 -> Just $ playerWalkMessage clientIdentifier packet -- Red X walk
