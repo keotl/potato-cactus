@@ -13,6 +13,7 @@ import PotatoCactus.Game.Position (Position (Position))
 import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest)
 import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation)
 import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest)
+import PotatoCactus.Game.Definitions.ItemDefinitions (ItemId)
 
 data GameEvent
   = ServerInitEvent
@@ -44,6 +45,7 @@ data ScriptActionResult
   | InvokeScript ScriptInvocation Int
   | CreateInterface PlayerIndex CreateInterfaceRequest
   | ClearStandardInterface PlayerIndex
+  | GiveItem PlayerIndex ItemId Int
   | SetPlayerEntityData PlayerIndex String Value
   | InternalNoop
   | ServerPrintMessage String -- for testing

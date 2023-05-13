@@ -11,13 +11,14 @@ import PotatoCactus.Game.Entity.Npc.NpcMovement (immediatelyQueueMovement)
 import qualified PotatoCactus.Game.Entity.Npc.NpcMovement as NM
 import PotatoCactus.Game.Entity.Npc.RespawnStrategy (RespawnStrategy (Never), respawning)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (addDynamicObject)
+import qualified PotatoCactus.Game.ItemContainer as ItemContainer
 import PotatoCactus.Game.Movement.PathPlanner (findPath, findPathNaive)
 import PotatoCactus.Game.Player (Player (interaction), clearTargetIfEngagedWithNpc)
 import qualified PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions as PAnim
 import PotatoCactus.Game.Position (GetPosition (getPosition))
 import qualified PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest as SpawnReq
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, InvokeScript, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnNpc, UpdateNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, GiveItem, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, InvokeScript, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnNpc, UpdateNpc))
 import PotatoCactus.Game.World (World (npcs, objects, players))
 import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAll, updateAtIndex)
@@ -169,4 +170,8 @@ applyScriptResult world (SetPlayerEntityData playerIndex key val) =
 applyScriptResult world (SetPlayerAnimation playerIndex anim) =
   world
     { players = updateAtIndex (players world) playerIndex (P.setAnimation anim)
+    }
+applyScriptResult world (GiveItem playerIndex itemId quantity) =
+  world
+    { players = updateAtIndex (players world) playerIndex (`P.giveItem` ItemContainer.ItemStack itemId quantity)
     }

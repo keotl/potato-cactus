@@ -40,6 +40,7 @@ initializeDb = do
             addMockItem_ 1067 "Iron platelegs" False,
             addMockItem_ 1137 "Iron med helm" False,
             addMockItem_ 1155 "Bronze full helm" False,
+            addMockItem_ 1947 "Grain" False,
             addMockItem_ 617 "Coins" True
           ]
   writeIORef itemDb updated

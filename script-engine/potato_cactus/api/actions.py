@@ -161,7 +161,21 @@ def SetPlayerEntityData(playerIndex: int, key: str,
     })
 
 
+def GiveItem(playerIndex: int, itemId: int, quantity: int = 1) -> ScriptAction:
+    return ScriptAction("giveItem", {
+        "playerIndex": playerIndex,
+        "itemId": itemId,
+        "quantity": quantity
+    })
+
+
 def _map_position(position: Union[Position, Tuple[int, int, int]]) -> dict:
-    if hasattr(position, "x"):
-        return {"x": position.x, "y": position.y, "z": position.z}
+    if hasattr(position, "x") or isinstance(position, Position):
+        return {
+            "x": position.x,  # type: ignore
+            "y": position.y,  # type: ignore
+            "z":
+                position.z  # type: ignore
+        }
+
     return {"x": position[0], "y": position[1], "z": position[2]}

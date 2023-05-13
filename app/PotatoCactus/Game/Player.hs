@@ -13,6 +13,7 @@ import PotatoCactus.Game.Entity.Npc.Npc (NpcIndex)
 import PotatoCactus.Game.Interface.InterfaceController (InterfaceController, clearStandardInterfaces, configureInterface)
 import qualified PotatoCactus.Game.Interface.InterfaceController as IC
 import PotatoCactus.Game.ItemContainer (ItemContainer, playerEquipmentContainer, playerInventory)
+import qualified PotatoCactus.Game.ItemContainer as Container
 import PotatoCactus.Game.Movement.MovementEntity (immediatelySetPosition, playerWalkMovement)
 import qualified PotatoCactus.Game.Movement.MovementEntity as M (MovementEntity, issueWalkCommand)
 import PotatoCactus.Game.Movement.PositionXY (PositionXY)
@@ -149,4 +150,10 @@ updateEntityData :: Player -> (EntityData.EntityData -> EntityData.EntityData) -
 updateEntityData p transform =
   p
     { entityData = transform (entityData p)
+    }
+
+giveItem :: Player -> Container.ItemStack -> Player
+giveItem p stack =
+  p
+    { inventory = Container.addItem (inventory p) stack
     }
