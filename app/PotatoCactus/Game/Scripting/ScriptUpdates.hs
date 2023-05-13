@@ -38,9 +38,10 @@ data ScriptActionResult
   | SpawnNpc SpawnNpcRequest
   | SendMessage PlayerIndex String
   | SetPlayerPosition PlayerIndex Position
+  | SetPlayerAnimation PlayerIndex Animation
   | InternalRemoveNpcTargetReferences NpcIndex
   | InternalProcessingComplete -- Sentinel token to indicate script execution complete
-  | InvokeScript ScriptInvocation
+  | InvokeScript ScriptInvocation Int
   | CreateInterface PlayerIndex CreateInterfaceRequest
   | ClearStandardInterface PlayerIndex
   | SetPlayerEntityData PlayerIndex String Value

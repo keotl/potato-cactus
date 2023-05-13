@@ -1,5 +1,8 @@
 from potato_cactus import EventHandler, GameEvent, get_context
-from potato_cactus.api.actions import ClearPlayerInteraction, SetPlayerPosition
+from potato_cactus.api.actions import (ClearPlayerInteraction, InvokeScript,
+                                       SendMessage, SetPlayerAnimation,
+                                       SetPlayerPosition)
+from potato_cactus.api.dto.script_invocation import ScriptInvocation
 from potato_cactus.api.events import ObjectInteractionEventPayload
 from potato_cactus.helper.dialogue import (DialogueCallbackRef, DialogueNode,
                                            OptionsDialogueScreen,
@@ -36,7 +39,10 @@ def go_up(playerIndex: int):
         return []
     pos = player.movement.position
     return [
-        SetPlayerPosition(playerIndex, (pos.x, pos.y, pos.z + 1)),
+        InvokeScript(ScriptInvocation(set_position_delayed,
+                                      (playerIndex, pos.x, pos.y, pos.z + 1)),
+                     delay=1),
+        SetPlayerAnimation(playerIndex, 828),
         ClearPlayerInteraction(playerIndex)
     ]
 
@@ -47,9 +53,17 @@ def go_down(playerIndex: int):
         return []
     pos = player.movement.position
     return [
-        SetPlayerPosition(playerIndex, (pos.x, pos.y, pos.z - 1)),
+        InvokeScript(ScriptInvocation(set_position_delayed,
+                                      (playerIndex, pos.x, pos.y, pos.z - 1)),
+                     delay=1),
+        SetPlayerAnimation(playerIndex, 828),
         ClearPlayerInteraction(playerIndex)
     ]
+
+
+def set_position_delayed(playerIndex: int, x: int, y: int, z: int):
+    return [SetPlayerPosition(playerIndex, (x, y, z))]
+
 ladder_dialogue = DialogueNode(__name__, "ladder_dialogue") \
     .add(OptionsDialogueScreen([("Climb up", DialogueCallbackRef(go_up)),
                                 ("Climb down", DialogueCallbackRef(go_down))]))

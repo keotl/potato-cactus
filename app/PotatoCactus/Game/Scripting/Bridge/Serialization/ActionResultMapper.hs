@@ -20,7 +20,7 @@ import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceReque
 import qualified PotatoCactus.Game.Scripting.Actions.CreateInterface as I
 import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation (ScriptInvocation))
 import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest (SpawnNpcRequest))
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, InternalNoop, InternalProcessingComplete, InvokeScript, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerEntityData, SetPlayerPosition, SpawnNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, InternalNoop, InternalProcessingComplete, InvokeScript, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnNpc))
 
 mapResult :: ByteString -> ScriptActionResult
 mapResult bytes =
@@ -159,8 +159,37 @@ decodeBody "setPlayerPosition" body =
     body of
     Error msg -> InternalNoop
     Success decoded -> decoded
+decodeBody "setPlayerAnimation" body =
+  case parse
+    ( \obj -> do
+        playerIndex <- obj .: "playerIndex"
+        animationId <- obj .: "animationId"
+        delay <- obj .: "delay"
+        priority <- obj .: "priority"
+        return
+          ( SetPlayerAnimation
+              playerIndex
+              ( Animation
+                  animationId
+                  delay
+                  (decodeAnimationPriority_ priority)
+              )
+          )
+    )
+    body of
+    Error msg -> InternalNoop
+    Success decoded -> decoded
 decodeBody "invokeScript" body =
-  maybe InternalNoop InvokeScript (decodeScriptInvocation_ $ Just body)
+  case parse
+    ( \obj -> do
+        f <- obj .: "f"
+        args <- obj .: "args"
+        delay <- obj .: "delay"
+        return $ InvokeScript (ScriptInvocation f args) delay
+    )
+    body of
+    Error msg -> trace msg InternalNoop
+    Success decoded -> decoded
 decodeBody "createInterface" body =
   case parse
     ( \obj -> do

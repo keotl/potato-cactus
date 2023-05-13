@@ -175,6 +175,7 @@ executable potato-cactus
                    PotatoCactus.Game.Skills
                    PotatoCactus.Game.Typing
                    PotatoCactus.Game.World
+                   PotatoCactus.Game.World.CallbackScheduler
                    PotatoCactus.Game.World.EntityPositionFinder
                    PotatoCactus.Game.World.MobList
                    PotatoCactus.Game.World.Selectors

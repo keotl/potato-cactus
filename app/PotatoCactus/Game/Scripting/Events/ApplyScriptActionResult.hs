@@ -17,7 +17,7 @@ import qualified PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions as PAnim
 import PotatoCactus.Game.Position (GetPosition (getPosition))
 import qualified PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest as SpawnReq
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, InvokeScript, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerEntityData, SetPlayerPosition, SpawnNpc, UpdateNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, InvokeScript, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnNpc, UpdateNpc))
 import PotatoCactus.Game.World (World (npcs, objects, players))
 import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAll, updateAtIndex)
@@ -148,8 +148,8 @@ applyScriptResult world (SetPlayerPosition playerIndex pos) =
   world
     { players = updateAtIndex (players world) playerIndex (`P.setPosition` pos)
     }
-applyScriptResult world (InvokeScript invocation) =
-  W.queueEvent world (ScriptInvokedEvent invocation)
+applyScriptResult world (InvokeScript invocation delay) =
+  W.scheduleCallback world invocation (W.tick world + max delay 1)
 applyScriptResult world (CreateInterface playerIndex request) =
   world
     { players = updateAtIndex (players world) playerIndex (`P.createInterface` request)
@@ -165,4 +165,8 @@ applyScriptResult world (SetPlayerEntityData playerIndex key val) =
           (players world)
           playerIndex
           (`P.updateEntityData` (\d -> EntityData.setValue d key val))
+    }
+applyScriptResult world (SetPlayerAnimation playerIndex anim) =
+  world
+    { players = updateAtIndex (players world) playerIndex (P.setAnimation anim)
     }

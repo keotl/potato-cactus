@@ -43,7 +43,18 @@ def NpcSetAnimation(
             "delay": delay,
             "priority": priority
         })
-
+def SetPlayerAnimation(
+        playerIndex: int,
+        animationId: int,
+        delay: int = 0,
+        priority: Literal["high", "normal", "low"] = "normal") -> ScriptAction:
+    return ScriptAction(
+        "setPlayerAnimation", {
+            "playerIndex": playerIndex,
+            "animationId": animationId,
+            "delay": delay,
+            "priority": priority
+        })
 
 def NpcSetForcedChat(npcIndex: int, message: str) -> ScriptAction:
     return ScriptAction("npcSetForcedChat", {
@@ -79,8 +90,12 @@ def SetPlayerPosition(
     })
 
 
-def InvokeScript(callback: ScriptInvocation) -> ScriptAction:
-    return ScriptAction("invokeScript", callback.__dict__)
+def InvokeScript(callback: ScriptInvocation, delay: int = 1) -> ScriptAction:
+    return ScriptAction("invokeScript", {
+        "f": callback.f,
+        "args": callback.args,
+        "delay": delay
+    })
 
 
 def CreateInterface(
