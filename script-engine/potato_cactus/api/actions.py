@@ -43,6 +43,8 @@ def NpcSetAnimation(
             "delay": delay,
             "priority": priority
         })
+
+
 def SetPlayerAnimation(
         playerIndex: int,
         animationId: int,
@@ -55,6 +57,7 @@ def SetPlayerAnimation(
             "delay": delay,
             "priority": priority
         })
+
 
 def NpcSetForcedChat(npcIndex: int, message: str) -> ScriptAction:
     return ScriptAction("npcSetForcedChat", {
@@ -71,6 +74,31 @@ def SpawnNpc(npcId: int,
             "npcId": npcId,
             "position": _map_position(position),
             "respawnDelay": respawnDelay or -1
+        })
+
+
+def SpawnGameObject(objectId: int, position: Union[Position, Tuple[int, int,
+                                                                   int]],
+                    objectType: int, facingDirection: int) -> ScriptAction:
+    return ScriptAction(
+        "spawnObject", {
+            "objectId": objectId,
+            "position": _map_position(position),
+            "objectType": objectType,
+            "facingDirection": facingDirection
+        })
+
+
+def RemoveGameObject(objectId: int,
+                     position: Union[Position, Tuple[int, int, int]],
+                     objectType: int,
+                     facingDirection: int = 0) -> ScriptAction:
+    return ScriptAction(
+        "removeObject", {
+            "objectId": objectId,
+            "position": _map_position(position),
+            "objectType": objectType,
+            "facingDirection": facingDirection
         })
 
 
@@ -134,6 +162,6 @@ def SetPlayerEntityData(playerIndex: int, key: str,
 
 
 def _map_position(position: Union[Position, Tuple[int, int, int]]) -> dict:
-    if isinstance(position, Position):
+    if hasattr(position, "x"):
         return {"x": position.x, "y": position.y, "z": position.z}
     return {"x": position[0], "y": position[1], "z": position[2]}

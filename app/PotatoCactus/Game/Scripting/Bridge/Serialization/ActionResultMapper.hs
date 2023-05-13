@@ -14,6 +14,7 @@ import Debug.Trace (trace)
 import GHC.Generics (Generic)
 import PotatoCactus.Game.Entity.Animation.Animation (Animation (Animation), AnimationPriority (High, Low, Normal))
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject (Added, Removed))
+import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject))
 import qualified PotatoCactus.Game.Entity.Object.GameObject as O
 import PotatoCactus.Game.Position (Position (Position))
 import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest (CreateInterfaceRequest))
@@ -231,6 +232,38 @@ decodeBody "setPlayerEntityData" body =
         val <- obj .: "val"
         return
           (SetPlayerEntityData playerIndex key val)
+    )
+    body of
+    Error msg -> trace msg InternalNoop
+    Success decoded -> decoded
+decodeBody "spawnObject" body =
+  case parse
+    ( \obj -> do
+        objectId <- obj .: "objectId"
+        positionObj <- obj .: "position"
+        objectType <- obj .: "objectType"
+        facingDirection <- obj .: "facingDirection"
+        return
+          ( AddGameObject $
+              Added $
+                GameObject objectId (decodePos_ positionObj) objectType facingDirection
+          )
+    )
+    body of
+    Error msg -> trace msg InternalNoop
+    Success decoded -> decoded
+decodeBody "removeObject" body =
+  case parse
+    ( \obj -> do
+        objectId <- obj .: "objectId"
+        positionObj <- obj .: "position"
+        objectType <- obj .: "objectType"
+        facingDirection <- obj .: "facingDirection"
+        return
+          ( AddGameObject $
+              Removed $
+                GameObject objectId (decodePos_ positionObj) objectType facingDirection
+          )
     )
     body of
     Error msg -> trace msg InternalNoop
