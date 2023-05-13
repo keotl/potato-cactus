@@ -18,7 +18,7 @@ import qualified PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions as PAnim
 import PotatoCactus.Game.Position (GetPosition (getPosition))
 import qualified PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest as SpawnReq
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, GiveItem, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, InvokeScript, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnNpc, UpdateNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, GiveItem, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, InvokeScript, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnNpc, SubtractItem))
 import PotatoCactus.Game.World (World (npcs, objects, players))
 import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAll, updateAtIndex)
@@ -29,14 +29,6 @@ applyScriptResult :: World -> ScriptActionResult -> World
 applyScriptResult world (AddGameObject obj) =
   world
     { objects = addDynamicObject obj (objects world)
-    }
--- applyScriptResult world (UpdatePlayer playerId p) =
---   world
---     { players = updateAtIndex (players world) playerId (const p)
---     }
-applyScriptResult world (UpdateNpc npcId npc) =
-  world
-    { npcs = updateAtIndex (npcs world) npcId (const npc)
     }
 applyScriptResult world (ClearPlayerInteraction playerId) =
   world
@@ -174,4 +166,8 @@ applyScriptResult world (SetPlayerAnimation playerIndex anim) =
 applyScriptResult world (GiveItem playerIndex itemId quantity) =
   world
     { players = updateAtIndex (players world) playerIndex (`P.giveItem` ItemContainer.ItemStack itemId quantity)
+    }
+applyScriptResult world (SubtractItem playerIndex itemId quantity) =
+  world
+    { players = updateAtIndex (players world) playerIndex (`P.subtractItem` (itemId, quantity))
     }

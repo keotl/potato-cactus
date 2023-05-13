@@ -2,8 +2,11 @@ from enum import Enum
 from typing import List, Optional
 
 from potato_cactus.api.dto.combat import CombatTarget
-from potato_cactus.api.dto.interaction import NpcAttackInteractionTarget, NpcInteractionTarget, ObjectInteractionTarget, \
-    PlayerInteraction
+from potato_cactus.api.dto.interaction import (ItemOnObjectInteractionTarget,
+                                               NpcAttackInteractionTarget,
+                                               NpcInteractionTarget,
+                                               ObjectInteractionTarget,
+                                               PlayerInteraction)
 
 
 class GameEvent(str, Enum):
@@ -11,6 +14,7 @@ class GameEvent(str, Enum):
     NpcEntityTickEvent = "NpcEntityTickEvent"
     NpcInteractionEvent = "NpcInteractionEvent"
     ObjectInteractionEvent = "ObjectInteractionEvent"
+    ItemOnObjectInteractionEvent = "ItemOnObjectInteractionEvent"
     NpcAttackInteractionEvent = "NpcAttackInteractionEvent"  # TODO - Can this be consolidated with NpcAttackEvent?  - keotl 2023-04-27
     PlayerAttackEvent = "PlayerAttackEvent"
     PlayerCommandEvent = "PlayerCommandEvent"
@@ -21,6 +25,11 @@ class GameEvent(str, Enum):
 class ObjectInteractionEventPayload(object):
     playerIndex: int
     interaction: PlayerInteraction[ObjectInteractionTarget]
+
+
+class ItemOnObjectInteractionEventPayload(object):
+    playerIndex: int
+    interaction: PlayerInteraction[ItemOnObjectInteractionTarget]
 
 
 class NpcInteractionEventPayload(object):

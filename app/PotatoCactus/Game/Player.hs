@@ -5,6 +5,7 @@ import Data.Foldable (fold)
 import PotatoCactus.Game.Combat.CombatEntity (CombatEntity, CombatTarget (NpcTarget), clearTargetIfEngagedWith)
 import qualified PotatoCactus.Game.Combat.CombatEntity as CombatEntity
 import PotatoCactus.Game.Combat.Hit (Hit)
+import PotatoCactus.Game.Definitions.ItemDefinitions (ItemId)
 import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
 import qualified PotatoCactus.Game.Entity.EntityData as EntityData
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction)
@@ -156,4 +157,10 @@ giveItem :: Player -> Container.ItemStack -> Player
 giveItem p stack =
   p
     { inventory = Container.addItem (inventory p) stack
+    }
+
+subtractItem :: Player -> (ItemId, Int) -> Player
+subtractItem p stack =
+  p
+    { inventory = Container.subtractItem (inventory p) stack
     }

@@ -6,6 +6,7 @@ import PotatoCactus.Game.Entity.Npc.Npc (NpcIndex)
 import PotatoCactus.Game.Message.EquipItemMessagePayload (EquipItemMessagePayload)
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload)
 import PotatoCactus.Game.PlayerUpdate.ChatMessage (ChatMessage)
+import PotatoCactus.Game.Message.ItemOnObjectPayload (ItemOnObjectPayload)
 
 data PlayerUpdate
   = EquipItem EquipItemMessagePayload
@@ -14,6 +15,7 @@ data PlayerUpdate
   | SayChatMessage ChatMessage
   | SayForcedChatMessage String
   | InteractWithObject ObjectClickPayload
+  | InteractWithObjectWithItem ItemOnObjectPayload
   | InteractWithNpc NpcIndex NpcInteractionType
   | ContinueDialogue
   deriving (Show)

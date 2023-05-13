@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Literal, Optional
+from typing import Generic, Literal, Optional, TypeVar
 
 from potato_cactus.api.dto.position import Position
 
@@ -15,6 +15,15 @@ class ObjectInteractionTarget(object):
     objectId: int
     position: Position
     actionIndex: int
+
+
+class ItemOnObjectInteractionTarget(object):
+    type: Literal["itemOnObject"]
+    objectId: int
+    position: Position
+    itemId: int
+    itemIndex: int
+    interfaceId: int
 
 
 class NpcAttackInteractionTarget(object):

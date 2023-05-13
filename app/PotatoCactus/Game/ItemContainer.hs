@@ -1,6 +1,7 @@
 module PotatoCactus.Game.ItemContainer where
 
 import Data.List (findIndex)
+import Data.Maybe (isJust, isNothing)
 import PotatoCactus.Game.Definitions.ItemDefinitions (ItemDefinition (stackable), ItemId, itemDefinition)
 import PotatoCactus.Game.Typing (Advance (advance))
 import PotatoCactus.Utils.Iterable (replaceAtIndex)
@@ -73,7 +74,11 @@ canAddItems container = all (canAddItem container)
 combine_ :: ItemStack -> ItemStack -> ItemStack
 combine_ Empty b = b
 combine_ a Empty = a
-combine_ a b = a {quantity = quantity a + quantity b}
+combine_ a b =
+  let q = quantity a + quantity b
+   in if q > 0
+        then a {quantity = q}
+        else Empty
 
 addItem :: ItemContainer -> ItemStack -> ItemContainer
 addItem container item =
@@ -109,3 +114,28 @@ replaceStack index container item =
 atIndex :: Int -> ItemContainer -> ItemStack
 atIndex index container =
   content container !! index
+
+subtractItem :: ItemContainer -> (ItemId, Int) -> ItemContainer
+subtractItem container (itemId, quantity) =
+  let stack = ItemStack itemId (- quantity)
+   in case findIndex
+        (isItem itemId)
+        (content container) of
+        Just i ->
+          container
+            { content =
+                replaceAtIndex
+                  i
+                  (combine_ (content container !! i) stack)
+                  (content container),
+              willUpdate_ = True
+            }
+        Nothing -> container
+
+isEmptyStack :: ItemStack -> Bool
+isEmptyStack Empty = True
+isEmptyStack _ = False
+
+isItem :: ItemId -> ItemStack -> Bool
+isItem _ Empty = False
+isItem desiredItemId stack = itemId stack == desiredItemId

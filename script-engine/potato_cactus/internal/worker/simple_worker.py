@@ -73,6 +73,8 @@ def _event_key(payload) -> Tuple[Optional[Union[str, int]], ...]:
         return GameEvent.ServerInitEvent,
     if payload.event == GameEvent.ObjectInteractionEvent:
         return GameEvent.ObjectInteractionEvent, payload.body.interaction.target.objectId
+    if payload.event == GameEvent.ItemOnObjectInteractionEvent:
+        return GameEvent.ItemOnObjectInteractionEvent, payload.body.interaction.target.objectId
     if payload.event == GameEvent.NpcInteractionEvent:
         return GameEvent.NpcInteractionEvent, payload.body.interaction.target.npcId
     if payload.event == GameEvent.NpcAttackInteractionEvent:

@@ -2,10 +2,11 @@ module PotatoCactus.Game.Entity.Interaction.Target where
 
 import PotatoCactus.Game.Entity.Npc.Npc (Npc, NpcIndex)
 import PotatoCactus.Game.Entity.Object.GameObjectKey (GameObjectKey)
+import PotatoCactus.Game.Message.ItemOnObjectPayload (ItemOnObjectPayload)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position, isNextTo, isWithin)
 
 data InteractionTarget
-  = ObjectTarget GameObjectKey Int
+  = ObjectTarget GameObjectKey (Either Int ItemOnObjectPayload)
   | NpcTarget NpcIndex NpcInteractionType
   | None
   deriving (Show)

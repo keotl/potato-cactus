@@ -15,17 +15,6 @@ from potato_cactus.api.exception import ScriptException
 from potato_cactus.internal.util.script_invoker import invoke_script
 
 
-class DialogueScreen(ABC):
-
-    @abstractmethod
-    def configure(self, playerIndex: int,
-                  onNext: Optional[ScriptInvocation]) -> List[ScriptAction]:
-        raise NotImplementedError
-
-    def onContinue(self) -> Optional[ScriptInvocation]:
-        return None
-
-
 class DialogueCallbackRef(object):
     """Describes a callable with the playerIndex as the sole argument.
        Use to chain dialogue nodes or circumvent circular reference between dialogue nodes."""
@@ -34,6 +23,18 @@ class DialogueCallbackRef(object):
         self, f: Union[Callable[[int], List[ScriptAction]],
                        Tuple[str, str]]) -> None:
         self.f = f
+
+
+class DialogueScreen(ABC):
+
+    @abstractmethod
+    def configure(self, playerIndex: int,
+                  onNext: Optional[ScriptInvocation]) -> List[ScriptAction]:
+        raise NotImplementedError
+
+    def onContinue(
+            self) -> Optional[Union[ScriptInvocation, DialogueCallbackRef]]:
+        return None
 
 
 class DialogueNode(object):
@@ -59,7 +60,12 @@ class DialogueNode(object):
             prev_screen = self._screens[stage - 1]
             callback = prev_screen.onContinue()
             if callback:
-                actions.extend(invoke_script(callback))
+                if isinstance(callback, ScriptInvocation):
+                    actions.extend(invoke_script(callback))
+                elif isinstance(callback, DialogueCallbackRef):
+                    actions.extend(
+                        invoke_script(
+                            ScriptInvocation(callback.f, (playerIndex, ))))
         if -1 < stage < len(self._screens):
             actions.extend(self._screens[stage].configure(
                 playerIndex,
@@ -78,7 +84,8 @@ class NpcDialogueScreen(DialogueScreen):
                  npcName: str,
                  text: List[str],
                  expression: Expression = "default",
-                 onContinue: Optional[ScriptInvocation] = None):
+                 onContinue: Optional[Union[ScriptInvocation,
+                                            DialogueCallbackRef]] = None):
         self._npcId = npcId
         self._npcName = npcName
         self._text = text
@@ -104,7 +111,8 @@ class NpcDialogueScreen(DialogueScreen):
                 onClose=onNext),
         ]
 
-    def onContinue(self) -> Optional[ScriptInvocation]:
+    def onContinue(
+            self) -> Optional[Union[ScriptInvocation, DialogueCallbackRef]]:
         return self._onContinue
 
     @property
@@ -125,7 +133,8 @@ class PlayerDialogueScreen(DialogueScreen):
     def __init__(self,
                  text: List[str],
                  expression: Expression = "default",
-                 onContinue: Optional[ScriptInvocation] = None,
+                 onContinue: Optional[Union[ScriptInvocation,
+                                            DialogueCallbackRef]] = None,
                  playerNameOverride: Optional[str] = None):
         self._text = text
         self._expression: Expression = expression
@@ -152,7 +161,8 @@ class PlayerDialogueScreen(DialogueScreen):
                 onClose=onNext)
         ]
 
-    def onContinue(self) -> Optional[ScriptInvocation]:
+    def onContinue(
+            self) -> Optional[Union[ScriptInvocation, DialogueCallbackRef]]:
         return self._onContinue
 
     def _player_name(self, playerIndex: int) -> str:

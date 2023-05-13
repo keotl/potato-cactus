@@ -169,6 +169,16 @@ def GiveItem(playerIndex: int, itemId: int, quantity: int = 1) -> ScriptAction:
     })
 
 
+def SubtractItem(playerIndex: int,
+                 itemId: int,
+                 quantity: int = 1) -> ScriptAction:
+    return ScriptAction("subtractItem", {
+        "playerIndex": playerIndex,
+        "itemId": itemId,
+        "quantity": quantity
+    })
+
+
 def _map_position(position: Union[Position, Tuple[int, int, int]]) -> dict:
     if hasattr(position, "x") or isinstance(position, Position):
         return {

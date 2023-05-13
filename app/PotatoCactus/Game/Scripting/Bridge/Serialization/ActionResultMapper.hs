@@ -21,7 +21,7 @@ import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceReque
 import qualified PotatoCactus.Game.Scripting.Actions.CreateInterface as I
 import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation (ScriptInvocation))
 import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest (SpawnNpcRequest))
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, GiveItem, InternalNoop, InternalProcessingComplete, InvokeScript, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, GiveItem, InternalNoop, InternalProcessingComplete, InvokeScript, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnNpc, SubtractItem))
 
 mapResult :: ByteString -> ScriptActionResult
 mapResult bytes =
@@ -276,6 +276,18 @@ decodeBody "giveItem" body =
         quantity <- obj .: "quantity"
 
         return (GiveItem playerIndex itemId quantity)
+    )
+    body of
+    Error msg -> trace msg InternalNoop
+    Success decoded -> decoded
+decodeBody "subtractItem" body =
+  case parse
+    ( \obj -> do
+        playerIndex <- obj .: "playerIndex"
+        itemId <- obj .: "itemId"
+        quantity <- obj .: "quantity"
+
+        return (SubtractItem playerIndex itemId quantity)
     )
     body of
     Error msg -> trace msg InternalNoop

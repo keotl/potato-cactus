@@ -3,6 +3,7 @@ module PotatoCactus.Game.Scripting.ScriptUpdates where
 import Data.Aeson (Value)
 import PotatoCactus.Game.Combat.CombatEntity (CombatTarget)
 import PotatoCactus.Game.Combat.Hit (Hit)
+import PotatoCactus.Game.Definitions.ItemDefinitions (ItemId)
 import PotatoCactus.Game.Entity.Animation.Animation (Animation)
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc, NpcIndex)
@@ -10,14 +11,13 @@ import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Player (Player, PlayerIndex)
 import PotatoCactus.Game.Position (Position (Position))
-import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest)
-import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation)
 import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest)
-import PotatoCactus.Game.Definitions.ItemDefinitions (ItemId)
+import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation)
+import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest)
 
 data GameEvent
   = ServerInitEvent
-  | PlayerInteractionEvent Player Interaction -- maps to NpcInteractionEvent, ObjectInteractionEvent and NpcAttackInteractionEvent
+  | PlayerInteractionEvent Player Interaction -- maps to NpcInteractionEvent, ObjectInteractionEvent, ItemOnObjectInteractionEvent and NpcAttackInteractionEvent
   | PlayerAttackEvent Player CombatTarget
   | NpcAttackEvent Npc CombatTarget
   | NpcCannotReachTargetEvent Npc CombatTarget
@@ -46,8 +46,8 @@ data ScriptActionResult
   | CreateInterface PlayerIndex CreateInterfaceRequest
   | ClearStandardInterface PlayerIndex
   | GiveItem PlayerIndex ItemId Int
+  | SubtractItem PlayerIndex ItemId Int -- Remove quantity of item, from anywhere in the inventory
   | SetPlayerEntityData PlayerIndex String Value
   | InternalNoop
   | ServerPrintMessage String -- for testing
-  | UpdateNpc NpcIndex Npc -- deprecated
   deriving (Show)
