@@ -4,6 +4,7 @@ import Data.IntMap (IntMap, delete, empty, toList)
 import Data.IntMap.Lazy (insert)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (objectType, position), GameObjectType)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position, x, y, z), chunkX, chunkY)
+import qualified PotatoCactus.Game.Position as Pos
 import Prelude hiding (id)
 
 data DynamicObject = Added GameObject | Removed GameObject deriving (Eq, Show)
@@ -42,14 +43,15 @@ rawKey_ (position, objectType) =
     + objectType * 10 ^ 11
 
 -- TODO - use a more suitable data structure  - keotl 2023-03-12
-findByChunkXY :: Int -> Int -> DynamicObjectCollection -> [DynamicObject]
-findByChunkXY x y collection =
+findByChunkXY :: Int -> Int -> Int -> DynamicObjectCollection -> [DynamicObject]
+findByChunkXY x y z collection =
   filter
     ( \object ->
         ( chunkX . getPosition $ object,
-          chunkY . getPosition $ object
+          chunkY . getPosition $ object,
+          Pos.z . getPosition $ object
         )
-          == (x, y)
+          == (x, y, z)
     )
     (map snd $ toList . elements_ $ collection)
 
