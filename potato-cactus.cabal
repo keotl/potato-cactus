@@ -97,6 +97,8 @@ executable potato-cactus
                    PotatoCactus.Game.Combat.Hit
                    PotatoCactus.Game.Entity.Animation.Animation
                    PotatoCactus.Game.Entity.EntityData
+                   PotatoCactus.Game.Entity.GroundItem.GroundItem
+                   PotatoCactus.Game.Entity.GroundItem.GroundItemCollection
                    PotatoCactus.Game.Entity.Interaction.Interaction
                    PotatoCactus.Game.Entity.Interaction.State
                    PotatoCactus.Game.Entity.Interaction.Target
