@@ -132,6 +132,13 @@ subtractItem container (itemId, quantity) =
             }
         Nothing -> container
 
+removeStack :: ItemContainer -> (ItemId, Int) -> ItemContainer
+removeStack container (itemId, index) =
+  if index > capacity container + 1
+    || not (isItem itemId (atIndex index container))
+    then container
+    else fst (replaceStack index container Empty)
+
 isEmptyStack :: ItemStack -> Bool
 isEmptyStack Empty = True
 isEmptyStack _ = False

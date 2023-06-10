@@ -164,3 +164,8 @@ subtractItem p stack =
   p
     { inventory = Container.subtractItem (inventory p) stack
     }
+removeItemStack :: Player -> (ItemId, Int) -> Player
+removeItemStack p stack =
+  p
+    { inventory = Container.removeStack (inventory p) stack
+    }

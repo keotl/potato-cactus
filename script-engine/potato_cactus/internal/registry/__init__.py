@@ -56,6 +56,8 @@ class Registry(object):
             return event, options.get("npcId")
         elif event == GameEvent.PlayerCommandEvent:
             return event, options.get("command")
+        elif event == GameEvent.DropItemEvent:
+            return event, options.get("itemId")
         return "unassigned",
 
 

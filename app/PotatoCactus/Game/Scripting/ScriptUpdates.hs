@@ -5,13 +5,14 @@ import PotatoCactus.Game.Combat.CombatEntity (CombatTarget)
 import PotatoCactus.Game.Combat.Hit (Hit)
 import PotatoCactus.Game.Definitions.ItemDefinitions (ItemId)
 import PotatoCactus.Game.Entity.Animation.Animation (Animation)
+import PotatoCactus.Game.Entity.GroundItem.GroundItem (GroundItem (GroundItem))
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc, NpcIndex)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Player (Player, PlayerIndex)
 import PotatoCactus.Game.Position (Position (Position))
-import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest)
+import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest, WidgetId)
 import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation)
 import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest)
 
@@ -25,6 +26,7 @@ data GameEvent
   | NpcEntityTickEvent Npc
   | PlayerCommandEvent PlayerIndex String [String]
   | ScriptInvokedEvent ScriptInvocation
+  | DropItemEvent PlayerIndex WidgetId ItemId Int
   deriving (Show)
 
 data ScriptActionResult
@@ -47,6 +49,8 @@ data ScriptActionResult
   | ClearStandardInterface PlayerIndex
   | GiveItem PlayerIndex ItemId Int
   | SubtractItem PlayerIndex ItemId Int -- Remove quantity of item, from anywhere in the inventory
+  | RemoveItemStack PlayerIndex ItemId Int -- Remove stack of item at index
+  | SpawnGroundItem GroundItem
   | SetPlayerEntityData PlayerIndex String Value
   | InternalNoop
   | ServerPrintMessage String -- for testing

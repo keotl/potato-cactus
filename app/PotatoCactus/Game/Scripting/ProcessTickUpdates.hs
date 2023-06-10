@@ -1,9 +1,9 @@
 module PotatoCactus.Game.Scripting.ProcessTickUpdates (dispatchScriptEvents, readBridgeEventsUntilDone) where
 
 import PotatoCactus.Game.Scripting.Bridge.Communication (readScriptResult, sendEventsAsync)
+import PotatoCactus.Game.Scripting.BuiltinGameEventProcessor (dispatchScriptEvent)
 import PotatoCactus.Game.Scripting.Events.ApplyScriptActionResult (applyScriptResult)
 import PotatoCactus.Game.Scripting.Events.CreateGameEvents (createGameEvents)
-import PotatoCactus.Game.Scripting.MockScriptInteractions (dispatchScriptEvent)
 import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent, ScriptActionResult (InternalProcessingComplete))
 import PotatoCactus.Game.World (World)
 import PotatoCactus.Interop.ScriptEngineProcess (ScriptEngineHandle, getInstance)

@@ -19,5 +19,5 @@ addGroundItemPacket refPos item =
          in do
               putWord16le . fromIntegral $ (itemId item `xor` 128)
               putWord16be . fromIntegral . quantity $ item
-              putWord8 . fromIntegral $ offset - 128 -- TODO - hardcoded to 0 in Luna. Test whether it is the same format as game object  - keotl 2023-06-10
+              putWord8 . fromIntegral $ offset
     )

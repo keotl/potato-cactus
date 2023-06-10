@@ -4,6 +4,7 @@ import Debug.Trace (trace)
 import PotatoCactus.Game.Combat.CombatEntity (CombatEntity (target), CombatTarget (NpcTarget, PlayerTarget), clearTarget)
 import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
 import qualified PotatoCactus.Game.Entity.EntityData as EntityData
+import qualified PotatoCactus.Game.Entity.GroundItem.GroundItemCollection as GroundItemCollection
 import PotatoCactus.Game.Entity.Interaction.Interaction (create)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc (respawn))
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
@@ -18,8 +19,8 @@ import qualified PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions as PAnim
 import PotatoCactus.Game.Position (GetPosition (getPosition))
 import qualified PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest as SpawnReq
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, GiveItem, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, InvokeScript, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnNpc, SubtractItem))
-import PotatoCactus.Game.World (World (npcs, objects, players))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, GiveItem, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, InvokeScript, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, RemoveItemStack, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnGroundItem, SpawnNpc, SubtractItem))
+import PotatoCactus.Game.World (World (npcs, objects, players), groundItems)
 import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAll, updateAtIndex)
 import PotatoCactus.Game.World.Selectors (isNpcAt)
@@ -170,4 +171,12 @@ applyScriptResult world (GiveItem playerIndex itemId quantity) =
 applyScriptResult world (SubtractItem playerIndex itemId quantity) =
   world
     { players = updateAtIndex (players world) playerIndex (`P.subtractItem` (itemId, quantity))
+    }
+applyScriptResult world (RemoveItemStack playerIndex itemId index) =
+  world
+    { players = updateAtIndex (players world) playerIndex (`P.removeItemStack` (itemId, index))
+    }
+applyScriptResult world (SpawnGroundItem item) =
+  world
+    { groundItems = GroundItemCollection.insert (groundItems world) item
     }

@@ -8,23 +8,29 @@ Python scripts is considered *read-only*.
 Event names and payload types can be imported from
 `potato_cactus.api.events`.
 
-| Event                        | Key        | Description                                                         |
-|------------------------------|------------|---------------------------------------------------------------------|
-| ServerInitEvent              | N/A        | Sent on server initialization. Use to spawn entities, objects, etc. |
-| NpcEntityTickEvent           | `npcId`    | Sent every tick for NPCs. Use for AI, movement, etc.                |
-| ObjectInteractionEvent       | `objectId` | Sent on the tick when the player triggers the interaction.          |
-| ItemOnObjectInteractionEvent | `objectId` | When a player uses an item on a game object.                        |
-| NpcInteractionEvent          | `npcId`    | Sent on the tick when the player triggers the interaction.          |
-| NpcAttackInteractionEvent    | `npcId`    | TODO is this still necessary?                                       |
-| PlayerAttackEvent            |            |                                                                     |
-| PlayerCommandEvent           | `command`  | Sent when a client command is issued. (e.g. `::position`            |
-| NpcAttackEvent               |            |                                                                     |
-| NpcDeadEvent                 |            |                                                                     |
+| Event                        | Key        | Description                                                                                 |
+|------------------------------|------------|---------------------------------------------------------------------------------------------|
+| ServerInitEvent              | N/A        | Sent on server initialization. Use to spawn entities, objects, etc.                         |
+| NpcEntityTickEvent           | `npcId`    | Sent every tick for NPCs. Use for AI, movement, etc.                                        |
+| ObjectInteractionEvent       | `objectId` | Sent on the tick when the player triggers the interaction.                                  |
+| ItemOnObjectInteractionEvent | `objectId` | When a player uses an item on a game object.                                                |
+| NpcInteractionEvent          | `npcId`    | Sent on the tick when the player triggers the interaction.                                  |
+| NpcAttackInteractionEvent    | `npcId`    | TODO is this still necessary?                                                               |
+| PlayerAttackEvent            |            |                                                                                             |
+| PlayerCommandEvent           | `command`  | Sent when a client command is issued. (e.g. `::position`                                    |
+| NpcAttackEvent               |            |                                                                                             |
+| NpcDeadEvent                 |            |                                                                                             |
+| DropItemEvent                | `itemId`   | Sent when a user drops an item from their inventory. Override to prevent default behaviour. |
 
 
 ### Event Handlers
 To register an event handler, annotate a function with `@EventHandler`
 supplying the event name and the required key attribute.
+
+For events with a key argument, a default handler can be configured by
+passing `"default"` as the required key parameter. The default handler
+is **only invoked when no specific handler is found**.
+
 
 ```python
 from potato_cactus import EventHandler, GameEvent
@@ -51,4 +57,7 @@ Action constructors are imported from `potato_cactus.api.actions`.
 | CreateInterface        | Configure a player interface using low-level primitives. See `potato_cactus.api.dto.interface` for supported primitives. |
 | ClearStandardInterface | Clear the primary interfaces, as though the player issued an action.                                                     |
 | SetPlayerEntityData    | Write a key/value pair to the player data store.                                                                         |
+| SubtractItem           | Deduct an item amount from the player inventory.                                                                         |
+| RemoveItemStack        | Remove an item stack from the player inventory **at a specific index**.                                                  |
+| SpawnGroundItem        | Spawn an item on the ground. e.g. items dropped by players.                                                              |
 

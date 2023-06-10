@@ -49,6 +49,11 @@ class SimpleWorker(WorkerHandle):
         elif message.op == "gameEvent":
             _enrich_message(ContextImpl.INSTANCE, message.body)  # type: ignore
             handlers = Registry.INSTANCE.get_handlers(_event_key(message.body))
+            if not handlers:
+                default_handler_key = _default_event_handler_key(message.body)
+                if default_handler_key:
+                    handlers = Registry.INSTANCE.get_handlers(
+                        default_handler_key)
             for h in handlers:
                 try:
                     sig = signature(h)
@@ -89,11 +94,37 @@ def _event_key(payload) -> Tuple[Optional[Union[str, int]], ...]:
         return GameEvent.NpcEntityTickEvent, payload.body.npcId
     if payload.event == GameEvent.PlayerCommandEvent:
         return GameEvent.PlayerCommandEvent, payload.body.command
+    if payload.event == GameEvent.DropItemEvent:
+        return GameEvent.DropItemEvent, payload.body.itemId
 
     _logger.warning(
         f"Got event '{payload.event}' with an unconfigured key. No script will be invoked."
     )
     return "unassined",
+
+
+def _default_event_handler_key(
+        payload) -> Optional[Tuple[Optional[Union[str, int]], ...]]:
+    if payload.event == GameEvent.ObjectInteractionEvent:
+        return GameEvent.ObjectInteractionEvent, "default"
+    if payload.event == GameEvent.ItemOnObjectInteractionEvent:
+        return GameEvent.ItemOnObjectInteractionEvent, "default"
+    if payload.event == GameEvent.NpcInteractionEvent:
+        return GameEvent.NpcInteractionEvent, "default"
+    if payload.event == GameEvent.NpcAttackInteractionEvent:
+        return GameEvent.NpcAttackInteractionEvent, "default"
+    if payload.event == GameEvent.NpcAttackEvent:
+        return GameEvent.NpcAttackEvent, "default"
+    if payload.event == GameEvent.NpcDeadEvent:
+        return GameEvent.NpcDeadEvent, "default"
+    if payload.event == GameEvent.NpcEntityTickEvent:
+        return GameEvent.NpcEntityTickEvent, "default"
+    if payload.event == GameEvent.PlayerCommandEvent:
+        return GameEvent.PlayerCommandEvent, "default"
+    if payload.event == GameEvent.DropItemEvent:
+        return GameEvent.DropItemEvent, "default"
+
+    return None
 
 
 def _enrich_message(context: ContextImpl, payload):

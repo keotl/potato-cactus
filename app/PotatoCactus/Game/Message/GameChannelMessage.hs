@@ -1,6 +1,7 @@
 module PotatoCactus.Game.Message.GameChannelMessage where
 
 import PotatoCactus.Game.Definitions.EquipmentDefinitions (EquipmentSlot)
+import PotatoCactus.Game.Definitions.ItemDefinitions (ItemId)
 import PotatoCactus.Game.Entity.Npc.Npc (NpcIndex)
 import PotatoCactus.Game.Message.EquipItemMessagePayload (EquipItemMessagePayload)
 import PotatoCactus.Game.Message.ItemOnObjectPayload (ItemOnObjectPayload)
@@ -10,6 +11,7 @@ import PotatoCactus.Game.Movement.PositionXY (PositionXY)
 import PotatoCactus.Game.Movement.WalkingStep (WalkingStep)
 import PotatoCactus.Game.Player (PlayerIndex)
 import PotatoCactus.Game.PlayerUpdate.ChatMessage (ChatMessage)
+import PotatoCactus.Game.Scripting.Actions.CreateInterface (WidgetId)
 
 data GameChannelMessage
   = RegisterClientMessage RegisterClientPayload
@@ -25,4 +27,5 @@ data GameChannelMessage
   | ItemOnObjectMessage PlayerIndex ItemOnObjectPayload
   | NpcAttackMessage PlayerIndex NpcIndex
   | NpcClickMessage PlayerIndex NpcIndex Int
+  | DropItemMessage PlayerIndex WidgetId ItemId Int
   | UpdateWorldMessage

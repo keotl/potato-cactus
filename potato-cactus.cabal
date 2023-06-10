@@ -44,6 +44,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.In.ButtonClickPacket
                    PotatoCactus.Network.Packets.In.ChatMessagePacket
                    PotatoCactus.Network.Packets.In.ContinueDialoguePacket
+                   PotatoCactus.Network.Packets.In.DropItemPacket
                    PotatoCactus.Network.Packets.In.EquipItemPacket
                    PotatoCactus.Network.Packets.In.ItemContainerClickPacket
                    PotatoCactus.Network.Packets.In.ItemOnObjectPacket
@@ -161,6 +162,7 @@ executable potato-cactus
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CombatDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CombatTargetDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CommandDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.DropItemDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.EntityDataDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.GameObjectDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.InteractionDto
@@ -173,11 +175,11 @@ executable potato-cactus
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PlayerDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PositionDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.WorldDto
+                   PotatoCactus.Game.Scripting.BuiltinGameEventProcessor
                    PotatoCactus.Game.Scripting.Events.ApplyScriptActionResult
                    PotatoCactus.Game.Scripting.Events.CreateGameEvents
                    PotatoCactus.Game.Scripting.Events.NpcEvents
                    PotatoCactus.Game.Scripting.Events.PlayerEvents
-                   PotatoCactus.Game.Scripting.MockScriptInteractions
                    PotatoCactus.Game.Scripting.ProcessTickUpdates
                    PotatoCactus.Game.Scripting.ScriptUpdates
                    PotatoCactus.Game.Skills

@@ -1,5 +1,6 @@
 from typing import Dict, List, Literal, Optional, Tuple, Union
 
+from potato_cactus import get_context
 from potato_cactus.api.dto.interface import InterfaceElement
 from potato_cactus.api.dto.position import Position
 from potato_cactus.api.dto.script_invocation import ScriptInvocation
@@ -177,6 +178,29 @@ def SubtractItem(playerIndex: int,
         "itemId": itemId,
         "quantity": quantity
     })
+
+
+def RemoveItemStack(playerIndex: int, itemId: int, index: int) -> ScriptAction:
+    return ScriptAction("removeItemStack", {
+        "playerIndex": playerIndex,
+        "itemId": itemId,
+        "index": index
+    })
+
+
+def SpawnGroundItem(itemId: int,
+                    quantity: int,
+                    position: Union[Position, Tuple[int, int, int]],
+                    player: Optional[str] = None,
+                    despawn_delay: int = 100) -> ScriptAction:
+    return ScriptAction(
+        "spawnGroundItem", {
+            "itemId": itemId,
+            "quantity": quantity,
+            "position": _map_position(position),
+            "player": player,
+            "despawnTime": get_context().world.tick + despawn_delay
+        })
 
 
 def _map_position(position: Union[Position, Tuple[int, int, int]]) -> dict:

@@ -20,6 +20,7 @@ class GameEvent(str, Enum):
     PlayerCommandEvent = "PlayerCommandEvent"
     NpcAttackEvent = "NpcAttackEvent"
     NpcDeadEvent = "NpcDeadEvent"
+    DropItemEvent = "DropItemEvent"
 
 
 class ObjectInteractionEventPayload(object):
@@ -56,6 +57,13 @@ class PlayerCommandEventPayload(object):
 class NpcAttackEventPayload(object):
     npcIndex: int
     target: Optional[CombatTarget]
+
+
+class DropItemEventPayload(object):
+    playerIndex: int
+    widgetId: int
+    itemId: int
+    index: int
 
 
 class NpcReference(object):

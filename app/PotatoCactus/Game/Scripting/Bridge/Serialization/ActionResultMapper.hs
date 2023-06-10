@@ -12,7 +12,9 @@ import Data.Maybe (catMaybes, mapMaybe)
 import Data.Time.Format.ISO8601 (iso8601ParseM)
 import Debug.Trace (trace)
 import GHC.Generics (Generic)
+import PotatoCactus.Config.Constants (groundItemGlobalDespawnDelay)
 import PotatoCactus.Game.Entity.Animation.Animation (Animation (Animation), AnimationPriority (High, Low, Normal))
+import PotatoCactus.Game.Entity.GroundItem.GroundItem (GroundItem (GroundItem, despawnTime))
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject (Added, Removed))
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject))
 import qualified PotatoCactus.Game.Entity.Object.GameObject as O
@@ -21,7 +23,7 @@ import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceReque
 import qualified PotatoCactus.Game.Scripting.Actions.CreateInterface as I
 import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation (ScriptInvocation))
 import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest (SpawnNpcRequest))
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, GiveItem, InternalNoop, InternalProcessingComplete, InvokeScript, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnNpc, SubtractItem))
+import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, GiveItem, InternalNoop, InternalProcessingComplete, InvokeScript, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, RemoveItemStack, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnGroundItem, SpawnNpc, SubtractItem))
 
 mapResult :: ByteString -> ScriptActionResult
 mapResult bytes =
@@ -288,6 +290,32 @@ decodeBody "subtractItem" body =
         quantity <- obj .: "quantity"
 
         return (SubtractItem playerIndex itemId quantity)
+    )
+    body of
+    Error msg -> trace msg InternalNoop
+    Success decoded -> decoded
+decodeBody "removeItemStack" body =
+  case parse
+    ( \obj -> do
+        playerIndex <- obj .: "playerIndex"
+        itemId <- obj .: "itemId"
+        index <- obj .: "index"
+
+        return (RemoveItemStack playerIndex itemId index)
+    )
+    body of
+    Error msg -> trace msg InternalNoop
+    Success decoded -> decoded
+decodeBody "spawnGroundItem" body =
+  case parse
+    ( \obj -> do
+        itemId <- obj .: "itemId"
+        quantity <- obj .: "quantity"
+        posObj <- obj .: "position"
+        player <- obj .:? "player"
+        despawnTime <- obj .: "despawnTime"
+
+        return (SpawnGroundItem $ GroundItem itemId quantity (decodePos_ posObj) player despawnTime)
     )
     body of
     Error msg -> trace msg InternalNoop
