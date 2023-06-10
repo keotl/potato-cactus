@@ -32,6 +32,8 @@ executable potato-cactus
                    PotatoCactus.Client.ClientUpdate
                    PotatoCactus.Client.GameObjectUpdate.EncodeGameObjectUpdate
                    PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateDiff
+                   PotatoCactus.Client.GroundItemsUpdate.EncodeGroundItemsUpdate
+                   PotatoCactus.Client.GroundItemsUpdate.GroundItemsUpdateDiff
                    PotatoCactus.Client.Interface.EncodeInterfaceUpdate
                    PotatoCactus.Client.LocalEntityList
                    PotatoCactus.Client.PlayerInit
@@ -55,6 +57,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Opcodes
                    PotatoCactus.Network.Packets.PacketLengths
                    PotatoCactus.Network.Packets.Out.AddObjectPacket
+                   PotatoCactus.Network.Packets.Out.AddGroundItemPacket
                    PotatoCactus.Network.Packets.Out.ChatboxInterfacePacket
                    PotatoCactus.Network.Packets.Out.ChatboxMessagePacket
                    PotatoCactus.Network.Packets.Out.ClearChunkObjectsPacket
@@ -85,6 +88,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.PlayerUpdatePacket
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeSecondaryHitUpdateBlock
                    PotatoCactus.Network.Packets.Out.PlayerSettingsPackets
+                   PotatoCactus.Network.Packets.Out.RemoveGroundItemPacket
                    PotatoCactus.Network.Packets.Out.RemoveObjectPacket
                    PotatoCactus.Network.Packets.Out.SetPlacementReferencePacket
                    PotatoCactus.Network.Packets.Out.TabInterfacePacket

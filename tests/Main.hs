@@ -5,6 +5,7 @@ import BinaryTest (testByte, testByteNegate, testIntME, testMixedBitMode, testPa
 import DecodeChatTests (decodeChatTests, encodeChatTests, testNibbles)
 import Game.GameObjectUpdateDiffTests (testObjectDiff)
 import Game.GroudItemCollectionTests (testGroundItemCollection)
+import Game.GroundItemsUpdateDiffTests (groundItemsUpdateDiffTests)
 import Game.InterpolatePathTests (interpolatePathTests)
 import GetMonadTests (getTests)
 import IterableTests (testReplaceAt)
@@ -31,7 +32,8 @@ tests =
       testReplaceAt,
       testMobList,
       testObjectDiff,
-      testGroundItemCollection
+      testGroundItemCollection,
+      groundItemsUpdateDiffTests
     ]
 
 main :: IO ()

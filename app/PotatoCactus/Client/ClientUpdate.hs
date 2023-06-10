@@ -11,7 +11,11 @@ import GHC.IORef (readIORef)
 import Network.Socket
 import Network.Socket.ByteString (recv, send, sendAll)
 import PotatoCactus.Client.GameObjectUpdate.EncodeGameObjectUpdate (encodeGameObjectUpdate)
+import PotatoCactus.Client.GroundItemsUpdate.EncodeGroundItemsUpdate (encodeGroundItemsUpdate)
+import PotatoCactus.Client.GroundItemsUpdate.GroundItemsUpdateDiff (GroundItemClientView)
+import PotatoCactus.Client.Interface.EncodeInterfaceUpdate (encodeInterfaceUpdate)
 import PotatoCactus.Client.LocalEntityList (LocalEntityList, updateLocalEntities)
+import PotatoCactus.Game.Entity.GroundItem.GroundItem (GroundItem)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject))
@@ -19,7 +23,7 @@ import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload (ObjectC
 import PotatoCactus.Game.Movement.MovementEntity (MovementEntity (PlayerWalkMovement_), hasChangedRegion)
 import PotatoCactus.Game.Movement.PlayerWalkMovement (PlayerWalkMovement (lastRegionUpdate_))
 import PotatoCactus.Game.Movement.PositionXY (fromXY, toXY)
-import PotatoCactus.Game.Player (Player (Player, equipment, inventory, movement, serverIndex, username, interfaces))
+import PotatoCactus.Game.Player (Player (Player, equipment, interfaces, inventory, movement, serverIndex, username))
 import qualified PotatoCactus.Game.Player as P
 import PotatoCactus.Game.PlayerUpdate.Equipment (Equipment (container))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position, x, y))
@@ -37,12 +41,12 @@ import PotatoCactus.Network.Packets.Out.SetPlacementReferencePacket (setPlacemen
 import PotatoCactus.Network.Packets.Out.UpdateItemContainerPacket (updateItemContainerPacket)
 import PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket (updateRunEnergyPacket)
 import PotatoCactus.Utils.Logging (LogLevel (Error, Info), logger)
-import PotatoCactus.Client.Interface.EncodeInterfaceUpdate (encodeInterfaceUpdate)
 
 data ClientLocalState_ = ClientLocalState_
   { localPlayers :: LocalEntityList Player,
     localNpcs :: LocalEntityList Npc,
     gameObjects :: [DynamicObject],
+    groundItems :: [GroundItemClientView],
     localPlayerIndex :: Int
   }
 
@@ -51,6 +55,7 @@ defaultState =
     { localPlayers = [],
       localNpcs = [],
       gameObjects = [],
+      groundItems = [],
       localPlayerIndex = -1
     }
 
@@ -108,16 +113,19 @@ updateClient sock client localState W.WorldUpdatedMessage = do
                 --                   -- ((getPosition p) {x = 1 + x (getPosition p)})
                 --               )
                 --           )
-                let (newObjects, packets) = encodeGameObjectUpdate (gameObjects localState) world p
-                 in do
-                      sendAll sock packets
-                      return
-                        ClientLocalState_
-                          { localPlayers = newLocalPlayers,
-                            localNpcs = newLocalNpcs,
-                            localPlayerIndex = serverIndex p,
-                            gameObjects = newObjects
-                          }
+                let (newObjects, objectPackets) = encodeGameObjectUpdate (gameObjects localState) world p
+                 in let (newGroundItems, groundItemPackets) = encodeGroundItemsUpdate (groundItems localState) world p
+                     in do
+                          sendAll sock objectPackets
+                          sendAll sock groundItemPackets
+                          return
+                            ClientLocalState_
+                              { localPlayers = newLocalPlayers,
+                                localNpcs = newLocalNpcs,
+                                localPlayerIndex = serverIndex p,
+                                gameObjects = newObjects,
+                                groundItems = newGroundItems
+                              }
     Nothing -> do
       logger_ Error $ "Could not find player for client update " ++ W.username client
       return localState
