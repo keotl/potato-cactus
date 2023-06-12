@@ -28,4 +28,5 @@ data GameChannelMessage
   | NpcAttackMessage PlayerIndex NpcIndex
   | NpcClickMessage PlayerIndex NpcIndex Int
   | DropItemMessage PlayerIndex WidgetId ItemId Int
+  | PickupGroundItemMessage PlayerIndex ItemId PositionXY
   | UpdateWorldMessage

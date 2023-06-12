@@ -18,7 +18,7 @@ import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest)
 
 data GameEvent
   = ServerInitEvent
-  | PlayerInteractionEvent Player Interaction -- maps to NpcInteractionEvent, ObjectInteractionEvent, ItemOnObjectInteractionEvent and NpcAttackInteractionEvent
+  | PlayerInteractionEvent Player Interaction -- maps to NpcInteractionEvent, ObjectInteractionEvent, ItemOnObjectInteractionEvent, NpcAttackInteractionEvent and PickupItemInteractionEvent
   | PlayerAttackEvent Player CombatTarget
   | NpcAttackEvent Npc CombatTarget
   | NpcCannotReachTargetEvent Npc CombatTarget
@@ -51,6 +51,7 @@ data ScriptActionResult
   | SubtractItem PlayerIndex ItemId Int -- Remove quantity of item, from anywhere in the inventory
   | RemoveItemStack PlayerIndex ItemId Int -- Remove stack of item at index
   | SpawnGroundItem GroundItem
+  | RemoveGroundItem ItemId Int Position (Maybe PlayerIndex)
   | SetPlayerEntityData PlayerIndex String Value
   | InternalNoop
   | ServerPrintMessage String -- for testing

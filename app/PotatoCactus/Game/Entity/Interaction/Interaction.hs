@@ -1,7 +1,7 @@
 module PotatoCactus.Game.Entity.Interaction.Interaction where
 
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (InProgress, Pending, PendingPathing))
-import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (None, NpcTarget, ObjectTarget), canStartInteractionFromPos)
+import PotatoCactus.Game.Entity.Interaction.Target (GroundItemInteractionType (ItemPickup), InteractionTarget (GroundItemTarget, None, NpcTarget, ObjectTarget), canStartInteractionFromPos)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc, NpcIndex)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position, isNextTo)
 
@@ -36,5 +36,10 @@ advanceInteraction _ (Interaction (ObjectTarget objectKey actionIndex) Pending) 
   case (isStopped, canStartInteractionFromPos (getPosition objectKey) pos) of
     (True, True) -> Interaction (ObjectTarget objectKey actionIndex) InProgress
     (False, _) -> Interaction (ObjectTarget objectKey actionIndex) Pending
+    _ -> Interaction None Pending
+advanceInteraction _ (Interaction (GroundItemTarget itemId quantity position ItemPickup) Pending) (pos, isStopped) =
+  case (isStopped, position == pos) of
+    (True, True) -> Interaction (GroundItemTarget itemId quantity position ItemPickup) InProgress
+    (False, _) -> Interaction (GroundItemTarget itemId quantity position ItemPickup) Pending
     _ -> Interaction None Pending
 advanceInteraction _ interaction _ = interaction

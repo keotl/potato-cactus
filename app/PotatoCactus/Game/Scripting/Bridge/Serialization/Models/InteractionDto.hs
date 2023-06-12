@@ -8,7 +8,7 @@ import Data.Aeson.Types (Value (String))
 import GHC.Generics (Generic)
 import qualified PotatoCactus.Game.Entity.Interaction.Interaction as I
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (InProgress, Pending, PendingPathing))
-import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (None, NpcTarget, ObjectTarget), NpcInteractionType (NpcAction, NpcAttack))
+import PotatoCactus.Game.Entity.Interaction.Target (GroundItemInteractionType (ItemPickup), InteractionTarget (GroundItemTarget, None, NpcTarget, ObjectTarget), NpcInteractionType (NpcAction, NpcAttack))
 import PotatoCactus.Game.Entity.Npc.Npc (Npc (definitionId))
 import PotatoCactus.Game.Entity.Object.GameObjectKey (GameObjectKey (GameObjectKey, position))
 import qualified PotatoCactus.Game.Message.ItemOnObjectPayload as IonO
@@ -31,6 +31,7 @@ eventName I.Interaction {I.target = (ObjectTarget _ (Left _))} = "ObjectInteract
 eventName I.Interaction {I.target = (ObjectTarget _ (Right _))} = "ItemOnObjectInteractionEvent"
 eventName I.Interaction {I.target = (NpcTarget _ NpcAttack)} = "NpcAttackInteractionEvent" -- TODO - Can this be consolidated with NpcAttackEvent?  - keotl 2023-04-27
 eventName I.Interaction {I.target = (NpcTarget _ _)} = "NpcInteractionEvent"
+eventName I.Interaction {I.target = (GroundItemTarget _ _ _ ItemPickup)} = "PickupItemInteractionEvent"
 
 interactionToDto :: I.Interaction -> Value
 interactionToDto I.Interaction {I.target = None} =
@@ -78,6 +79,17 @@ interactionToDto I.Interaction {I.target = (NpcTarget npcId (NpcAction actionInd
           [ "type" .= String "npc",
             "npcIndex" .= npcId,
             "actionIndex" .= actionIndex
+          ],
+      "state" .= mapState s
+    ]
+interactionToDto I.Interaction {I.target = (GroundItemTarget itemId quantity pos ItemPickup), I.state = s} =
+  object
+    [ "target"
+        .= object
+          [ "type" .= String "groundItem",
+            "itemId" .= itemId,
+            "quantity" .= quantity,
+            "position" .= Pos.toDto pos
           ],
       "state" .= mapState s
     ]

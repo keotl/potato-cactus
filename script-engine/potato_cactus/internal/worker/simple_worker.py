@@ -84,6 +84,8 @@ def _event_key(payload) -> Tuple[Optional[Union[str, int]], ...]:
         return GameEvent.NpcInteractionEvent, payload.body.interaction.target.npcId
     if payload.event == GameEvent.NpcAttackInteractionEvent:
         return GameEvent.NpcAttackInteractionEvent, payload.body.interaction.target.npcId
+    if payload.event == GameEvent.PickupItemInteractionEvent:
+        return GameEvent.PickupItemInteractionEvent, payload.body.interaction.target.itemId
     if payload.event == GameEvent.NpcAttackEvent:
         return GameEvent.NpcAttackEvent, payload.body.npcId
     if payload.event == GameEvent.PlayerAttackEvent:
@@ -113,6 +115,8 @@ def _default_event_handler_key(
         return GameEvent.NpcInteractionEvent, "default"
     if payload.event == GameEvent.NpcAttackInteractionEvent:
         return GameEvent.NpcAttackInteractionEvent, "default"
+    if payload.event == GameEvent.PickupItemInteractionEvent:
+        return GameEvent.PickupItemInteractionEvent, "default"
     if payload.event == GameEvent.NpcAttackEvent:
         return GameEvent.NpcAttackEvent, "default"
     if payload.event == GameEvent.NpcDeadEvent:

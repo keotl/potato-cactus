@@ -3,7 +3,7 @@ module PotatoCactus.Game.PlayerUpdate.ProcessPlayerUpdate where
 import Data.Bits ((.|.))
 import PotatoCactus.Game.Definitions.EquipmentDefinitions (EquipmentDefinition (slot), equipmentDefinition)
 import PotatoCactus.Game.Entity.Interaction.Interaction (createForTarget)
-import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (NpcTarget, ObjectTarget))
+import PotatoCactus.Game.Entity.Interaction.Target (GroundItemInteractionType (ItemPickup), InteractionTarget (GroundItemTarget, NpcTarget, ObjectTarget))
 import PotatoCactus.Game.Entity.Object.GameObjectKey (GameObjectKey (GameObjectKey))
 import PotatoCactus.Game.Interface.InterfaceController (clearStandardInterfaces)
 import qualified PotatoCactus.Game.Interface.InterfaceController as IC
@@ -14,7 +14,7 @@ import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload (index, 
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
 import PotatoCactus.Game.Player (Player (chatMessage, equipment, interaction, interfaces, inventory, updateMask))
 import PotatoCactus.Game.PlayerUpdate.Equipment (Equipment (container), equipItem, unequipItem)
-import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (ContinueDialogue, EquipItem, InteractWithNpc, InteractWithObject, InteractWithObjectWithItem, SayChatMessage, UnequipItem))
+import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (ContinueDialogue, EquipItem, InteractWithGroundItem, InteractWithNpc, InteractWithObject, InteractWithObjectWithItem, SayChatMessage, UnequipItem))
 import PotatoCactus.Game.PlayerUpdate.UpdateMask (appearanceFlag, chatFlag)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (z))
 import qualified PotatoCactus.Game.Scripting.Actions.CreateInterface as I
@@ -75,6 +75,11 @@ processPlayerUpdate p (InteractWithObjectWithItem payload) =
 processPlayerUpdate p (InteractWithNpc npcId interactionType) =
   p
     { interaction = createForTarget (NpcTarget npcId interactionType),
+      interfaces = clearStandardInterfaces . interfaces $ p
+    }
+processPlayerUpdate p (InteractWithGroundItem itemId quantity pos) =
+  p
+    { interaction = createForTarget (GroundItemTarget itemId quantity pos ItemPickup),
       interfaces = clearStandardInterfaces . interfaces $ p
     }
 processPlayerUpdate p ContinueDialogue =

@@ -203,6 +203,21 @@ def SpawnGroundItem(itemId: int,
         })
 
 
+def RemoveGroundItem(itemId: int,
+                     quantity: int,
+                     position: Union[Position, Tuple[int, int, int]],
+                     removedByPlayer: Optional[int] = None) -> ScriptAction:
+    return ScriptAction(
+        "removeGroundItem",
+        {
+            "itemId": itemId,
+            "quantity": quantity,
+            "position": _map_position(position),
+            "removedByPlayer":
+                removedByPlayer  # For removing scoped items and giving to player
+        })
+
+
 def _map_position(position: Union[Position, Tuple[int, int, int]]) -> dict:
     if hasattr(position, "x") or isinstance(position, Position):
         return {

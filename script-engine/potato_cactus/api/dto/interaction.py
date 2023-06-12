@@ -35,3 +35,10 @@ class NpcInteractionTarget(object):
     type: Literal["npc"]
     npcIndex: int
     actionIndex: int
+
+
+class GroundItemInteractionTarget(object):
+    type: Literal["groundItem"]
+    itemId: int
+    position: Position
+    quantity: int

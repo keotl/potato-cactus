@@ -51,6 +51,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.In.NpcActionPacket
                    PotatoCactus.Network.Packets.In.NpcAttackPacket
                    PotatoCactus.Network.Packets.In.ObjectActionPacket
+                   PotatoCactus.Network.Packets.In.PickupGroundItemPacket
                    PotatoCactus.Network.Packets.In.PlayerCommandPacket
                    PotatoCactus.Network.Packets.In.PlayerWalkPacket
                    PotatoCactus.Network.Packets.Packet

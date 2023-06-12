@@ -23,7 +23,7 @@ import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceReque
 import qualified PotatoCactus.Game.Scripting.Actions.CreateInterface as I
 import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation (ScriptInvocation))
 import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest (SpawnNpcRequest))
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, GiveItem, InternalNoop, InternalProcessingComplete, InvokeScript, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, RemoveItemStack, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnGroundItem, SpawnNpc, SubtractItem))
+import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, GiveItem, InternalNoop, InternalProcessingComplete, InvokeScript, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, RemoveGroundItem, RemoveItemStack, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnGroundItem, SpawnNpc, SubtractItem))
 
 mapResult :: ByteString -> ScriptActionResult
 mapResult bytes =
@@ -316,6 +316,19 @@ decodeBody "spawnGroundItem" body =
         despawnTime <- obj .: "despawnTime"
 
         return (SpawnGroundItem $ GroundItem itemId quantity (decodePos_ posObj) player despawnTime)
+    )
+    body of
+    Error msg -> trace msg InternalNoop
+    Success decoded -> decoded
+decodeBody "removeGroundItem" body =
+  case parse
+    ( \obj -> do
+        itemId <- obj .: "itemId"
+        quantity <- obj .: "quantity"
+        posObj <- obj .: "position"
+        player <- obj .:? "removedByPlayer"
+
+        return (RemoveGroundItem itemId quantity (decodePos_ posObj) player)
     )
     body of
     Error msg -> trace msg InternalNoop

@@ -15,7 +15,7 @@ data ItemStack
         quantity :: Int
       }
   | Empty
-  deriving (Show)
+  deriving (Show, Eq)
 
 data ItemContainer = ItemContainer
   { capacity :: Int,
