@@ -7,7 +7,7 @@ A Runescape server engine written in Haskell. Targets revision 317.
 Takes some inspiration from
 [luna-rs](https://github.com/luna-rs/luna) and [317refactor](https://github.com/Jameskmonger/317refactor).
 
-## Engine demo (v0.0.1, 2023-06-14)
+## Engine demo (v0.0.2, 2023-06-14)
 [![2023-06-14](https://img.youtube.com/vi/q1qQ_Inp_QI/0.jpg)](https://www.youtube.com/watch?v=q1qQ_Inp_QI)
 
 
