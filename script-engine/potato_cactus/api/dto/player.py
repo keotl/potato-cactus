@@ -14,3 +14,4 @@ class Player(object):
     interaction: PlayerInteraction
     inventory: List[Optional[ItemStack]]
     equipment: List[Optional[ItemStack]]
+    entityData: dict

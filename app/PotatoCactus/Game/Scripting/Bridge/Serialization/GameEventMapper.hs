@@ -4,15 +4,19 @@ module PotatoCactus.Game.Scripting.Bridge.Serialization.GameEventMapper (mapEven
 
 import Data.Aeson (ToJSON, Value (Null))
 import Data.Aeson.Text (encodeToTextBuilder)
+import Data.Aeson.Types (listValue)
+import GHC.ExecutionStack (Location (functionName))
 import GHC.Generics (Generic)
+import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation (ScriptInvocation))
 import PotatoCactus.Game.Scripting.Bridge.BridgeMessage (BridgeMessage, EmptyPayload, bridgeMessage)
 import PotatoCactus.Game.Scripting.Bridge.ControlMessages (doneSendingEventsMessage)
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CommandDto (commandDto)
+import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.DropItemDto (dropItemDto)
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.InteractionDto (playerInteractionToDto)
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.NpcAttackDto (npcAttackDto)
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.NpcReferenceDto (npcReferenceDto)
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PlayerAttackDto (playerAttackToDto)
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcCannotReachTargetEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerCommandEvent, PlayerInteractionEvent, ServerInitEvent))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (DropItemEvent, NpcAttackEvent, NpcCannotReachTargetEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerCommandEvent, PlayerInteractionEvent, ScriptInvokedEvent, ServerInitEvent))
 
 mapEvent :: GameEvent -> BridgeMessage (GameEventDto Value)
 mapEvent ServerInitEvent =
@@ -38,6 +42,10 @@ mapEvent (NpcEntityTickEvent npc) =
     GameEventDto "NpcEntityTickEvent" (npcReferenceDto npc)
 mapEvent (PlayerCommandEvent playerIndex cmd args) =
   bridgeMessage "gameEvent" $ GameEventDto "PlayerCommandEvent" (commandDto playerIndex cmd args)
+mapEvent (DropItemEvent playerId widgetId itemId index) =
+  bridgeMessage "gameEvent" $ GameEventDto "DropItemEvent" (dropItemDto playerId widgetId itemId index)
+mapEvent (ScriptInvokedEvent (ScriptInvocation functionName args)) =
+  bridgeMessage "invokeScript" $ GameEventDto functionName (listValue id args)
 
 data GameEventDto b = GameEventDto
   { event :: String,

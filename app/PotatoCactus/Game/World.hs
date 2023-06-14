@@ -5,6 +5,8 @@ import Data.IORef (newIORef)
 import Data.List (find)
 import GHC.IO (unsafePerformIO)
 import PotatoCactus.Config.Constants (maxNpcs, maxPlayers)
+import PotatoCactus.Game.Entity.GroundItem.GroundItemCollection (GroundItemCollection)
+import qualified PotatoCactus.Game.Entity.GroundItem.GroundItemCollection as GroundItemCollection
 import PotatoCactus.Game.Entity.Npc.AdvanceNpc (advanceNpc)
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCollection (DynamicObjectCollection), create)
@@ -14,8 +16,11 @@ import PotatoCactus.Game.Player (PlayerIndex)
 import qualified PotatoCactus.Game.Player as P (Player (serverIndex), create, username)
 import PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer)
 import PotatoCactus.Game.Position (Position (Position))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent)
+import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation)
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent))
 import PotatoCactus.Game.Typing (Advance (advance), ShouldDiscard (shouldDiscard))
+import PotatoCactus.Game.World.CallbackScheduler (CallbackScheduler)
+import qualified PotatoCactus.Game.World.CallbackScheduler as Scheduler
 import PotatoCactus.Game.World.EntityPositionFinder (combatTargetPosOrDefault)
 import PotatoCactus.Game.World.MobList (MobList, add, create, findByIndex, findByPredicate, remove, removeByPredicate, updateAll, updateAtIndex, updateByPredicate)
 import PotatoCactus.Utils.Iterable (replace)
@@ -36,8 +41,10 @@ data World = World
     npcs :: MobList NPC.Npc,
     clients :: [ClientHandle],
     objects :: DynamicObjectCollection,
+    groundItems :: GroundItemCollection,
     triggeredEvents :: [GameEvent], -- Additional events to dispatch on this tick. For events not tied to a specific entity.
-    pendingEvents_ :: [GameEvent] -- Additional events to dispatch on the next tick.
+    pendingEvents_ :: [GameEvent], -- Additional events to dispatch on the next tick.
+    scheduler :: CallbackScheduler
   }
   deriving (Show)
 
@@ -52,9 +59,15 @@ instance Advance World where
           { tick = tick w + 1,
             players = updateAll (players w) (advancePlayer (findByIndex newNpcs)),
             npcs = removeByPredicate newNpcs shouldDiscard,
-            triggeredEvents = pendingEvents_ w,
-            pendingEvents_ = []
+            groundItems = GroundItemCollection.advanceTime (groundItems w) (tick w + 1),
+            triggeredEvents = pendingEvents_ w ++ invokedScripts_ w,
+            pendingEvents_ = [],
+            scheduler = Scheduler.clearCallbacksForTick (scheduler w) (tick w + 1)
           }
+
+invokedScripts_ :: World -> [GameEvent]
+invokedScripts_ w =
+  map ScriptInvokedEvent $ Scheduler.callbacksForTick (scheduler w) (tick w + 1)
 
 defaultWorldValue :: World
 defaultWorldValue =
@@ -64,8 +77,10 @@ defaultWorldValue =
       npcs = PotatoCactus.Game.World.MobList.create maxNpcs,
       clients = [],
       objects = PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create,
+      groundItems = GroundItemCollection.create,
       triggeredEvents = [],
-      pendingEvents_ = []
+      pendingEvents_ = [],
+      scheduler = Scheduler.create
     }
 
 worldInstance = unsafePerformIO $ newIORef defaultWorldValue
@@ -114,3 +129,9 @@ addNpc world npc =
 queueEvent :: World -> GameEvent -> World
 queueEvent w e =
   w {pendingEvents_ = e : pendingEvents_ w}
+
+scheduleCallback :: World -> ScriptInvocation -> Int -> World
+scheduleCallback w script tick =
+  w
+    { scheduler = Scheduler.queueCallback (scheduler w) script tick
+    }

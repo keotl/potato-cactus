@@ -5,11 +5,16 @@ import Data.Foldable (fold)
 import PotatoCactus.Game.Combat.CombatEntity (CombatEntity, CombatTarget (NpcTarget), clearTargetIfEngagedWith)
 import qualified PotatoCactus.Game.Combat.CombatEntity as CombatEntity
 import PotatoCactus.Game.Combat.Hit (Hit)
+import PotatoCactus.Game.Definitions.ItemDefinitions (ItemId)
 import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
+import qualified PotatoCactus.Game.Entity.EntityData as EntityData
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction)
 import qualified PotatoCactus.Game.Entity.Interaction.Interaction as Interaction
 import PotatoCactus.Game.Entity.Npc.Npc (NpcIndex)
+import PotatoCactus.Game.Interface.InterfaceController (InterfaceController, clearStandardInterfaces, configureInterface)
+import qualified PotatoCactus.Game.Interface.InterfaceController as IC
 import PotatoCactus.Game.ItemContainer (ItemContainer, playerEquipmentContainer, playerInventory)
+import qualified PotatoCactus.Game.ItemContainer as Container
 import PotatoCactus.Game.Movement.MovementEntity (immediatelySetPosition, playerWalkMovement)
 import qualified PotatoCactus.Game.Movement.MovementEntity as M (MovementEntity, issueWalkCommand)
 import PotatoCactus.Game.Movement.PositionXY (PositionXY)
@@ -21,6 +26,7 @@ import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate)
 import PotatoCactus.Game.PlayerUpdate.UpdateMask (PlayerUpdateMask, animationFlag, appearanceFlag, primaryHealthUpdateFlag, secondaryHealthUpdateFlag)
 import qualified PotatoCactus.Game.PlayerUpdate.UpdateMask as Mask
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
+import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest, InterfaceType)
 import PotatoCactus.Game.Typing (Keyable (key))
 
 type PlayerIndex = Int
@@ -39,6 +45,8 @@ data Player = Player
     combat :: CombatEntity,
     animation :: Maybe Anim.Animation,
     chatboxMessages :: [String],
+    interfaces :: InterfaceController,
+    entityData :: EntityData.EntityData,
     skipUpdate_ :: Bool
   }
   deriving (Show)
@@ -53,7 +61,9 @@ issueWalkCommand :: (PositionXY, Bool, [WalkingStep]) -> Player -> Player
 issueWalkCommand (startPos, isRunning, steps) p =
   p
     { movement = M.issueWalkCommand (movement p) startPos steps,
-      combat = CombatEntity.clearTarget . combat $ p
+      combat = CombatEntity.clearTarget . combat $ p,
+      interaction = Interaction.create,
+      interfaces = clearStandardInterfaces . interfaces $ p
     }
 
 create :: String -> Position -> Player
@@ -72,6 +82,8 @@ create username position =
       combat = CombatEntity.create 10,
       animation = Nothing,
       chatboxMessages = [],
+      interfaces = IC.create,
+      entityData = EntityData.create,
       skipUpdate_ = True
     }
 
@@ -121,4 +133,39 @@ setPosition :: Player -> Position -> Player
 setPosition p pos =
   p
     { movement = immediatelySetPosition (movement p) pos
+    }
+
+createInterface :: Player -> CreateInterfaceRequest -> Player
+createInterface p req =
+  p
+    { interfaces = configureInterface (interfaces p) req
+    }
+
+clearStandardInterface :: Player -> Player
+clearStandardInterface p =
+  p
+    { interfaces = clearStandardInterfaces $ interfaces p
+    }
+
+updateEntityData :: Player -> (EntityData.EntityData -> EntityData.EntityData) -> Player
+updateEntityData p transform =
+  p
+    { entityData = transform (entityData p)
+    }
+
+giveItem :: Player -> Container.ItemStack -> Player
+giveItem p stack =
+  p
+    { inventory = Container.addItem (inventory p) stack
+    }
+
+subtractItem :: Player -> (ItemId, Int) -> Player
+subtractItem p stack =
+  p
+    { inventory = Container.subtractItem (inventory p) stack
+    }
+removeItemStack :: Player -> (ItemId, Int) -> Player
+removeItemStack p stack =
+  p
+    { inventory = Container.removeStack (inventory p) stack
     }

@@ -6,6 +6,9 @@ tickInterval = 600 * 1000
 entityViewingDistance :: Int
 entityViewingDistance = 15
 
+groundItemGlobalDespawnDelay :: Int
+groundItemGlobalDespawnDelay = 100
+
 maxPlayers :: Int
 maxPlayers = 2000
 

@@ -1,7 +1,7 @@
 import sys
-from potato_cactus.internal.messages.dispatcher import Dispatcher
-from potato_cactus.internal.messages.decode import decode_inbound
 
+from potato_cactus.internal.messages.decode import decode_inbound
+from potato_cactus.internal.messages.dispatcher import Dispatcher
 
 dispatcher = Dispatcher()
 # time.sleep(10)

@@ -5,9 +5,8 @@ import Data.Binary.Get (getInt16le, getWord16be, getWord16le, runGet)
 import Data.Bits (Bits (xor))
 import Data.ByteString.Lazy (fromStrict)
 import Data.Word (Word16)
-import Debug.Trace (trace)
-import PotatoCactus.Network.Packets.Reader (InboundPacket (InboundPacket, opcode, payload))
 import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (UnequipItemMessage))
+import PotatoCactus.Network.Packets.Reader (InboundPacket (InboundPacket, opcode, payload))
 
 itemContainerClickPacket :: String -> InboundPacket -> Maybe GameChannelMessage
 itemContainerClickPacket username packet =

@@ -1,6 +1,6 @@
-from potato_cactus import EventHandler, Context
+from potato_cactus import Context, EventHandler
 from potato_cactus.api.actions import SendMessage
-from potato_cactus.api.events import PlayerCommandEventPayload, GameEvent
+from potato_cactus.api.events import GameEvent, PlayerCommandEventPayload
 
 
 @EventHandler(GameEvent.PlayerCommandEvent, command="position")
@@ -11,5 +11,8 @@ def on_command(e: PlayerCommandEventPayload, context: Context):
         return []
 
     return [
-        SendMessage(e.playerIndex,
-                    f"Position [{player.movement.position.x}, {player.movement.position.y}, {player.movement.position.z}]")]
+        SendMessage(
+            e.playerIndex,
+            f"Position [{player.movement.position.x}, {player.movement.position.y}, {player.movement.position.z}]"
+        )
+    ]

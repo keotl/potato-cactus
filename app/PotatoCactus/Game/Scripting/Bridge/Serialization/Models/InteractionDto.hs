@@ -8,9 +8,10 @@ import Data.Aeson.Types (Value (String))
 import GHC.Generics (Generic)
 import qualified PotatoCactus.Game.Entity.Interaction.Interaction as I
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (InProgress, Pending, PendingPathing))
-import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (None, NpcTarget, ObjectTarget), NpcInteractionType (NpcAction, NpcAttack))
+import PotatoCactus.Game.Entity.Interaction.Target (GroundItemInteractionType (ItemPickup), InteractionTarget (GroundItemTarget, None, NpcTarget, ObjectTarget), NpcInteractionType (NpcAction, NpcAttack))
 import PotatoCactus.Game.Entity.Npc.Npc (Npc (definitionId))
 import PotatoCactus.Game.Entity.Object.GameObjectKey (GameObjectKey (GameObjectKey, position))
+import qualified PotatoCactus.Game.Message.ItemOnObjectPayload as IonO
 import PotatoCactus.Game.Player (Player)
 import qualified PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PositionDto as Pos
@@ -26,9 +27,11 @@ playerInteractionToDto p i =
 
 eventName :: I.Interaction -> String
 eventName I.Interaction {I.target = None} = "Noop"
-eventName I.Interaction {I.target = (ObjectTarget _ _)} = "ObjectInteractionEvent"
+eventName I.Interaction {I.target = (ObjectTarget _ (Left _))} = "ObjectInteractionEvent"
+eventName I.Interaction {I.target = (ObjectTarget _ (Right _))} = "ItemOnObjectInteractionEvent"
 eventName I.Interaction {I.target = (NpcTarget _ NpcAttack)} = "NpcAttackInteractionEvent" -- TODO - Can this be consolidated with NpcAttackEvent?  - keotl 2023-04-27
 eventName I.Interaction {I.target = (NpcTarget _ _)} = "NpcInteractionEvent"
+eventName I.Interaction {I.target = (GroundItemTarget _ _ _ ItemPickup)} = "PickupItemInteractionEvent"
 
 interactionToDto :: I.Interaction -> Value
 interactionToDto I.Interaction {I.target = None} =
@@ -36,7 +39,7 @@ interactionToDto I.Interaction {I.target = None} =
     [ "target" .= Null,
       "state" .= String "pending"
     ]
-interactionToDto I.Interaction {I.target = (ObjectTarget (GameObjectKey id position) actionIndex), I.state = s} =
+interactionToDto I.Interaction {I.target = (ObjectTarget (GameObjectKey id position) (Left actionIndex)), I.state = s} =
   object
     [ "target"
         .= object
@@ -44,6 +47,19 @@ interactionToDto I.Interaction {I.target = (ObjectTarget (GameObjectKey id posit
             "objectId" .= id,
             "position" .= Pos.toDto position,
             "actionIndex" .= actionIndex
+          ],
+      "state" .= mapState s
+    ]
+interactionToDto I.Interaction {I.target = (ObjectTarget (GameObjectKey id position) (Right payload)), I.state = s} =
+  object
+    [ "target"
+        .= object
+          [ "type" .= String "itemOnObject",
+            "objectId" .= id,
+            "position" .= Pos.toDto position,
+            "itemId" .= IonO.itemId payload,
+            "itemIndex" .= IonO.itemIndex payload,
+            "interfaceId" .= IonO.interfaceId payload
           ],
       "state" .= mapState s
     ]
@@ -63,6 +79,17 @@ interactionToDto I.Interaction {I.target = (NpcTarget npcId (NpcAction actionInd
           [ "type" .= String "npc",
             "npcIndex" .= npcId,
             "actionIndex" .= actionIndex
+          ],
+      "state" .= mapState s
+    ]
+interactionToDto I.Interaction {I.target = (GroundItemTarget itemId quantity pos ItemPickup), I.state = s} =
+  object
+    [ "target"
+        .= object
+          [ "type" .= String "groundItem",
+            "itemId" .= itemId,
+            "quantity" .= quantity,
+            "position" .= Pos.toDto pos
           ],
       "state" .= mapState s
     ]

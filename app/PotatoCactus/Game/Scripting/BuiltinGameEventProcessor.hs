@@ -1,4 +1,4 @@
-module PotatoCactus.Game.Scripting.MockScriptInteractions where
+module PotatoCactus.Game.Scripting.BuiltinGameEventProcessor where
 
 import Debug.Trace (trace)
 import qualified PotatoCactus.Game.Combat.CombatEntity as Combat
@@ -18,7 +18,7 @@ import PotatoCactus.Game.Message.RegisterClientPayload (RegisterClientPayload (p
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
 import PotatoCactus.Game.Player (Player (serverIndex))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, z))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcCannotReachTargetEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalRemoveNpcTargetReferences, NpcMoveTowardsTarget, NpcSetAnimation, UpdateNpc))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (DropItemEvent, NpcAttackEvent, NpcCannotReachTargetEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalRemoveNpcTargetReferences, NpcMoveTowardsTarget, NpcSetAnimation, RemoveItemStack))
 import PotatoCactus.Game.Typing (key)
 import PotatoCactus.Game.World (World (tick))
 
@@ -27,9 +27,9 @@ dispatchScriptEvent world (PlayerInteractionEvent player interaction) =
   trace
     ("Dispatched interaction event " ++ show interaction)
     ( case (target interaction, state interaction) of
-        (ObjectTarget (GameObjectKey 1530 pos) 1, InProgress) ->
+        (ObjectTarget (GameObjectKey 1530 pos) (Left 1), InProgress) ->
           return (ClearPlayerInteraction (serverIndex player) : openDoor_ pos)
-        (ObjectTarget (GameObjectKey 1531 pos) 1, InProgress) ->
+        (ObjectTarget (GameObjectKey 1531 pos) (Left 1), InProgress) ->
           return (ClearPlayerInteraction (serverIndex player) : closeDoor_ pos)
         (NpcTarget npcId NpcAttack, InProgress) ->
           return
@@ -40,7 +40,6 @@ dispatchScriptEvent world (PlayerInteractionEvent player interaction) =
     )
 dispatchScriptEvent world (NpcCannotReachTargetEvent npc target) =
   return [NpcMoveTowardsTarget npc]
-
 dispatchScriptEvent world (PlayerAttackEvent player target) =
   trace
     "dispatched attack event"

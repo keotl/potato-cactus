@@ -12,7 +12,7 @@ synopsis: A 2005-era Runescape server engine.
 -- bug-reports:
 
 -- The license under which the package is released.
--- license: GPLv3
+license: GPL-3.0-only
 author:             Kento Lauzon
 maintainer:         kento.lauzon@ligature.ca
 
@@ -32,6 +32,9 @@ executable potato-cactus
                    PotatoCactus.Client.ClientUpdate
                    PotatoCactus.Client.GameObjectUpdate.EncodeGameObjectUpdate
                    PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateDiff
+                   PotatoCactus.Client.GroundItemsUpdate.EncodeGroundItemsUpdate
+                   PotatoCactus.Client.GroundItemsUpdate.GroundItemsUpdateDiff
+                   PotatoCactus.Client.Interface.EncodeInterfaceUpdate
                    PotatoCactus.Client.LocalEntityList
                    PotatoCactus.Client.PlayerInit
                    PotatoCactus.Interop.ScriptEngineProcess
@@ -40,11 +43,15 @@ executable potato-cactus
                    PotatoCactus.Network.InboundPacketMapper
                    PotatoCactus.Network.Packets.In.ButtonClickPacket
                    PotatoCactus.Network.Packets.In.ChatMessagePacket
+                   PotatoCactus.Network.Packets.In.ContinueDialoguePacket
+                   PotatoCactus.Network.Packets.In.DropItemPacket
                    PotatoCactus.Network.Packets.In.EquipItemPacket
                    PotatoCactus.Network.Packets.In.ItemContainerClickPacket
+                   PotatoCactus.Network.Packets.In.ItemOnObjectPacket
                    PotatoCactus.Network.Packets.In.NpcActionPacket
                    PotatoCactus.Network.Packets.In.NpcAttackPacket
                    PotatoCactus.Network.Packets.In.ObjectActionPacket
+                   PotatoCactus.Network.Packets.In.PickupGroundItemPacket
                    PotatoCactus.Network.Packets.In.PlayerCommandPacket
                    PotatoCactus.Network.Packets.In.PlayerWalkPacket
                    PotatoCactus.Network.Packets.Packet
@@ -52,9 +59,16 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Opcodes
                    PotatoCactus.Network.Packets.PacketLengths
                    PotatoCactus.Network.Packets.Out.AddObjectPacket
+                   PotatoCactus.Network.Packets.Out.AddGroundItemPacket
+                   PotatoCactus.Network.Packets.Out.ChatboxInterfacePacket
                    PotatoCactus.Network.Packets.Out.ChatboxMessagePacket
                    PotatoCactus.Network.Packets.Out.ClearChunkObjectsPacket
+                   PotatoCactus.Network.Packets.Out.CloseInterfacesPacket
                    PotatoCactus.Network.Packets.Out.InitializePlayerPacket
+                   PotatoCactus.Network.Packets.Out.InterfaceAnimationPacket
+                   PotatoCactus.Network.Packets.Out.InterfaceChatheadPacket
+                   PotatoCactus.Network.Packets.Out.InterfacePacket
+                   PotatoCactus.Network.Packets.Out.InterfaceTextPacket
                    PotatoCactus.Network.Packets.Out.LoadMapRegionPacket
                    PotatoCactus.Network.Packets.Out.UpdateFriendsListStatusPacket
                    PotatoCactus.Network.Packets.Out.UpdateItemContainerPacket
@@ -76,9 +90,11 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.PlayerUpdatePacket
                    PotatoCactus.Network.Packets.Out.PlayerUpdate.EncodeSecondaryHitUpdateBlock
                    PotatoCactus.Network.Packets.Out.PlayerSettingsPackets
+                   PotatoCactus.Network.Packets.Out.RemoveGroundItemPacket
                    PotatoCactus.Network.Packets.Out.RemoveObjectPacket
                    PotatoCactus.Network.Packets.Out.SetPlacementReferencePacket
                    PotatoCactus.Network.Packets.Out.TabInterfacePacket
+                   PotatoCactus.Network.Packets.Out.WalkableInterfacePacket
                    PotatoCactus.Network.ClientHandler
                    PotatoCactus.Network.Binary
                    PotatoCactus.Login.LoginHandler
@@ -86,6 +102,9 @@ executable potato-cactus
                    PotatoCactus.Game.Combat.CombatEntity
                    PotatoCactus.Game.Combat.Hit
                    PotatoCactus.Game.Entity.Animation.Animation
+                   PotatoCactus.Game.Entity.EntityData
+                   PotatoCactus.Game.Entity.GroundItem.GroundItem
+                   PotatoCactus.Game.Entity.GroundItem.GroundItemCollection
                    PotatoCactus.Game.Entity.Interaction.Interaction
                    PotatoCactus.Game.Entity.Interaction.State
                    PotatoCactus.Game.Entity.Interaction.Target
@@ -105,11 +124,13 @@ executable potato-cactus
                    PotatoCactus.Game.Interface.FriendsList
                    PotatoCactus.Game.Interface.GameTabs
                    PotatoCactus.Game.Interface.InterfaceButtonDispatch
+                   PotatoCactus.Game.Interface.InterfaceController
                    PotatoCactus.Game.Interface.PlayerInteraction
                    PotatoCactus.Game.Interface.PlayerSettings
                    PotatoCactus.Game.ItemContainer
                    PotatoCactus.Game.Message.EquipItemMessagePayload
                    PotatoCactus.Game.Message.GameChannelMessage
+                   PotatoCactus.Game.Message.ItemOnObjectPayload
                    PotatoCactus.Game.Message.ObjectClickPayload
                    PotatoCactus.Game.Message.RegisterClientPayload
                    PotatoCactus.Game.Movement.Direction
@@ -130,6 +151,8 @@ executable potato-cactus
                    PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions
                    PotatoCactus.Game.PlayerUpdate.ProcessPlayerUpdate
                    PotatoCactus.Game.Position
+                   PotatoCactus.Game.Scripting.Actions.CreateInterface
+                   PotatoCactus.Game.Scripting.Actions.ScriptInvocation
                    PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest
                    PotatoCactus.Game.Scripting.Bridge.BridgeMessage
                    PotatoCactus.Game.Scripting.Bridge.Communication
@@ -140,6 +163,8 @@ executable potato-cactus
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CombatDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CombatTargetDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.CommandDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.DropItemDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.EntityDataDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.GameObjectDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.InteractionDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.ItemContainerDto
@@ -151,16 +176,17 @@ executable potato-cactus
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PlayerDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PositionDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.WorldDto
+                   PotatoCactus.Game.Scripting.BuiltinGameEventProcessor
                    PotatoCactus.Game.Scripting.Events.ApplyScriptActionResult
                    PotatoCactus.Game.Scripting.Events.CreateGameEvents
                    PotatoCactus.Game.Scripting.Events.NpcEvents
                    PotatoCactus.Game.Scripting.Events.PlayerEvents
-                   PotatoCactus.Game.Scripting.MockScriptInteractions
                    PotatoCactus.Game.Scripting.ProcessTickUpdates
                    PotatoCactus.Game.Scripting.ScriptUpdates
                    PotatoCactus.Game.Skills
                    PotatoCactus.Game.Typing
                    PotatoCactus.Game.World
+                   PotatoCactus.Game.World.CallbackScheduler
                    PotatoCactus.Game.World.EntityPositionFinder
                    PotatoCactus.Game.World.MobList
                    PotatoCactus.Game.World.Selectors
@@ -185,6 +211,6 @@ executable potato-cactus
 test-suite tests
     type: exitcode-stdio-1.0
     main-is: Main.hs
-    build-depends: HUnit ^>=1.6, base ^>=4.14.3.0, network, bytestring, utf8-string, binary, binary-strict, time, containers
+    build-depends: HUnit ^>=1.6, base ^>=4.14.3.0, network, bytestring, utf8-string, binary, binary-strict, time, containers, aeson
     hs-source-dirs: tests, app
     default-language: Haskell2010

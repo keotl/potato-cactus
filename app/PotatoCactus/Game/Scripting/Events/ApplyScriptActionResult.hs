@@ -1,8 +1,11 @@
 module PotatoCactus.Game.Scripting.Events.ApplyScriptActionResult (applyScriptResult) where
 
+import Data.Maybe (isJust)
 import Debug.Trace (trace)
 import PotatoCactus.Game.Combat.CombatEntity (CombatEntity (target), CombatTarget (NpcTarget, PlayerTarget), clearTarget)
 import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
+import qualified PotatoCactus.Game.Entity.EntityData as EntityData
+import qualified PotatoCactus.Game.Entity.GroundItem.GroundItemCollection as GroundItemCollection
 import PotatoCactus.Game.Entity.Interaction.Interaction (create)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc (respawn))
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
@@ -10,14 +13,15 @@ import PotatoCactus.Game.Entity.Npc.NpcMovement (immediatelyQueueMovement)
 import qualified PotatoCactus.Game.Entity.Npc.NpcMovement as NM
 import PotatoCactus.Game.Entity.Npc.RespawnStrategy (RespawnStrategy (Never), respawning)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (addDynamicObject)
+import qualified PotatoCactus.Game.ItemContainer as ItemContainer
 import PotatoCactus.Game.Movement.PathPlanner (findPath, findPathNaive)
 import PotatoCactus.Game.Player (Player (interaction), clearTargetIfEngagedWithNpc)
 import qualified PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions as PAnim
 import PotatoCactus.Game.Position (GetPosition (getPosition))
 import qualified PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest as SpawnReq
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, SendMessage, ServerPrintMessage, SetPlayerPosition, SpawnNpc, UpdateNpc))
-import PotatoCactus.Game.World (World (npcs, objects, players))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, GiveItem, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, InvokeScript, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, RemoveGroundItem, RemoveItemStack, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnGroundItem, SpawnNpc, SubtractItem))
+import PotatoCactus.Game.World (World (npcs, objects, players), groundItems)
 import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAll, updateAtIndex)
 import PotatoCactus.Game.World.Selectors (isNpcAt)
@@ -27,14 +31,6 @@ applyScriptResult :: World -> ScriptActionResult -> World
 applyScriptResult world (AddGameObject obj) =
   world
     { objects = addDynamicObject obj (objects world)
-    }
--- applyScriptResult world (UpdatePlayer playerId p) =
---   world
---     { players = updateAtIndex (players world) playerId (const p)
---     }
-applyScriptResult world (UpdateNpc npcId npc) =
-  world
-    { npcs = updateAtIndex (npcs world) npcId (const npc)
     }
 applyScriptResult world (ClearPlayerInteraction playerId) =
   world
@@ -147,3 +143,79 @@ applyScriptResult world (SetPlayerPosition playerIndex pos) =
   world
     { players = updateAtIndex (players world) playerIndex (`P.setPosition` pos)
     }
+applyScriptResult world (InvokeScript invocation delay) =
+  W.scheduleCallback world invocation (W.tick world + max delay 1)
+applyScriptResult world (CreateInterface playerIndex request) =
+  world
+    { players = updateAtIndex (players world) playerIndex (`P.createInterface` request)
+    }
+applyScriptResult world (ClearStandardInterface playerIndex) =
+  world
+    { players = updateAtIndex (players world) playerIndex P.clearStandardInterface
+    }
+applyScriptResult world (SetPlayerEntityData playerIndex key val) =
+  world
+    { players =
+        updateAtIndex
+          (players world)
+          playerIndex
+          (`P.updateEntityData` (\d -> EntityData.setValue d key val))
+    }
+applyScriptResult world (SetPlayerAnimation playerIndex anim) =
+  world
+    { players = updateAtIndex (players world) playerIndex (P.setAnimation anim)
+    }
+applyScriptResult world (GiveItem playerIndex itemId quantity) =
+  world
+    { players = updateAtIndex (players world) playerIndex (`P.giveItem` ItemContainer.ItemStack itemId quantity)
+    }
+applyScriptResult world (SubtractItem playerIndex itemId quantity) =
+  world
+    { players = updateAtIndex (players world) playerIndex (`P.subtractItem` (itemId, quantity))
+    }
+applyScriptResult world (RemoveItemStack playerIndex itemId index) =
+  world
+    { players = updateAtIndex (players world) playerIndex (`P.removeItemStack` (itemId, index))
+    }
+applyScriptResult world (SpawnGroundItem item) =
+  world
+    { groundItems = GroundItemCollection.insert (groundItems world) item
+    }
+applyScriptResult world (RemoveGroundItem itemId quantity position removedByPlayer) =
+  let playerKey = case removedByPlayer of
+        Nothing -> Nothing
+        Just playerId -> fmap P.username (findByIndex (players world) playerId)
+   in let (removed, updated) =
+            GroundItemCollection.remove
+              (groundItems world)
+              (itemId, quantity, position, playerKey)
+       in case (removedByPlayer, removed) of
+            (_, ItemContainer.Empty) -> world
+            (Nothing, _) ->
+              world
+                { groundItems = updated
+                }
+            (Just playerIndex, item) ->
+              case findByIndex (players world) playerIndex of
+                Nothing -> world
+                Just player ->
+                  if ItemContainer.canAddItem (P.inventory player) item
+                    then
+                      world
+                        { groundItems = updated,
+                          players =
+                            updateAtIndex
+                              (players world)
+                              playerIndex
+                              (`P.giveItem` item)
+                        }
+                    else
+                      world
+                        { players =
+                            updateAtIndex
+                              (players world)
+                              playerIndex
+                              ( `P.sendChatboxMessage`
+                                  "You need more inventory space to carry that item."
+                              )
+                        }
