@@ -14,7 +14,7 @@ def give_empty_pot(playerIndex: int):
 
 
 dialogue_root = DialogueNode(__name__, "dialogue_root")
-dialogue_root.add(NpcDialogueScreen(NPC_ID, "Miller", ["Welcome to Mill Lane Mill."])) \
+dialogue_root.add(NpcDialogueScreen(NPC_ID, "Miller", ["Welcome to the mill."])) \
     .add(PlayerDialogueScreen(["Do you have any empty pots lying around?"])) \
     .add(NpcDialogueScreen(NPC_ID, "Miller", ["Of course. Here you go."],
                            onContinue=DialogueCallbackRef(give_empty_pot)))

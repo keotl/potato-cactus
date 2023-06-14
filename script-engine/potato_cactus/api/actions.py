@@ -1,4 +1,4 @@
-from typing import Dict, List, Literal, Optional, Tuple, Union
+from typing import Callable, Dict, List, Literal, Optional, Tuple, Union
 
 from potato_cactus import get_context
 from potato_cactus.api.dto.interface import InterfaceElement
@@ -119,7 +119,11 @@ def SetPlayerPosition(
     })
 
 
-def InvokeScript(callback: ScriptInvocation, delay: int = 1) -> ScriptAction:
+def InvokeScript(callback: Union[Callable[[], List[ScriptAction]], ScriptInvocation],
+                 delay: int = 1) -> ScriptAction:
+    if isinstance(callback, Callable):
+        callback = ScriptInvocation(callback)
+
     return ScriptAction("invokeScript", {
         "f": callback.f,
         "args": callback.args,

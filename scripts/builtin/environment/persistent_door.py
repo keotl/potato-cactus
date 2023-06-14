@@ -7,6 +7,8 @@ from potato_cactus.api.events import ObjectInteractionEventPayload
 @EventHandler(GameEvent.ObjectInteractionEvent, objectId=1516) # Large door left
 @EventHandler(GameEvent.ObjectInteractionEvent, objectId=1551) # Gate right # TODO - handle both parts as one  - keotl 2023-05-13
 @EventHandler(GameEvent.ObjectInteractionEvent, objectId=1553) # Gate left
+@EventHandler(GameEvent.ObjectInteractionEvent, objectId=1536)
+@EventHandler(GameEvent.ObjectInteractionEvent, objectId=1530)
 def on_door_open(e: ObjectInteractionEventPayload, context: Context):
     if (e.interaction.target is None):
         return [ClearPlayerInteraction(e.playerIndex)]

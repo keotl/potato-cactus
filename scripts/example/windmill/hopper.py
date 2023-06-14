@@ -74,17 +74,17 @@ def on_interact_flour_bin(e: ObjectInteractionEventPayload, context: Context):
     pos = e.interaction.target.position
 
     return [
-        SetPlayerEntityData(e.playerIndex, "windmill.flour", current_flour -
-                            1),
+        SetPlayerEntityData(e.playerIndex, "windmill.flour",
+                            current_flour - 1),
         SubtractItem(e.playerIndex, 1931),
         GiveItem(e.playerIndex, 1933),
         SendMessage(e.playerIndex, f"Current flour: {current_flour - 1}"),
         SetPlayerAnimation(e.playerIndex, 832)
-    ] + [
+    ] + ([
         SpawnGameObject(
             1781, (pos.x, pos.y, pos.z), 10,
             0)  # TODO - This object should be instanced  - keotl 2023-05-13
-    ] if current_flour == 1 else []
+    ] if current_flour == 1 else [])
 
 
 def _has_empty_pot(player: Player) -> bool:
