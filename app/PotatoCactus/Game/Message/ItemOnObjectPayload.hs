@@ -1,6 +1,6 @@
 module PotatoCactus.Game.Message.ItemOnObjectPayload where
 
-import PotatoCactus.Game.Definitions.GameObjectDefinitions (GameObjectId)
+import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectId)
 import PotatoCactus.Game.Movement.PositionXY (PositionXY)
 import PotatoCactus.Game.Scripting.Actions.CreateInterface (WidgetId)
 

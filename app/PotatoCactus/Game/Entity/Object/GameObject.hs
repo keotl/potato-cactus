@@ -1,6 +1,6 @@
 module PotatoCactus.Game.Entity.Object.GameObject where
 
-import PotatoCactus.Game.Definitions.GameObjectDefinitions (GameObjectId)
+import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectId)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position)
 import PotatoCactus.Game.Typing (ToNumeric (toNumeric))
 

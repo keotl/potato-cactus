@@ -3,14 +3,15 @@ module PotatoCactus.Boot.ServerInit where
 import Control.Concurrent (threadDelay)
 import Data.Time (diffUTCTime, getCurrentTime)
 import PotatoCactus.Boot.WorldInit (initializeWorld)
+import PotatoCactus.Config.Constants (objectDefinitionsFile)
 import PotatoCactus.Game.Definitions.EquipmentDefinitions (initializeEquipmentDefs)
 import PotatoCactus.Game.Definitions.GameObjectDefinitions (initializeObjectDb)
 import PotatoCactus.Game.Definitions.ItemDefinitions (initializeDb)
 import PotatoCactus.Game.Definitions.NpcDefinitions (initializeNpcDb)
 import PotatoCactus.Game.Definitions.StaticGameObjectSet (initializeStaticGameSet)
+import PotatoCactus.Game.Scripting.Bridge.InitializeScriptEngineContext (initializeScriptEngineContext)
 import PotatoCactus.Interop.ScriptEngineProcess (spawnScriptEngineProcess)
 import PotatoCactus.Utils.Logging (LogLevel (Info), logger)
-import PotatoCactus.Game.Scripting.Bridge.InitializeScriptEngineContext (initializeScriptEngineContext)
 
 initializeServer :: IO ()
 initializeServer = do
@@ -22,7 +23,7 @@ initializeServer = do
   equipmentDefs <- initializeEquipmentDefs
   logger_ Info $ "Loaded " ++ show equipmentDefs ++ " equipment definitions."
 
-  objectDefs <- initializeObjectDb
+  objectDefs <- initializeObjectDb objectDefinitionsFile
   logger_ Info $ "Loaded " ++ show objectDefs ++ " game object definitions."
 
   npcDefs <- initializeNpcDb

@@ -120,7 +120,9 @@ executable potato-cactus
                    PotatoCactus.Game.Definitions.GameObjectDefinitions
                    PotatoCactus.Game.Definitions.ItemDefinitions
                    PotatoCactus.Game.Definitions.NpcDefinitions
+                   PotatoCactus.Game.Definitions.Parser.ObjectDefinitionParser
                    PotatoCactus.Game.Definitions.StaticGameObjectSet
+                   PotatoCactus.Game.Definitions.Types.GameObjectDefinition
                    PotatoCactus.Game.Interface.FriendsList
                    PotatoCactus.Game.Interface.GameTabs
                    PotatoCactus.Game.Interface.InterfaceButtonDispatch
