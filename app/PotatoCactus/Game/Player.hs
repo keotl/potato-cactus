@@ -127,7 +127,7 @@ clearTargetIfEngagedWithNpc npcId p =
 
 sendChatboxMessage :: Player -> String -> Player
 sendChatboxMessage p msg =
-  p {chatboxMessages = msg : chatboxMessages p}
+  p {chatboxMessages = chatboxMessages p ++ [msg]}
 
 setPosition :: Player -> Position -> Player
 setPosition p pos =
