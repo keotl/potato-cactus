@@ -26,7 +26,7 @@ mockInventory_ =
     [ ItemStack 1115 1,
       ItemStack 1067 1,
       ItemStack 1137 1,
-      ItemStack 1155 1
-      -- ItemStack 617 100000
-      -- ItemStack 1947 1
+      ItemStack 1155 1,
+      ItemStack 617 100000,
+      ItemStack 1947 1
     ]
