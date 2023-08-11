@@ -93,6 +93,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Out.RemoveGroundItemPacket
                    PotatoCactus.Network.Packets.Out.RemoveObjectPacket
                    PotatoCactus.Network.Packets.Out.SetPlacementReferencePacket
+                   PotatoCactus.Network.Packets.Out.SetVarpPacket
                    PotatoCactus.Network.Packets.Out.TabInterfacePacket
                    PotatoCactus.Network.Packets.Out.WalkableInterfacePacket
                    PotatoCactus.Network.ClientHandler
@@ -152,6 +153,7 @@ executable potato-cactus
                    PotatoCactus.Game.PlayerUpdate.PlayerUpdate
                    PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions
                    PotatoCactus.Game.PlayerUpdate.ProcessPlayerUpdate
+                   PotatoCactus.Game.PlayerUpdate.VarpSet
                    PotatoCactus.Game.Position
                    PotatoCactus.Game.Scripting.Actions.CreateInterface
                    PotatoCactus.Game.Scripting.Actions.ScriptInvocation

@@ -25,6 +25,7 @@ import PotatoCactus.Game.PlayerUpdate.Equipment (Equipment (Equipment))
 import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate)
 import PotatoCactus.Game.PlayerUpdate.UpdateMask (PlayerUpdateMask, animationFlag, appearanceFlag, primaryHealthUpdateFlag, secondaryHealthUpdateFlag)
 import qualified PotatoCactus.Game.PlayerUpdate.UpdateMask as Mask
+import qualified PotatoCactus.Game.PlayerUpdate.VarpSet as VarpSet
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
 import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest, InterfaceType)
 import PotatoCactus.Game.Typing (Keyable (key))
@@ -47,6 +48,7 @@ data Player = Player
     chatboxMessages :: [String],
     interfaces :: InterfaceController,
     entityData :: EntityData.EntityData,
+    varps :: VarpSet.VarpSet,
     skipUpdate_ :: Bool
   }
   deriving (Show)
@@ -84,6 +86,7 @@ create username position =
       chatboxMessages = [],
       interfaces = IC.create,
       entityData = EntityData.create,
+      varps = VarpSet.create,
       skipUpdate_ = True
     }
 
