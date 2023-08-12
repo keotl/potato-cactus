@@ -1,4 +1,4 @@
-module PotatoCactus.Game.PlayerUpdate.VarpSet (VarpSet, VarpId, Varp, updated, update, allValues, create) where
+module PotatoCactus.Game.PlayerUpdate.VarpSet (VarpSet, VarpId, Varp(varpId, value), updated, update, allValues, create) where
 
 import Data.Binary (Word32)
 import Data.IntMap (IntMap)
