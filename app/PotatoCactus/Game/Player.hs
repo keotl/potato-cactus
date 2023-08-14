@@ -1,5 +1,6 @@
 module PotatoCactus.Game.Player where
 
+import Data.Binary (Word32, Word8)
 import Data.Bits ((.&.), (.|.))
 import Data.Foldable (fold)
 import PotatoCactus.Game.Combat.CombatEntity (CombatEntity, CombatTarget (NpcTarget), clearTargetIfEngagedWith)
@@ -167,8 +168,21 @@ subtractItem p stack =
   p
     { inventory = Container.subtractItem (inventory p) stack
     }
+
 removeItemStack :: Player -> (ItemId, Int) -> Player
 removeItemStack p stack =
   p
     { inventory = Container.removeStack (inventory p) stack
+    }
+
+setVarp :: Player -> (VarpSet.VarpId, Word32) -> Player
+setVarp p operation =
+  p
+    { varps = VarpSet.setVarp operation (varps p)
+    }
+
+setVarbit :: Player -> (VarpSet.VarpId, Word8, Word8, Word32) -> Player
+setVarbit p operation =
+  p
+    { varps = VarpSet.setVarbit operation (varps p)
     }

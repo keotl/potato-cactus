@@ -23,7 +23,7 @@ import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceReque
 import qualified PotatoCactus.Game.Scripting.Actions.CreateInterface as I
 import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation (ScriptInvocation))
 import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest (SpawnNpcRequest))
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, GiveItem, InternalNoop, InternalProcessingComplete, InvokeScript, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, RemoveGroundItem, RemoveItemStack, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnGroundItem, SpawnNpc, SubtractItem))
+import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, GiveItem, InternalNoop, InternalProcessingComplete, InvokeScript, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, RemoveGroundItem, RemoveItemStack, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SetPlayerVarbit, SetPlayerVarp, SpawnGroundItem, SpawnNpc, SubtractItem))
 
 mapResult :: ByteString -> ScriptActionResult
 mapResult bytes =
@@ -333,7 +333,31 @@ decodeBody "removeGroundItem" body =
     body of
     Error msg -> trace msg InternalNoop
     Success decoded -> decoded
-decodeBody _ _ = InternalNoop
+decodeBody "setVarp" body =
+  case parse
+    ( \obj -> do
+        playerIndex <- obj .: "playerIndex"
+        varpId <- obj .: "varpId"
+        value <- obj .: "value"
+        return (SetPlayerVarp playerIndex (varpId, value))
+    )
+    body of
+    Error msg -> trace msg InternalNoop
+    Success decoded -> decoded
+decodeBody "setVarbit" body =
+  case parse
+    ( \obj -> do
+        playerIndex <- obj .: "playerIndex"
+        varpId <- obj .: "varpId"
+        msb <- obj .: "msb"
+        length <- obj .: "length"
+        value <- obj .: "value"
+        return (SetPlayerVarbit playerIndex (varpId, msb, length, value))
+    )
+    body of
+    Error msg -> trace msg InternalNoop
+    Success decoded -> decoded
+decodeBody opcode _ = trace ("Unsupported script action " ++ opcode) InternalNoop
 
 data DecodedMessage = DecodedMessage
   { op :: String,

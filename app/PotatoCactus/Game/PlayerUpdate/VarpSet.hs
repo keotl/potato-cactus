@@ -1,6 +1,6 @@
-module PotatoCactus.Game.PlayerUpdate.VarpSet (VarpSet, VarpId, Varp(varpId, value), updated, update, allValues, create) where
+module PotatoCactus.Game.PlayerUpdate.VarpSet (VarpSet, VarpId, Varp (varpId, value), updated, setVarp, setVarbit, allValues, create) where
 
-import Data.Binary (Word32)
+import Data.Binary (Word32, Word8)
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as IntMap
 import Data.Maybe (mapMaybe)
@@ -39,8 +39,8 @@ updated set =
 allValues :: VarpSet -> [Varp]
 allValues = map snd . IntMap.toList . content_
 
-update :: (VarpId, Word32) -> VarpSet -> VarpSet
-update (varpId, value) set =
+setVarp :: (VarpId, Word32) -> VarpSet -> VarpSet
+setVarp (varpId, value) set =
   if isIdentical_ (varpId, value) set
     then set
     else
@@ -48,6 +48,10 @@ update (varpId, value) set =
         { content_ = IntMap.insert varpId (Varp varpId value) (content_ set),
           updated_ = varpId : updated_ set
         }
+
+setVarbit :: (VarpId, Word8, Word8, Word32) -> VarpSet -> VarpSet
+setVarbit (varpId, msb, length, value) set =
+  set -- TODO - implement  - keotl 2023-08-14
 
 isIdentical_ :: (VarpId, Word32) -> VarpSet -> Bool
 isIdentical_ (varpId, newValue) set =

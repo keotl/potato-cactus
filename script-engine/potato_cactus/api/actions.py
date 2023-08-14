@@ -119,7 +119,8 @@ def SetPlayerPosition(
     })
 
 
-def InvokeScript(callback: Union[Callable[[], List[ScriptAction]], ScriptInvocation],
+def InvokeScript(callback: Union[Callable[[], List[ScriptAction]],
+                                 ScriptInvocation],
                  delay: int = 1) -> ScriptAction:
     if isinstance(callback, Callable):
         callback = ScriptInvocation(callback)
@@ -219,6 +220,26 @@ def RemoveGroundItem(itemId: int,
             "position": _map_position(position),
             "removedByPlayer":
                 removedByPlayer  # For removing scoped items and giving to player
+        })
+
+
+def SetVarp(playerIndex: int, varpId: int, value: int) -> ScriptAction:
+    return ScriptAction("setVarp", {
+        "playerIndex": playerIndex,
+        "varpId": varpId,
+        "value": value
+    })
+
+
+def SetVarbit(playerIndex: int, varpId: int, msb: int, length: int,
+              value: int) -> ScriptAction:
+    return ScriptAction(
+        "setVarp", {
+            "playerIndex": playerIndex,
+            "varpId": varpId,
+            "msb": msb,
+            "length": length,
+            "value": value
         })
 
 

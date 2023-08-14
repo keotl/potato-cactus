@@ -62,4 +62,6 @@ Action constructors are imported from `potato_cactus.api.actions`.
 | RemoveItemStack        | Remove an item stack from the player inventory **at a specific index**.                                                                                                   |
 | SpawnGroundItem        | Spawn an item on the ground. e.g. items dropped by players.                                                                                                               |
 | RemoveGroundItem       | Removes a ground item at pos. e.g. Player picking up an item. If `removedByPlayer`is specified, will look for items visible to that player and add it to their inventory. |
+| SetPlayerVarp          | Set an entire player variable (VarP) to a Word32 value.                                                                                                                   |
+| SetPlayerVarbit        | Within a VarP, set bit values. Marks the VarP as updated.                                                                                                                 |
 

@@ -1,6 +1,7 @@
 module PotatoCactus.Game.Scripting.ScriptUpdates where
 
 import Data.Aeson (Value)
+import Data.Binary (Word32, Word8)
 import PotatoCactus.Game.Combat.CombatEntity (CombatTarget)
 import PotatoCactus.Game.Combat.Hit (Hit)
 import PotatoCactus.Game.Definitions.ItemDefinitions (ItemId)
@@ -11,6 +12,7 @@ import PotatoCactus.Game.Entity.Npc.Npc (Npc, NpcIndex)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Player (Player, PlayerIndex)
+import PotatoCactus.Game.PlayerUpdate.VarpSet (VarpId)
 import PotatoCactus.Game.Position (Position (Position))
 import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest, WidgetId)
 import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation)
@@ -53,6 +55,8 @@ data ScriptActionResult
   | SpawnGroundItem GroundItem
   | RemoveGroundItem ItemId Int Position (Maybe PlayerIndex)
   | SetPlayerEntityData PlayerIndex String Value
+  | SetPlayerVarp PlayerIndex (VarpId, Word32)
+  | SetPlayerVarbit PlayerIndex (VarpId, Word8, Word8, Word32)
   | InternalNoop
   | ServerPrintMessage String -- for testing
   deriving (Show)

@@ -18,9 +18,10 @@ import PotatoCactus.Game.Movement.PathPlanner (findPath, findPathNaive)
 import PotatoCactus.Game.Player (Player (interaction), clearTargetIfEngagedWithNpc)
 import qualified PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions as PAnim
+import PotatoCactus.Game.PlayerUpdate.VarpSet (Varp (varpId))
 import PotatoCactus.Game.Position (GetPosition (getPosition))
 import qualified PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest as SpawnReq
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, GiveItem, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, InvokeScript, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, RemoveGroundItem, RemoveItemStack, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnGroundItem, SpawnNpc, SubtractItem))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, GiveItem, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, InvokeScript, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, RemoveGroundItem, RemoveItemStack, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SetPlayerVarbit, SetPlayerVarp, SpawnGroundItem, SpawnNpc, SubtractItem))
 import PotatoCactus.Game.World (World (npcs, objects, players), groundItems)
 import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAll, updateAtIndex)
@@ -219,3 +220,19 @@ applyScriptResult world (RemoveGroundItem itemId quantity position removedByPlay
                                   "You need more inventory space to carry that item."
                               )
                         }
+applyScriptResult world (SetPlayerVarp playerIndex operation) =
+  world
+    { players =
+        updateAtIndex
+          (players world)
+          playerIndex
+          (`P.setVarp` operation)
+    }
+applyScriptResult world (SetPlayerVarbit playerIndex operation) =
+  world
+    { players =
+        updateAtIndex
+          (players world)
+          playerIndex
+          (`P.setVarbit` operation)
+    }
