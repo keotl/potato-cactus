@@ -129,7 +129,7 @@ testGroundItemCollection =
       TestCase
         ( assertEqual
             "findMatchingItem does not find an item only visible to another player"
-            (Just scopedItem)
+            Nothing
             ( GroundItemCollection.findMatchingItem
                 (123, itemPos, "the master")
                 collection
