@@ -1,7 +1,7 @@
 module PotatoCactus.Client.GroundItemsUpdate.GroundItemsUpdateDiff (fromGroundItem, computeDiff, GroundItemClientView (..), GroundItemDiff (..)) where
 
 import Data.Maybe (mapMaybe)
-import PotatoCactus.Game.Definitions.ItemDefinitions (ItemId)
+import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemId)
 import PotatoCactus.Game.Entity.GroundItem.GroundItem (GroundItem)
 import qualified PotatoCactus.Game.Entity.GroundItem.GroundItem as GroundItem
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position)

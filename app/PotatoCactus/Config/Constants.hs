@@ -22,3 +22,4 @@ scriptWorkers :: Int
 scriptWorkers = 1
 
 objectDefinitionsFile = "game-data/definitions/objects.json"
+itemDefinitionsFile = "game-data/definitions/items.json"

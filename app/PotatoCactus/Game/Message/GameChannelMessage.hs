@@ -1,7 +1,7 @@
 module PotatoCactus.Game.Message.GameChannelMessage where
 
 import PotatoCactus.Game.Definitions.EquipmentDefinitions (EquipmentSlot)
-import PotatoCactus.Game.Definitions.ItemDefinitions (ItemId)
+import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemId)
 import PotatoCactus.Game.Entity.Npc.Npc (NpcIndex)
 import PotatoCactus.Game.Message.EquipItemMessagePayload (EquipItemMessagePayload)
 import PotatoCactus.Game.Message.ItemOnObjectPayload (ItemOnObjectPayload)

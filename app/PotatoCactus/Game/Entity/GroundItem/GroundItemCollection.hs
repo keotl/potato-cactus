@@ -5,12 +5,12 @@ import Data.List (delete, find, partition)
 import qualified Data.Map as Map
 import Data.Maybe (fromJust, fromMaybe, mapMaybe, maybeToList)
 import PotatoCactus.Config.Constants (groundItemGlobalDespawnDelay)
-import PotatoCactus.Game.Definitions.ItemDefinitions (ItemId)
 import PotatoCactus.Game.Entity.GroundItem.GroundItem (GroundItem)
 import qualified PotatoCactus.Game.Entity.GroundItem.GroundItem as GroundItem
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as IntMap
 import PotatoCactus.Game.ItemContainer (ItemStack (Empty))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, y, z), chunkX, chunkY)
+import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemId)
 
 type PlayerVisibilityKey = String
 

@@ -2,7 +2,8 @@ module PotatoCactus.Game.ItemContainer where
 
 import Data.List (findIndex)
 import Data.Maybe (isJust, isNothing)
-import PotatoCactus.Game.Definitions.ItemDefinitions (ItemDefinition (stackable), ItemId, itemDefinition)
+import PotatoCactus.Game.Definitions.ItemDefinitions (itemDefinition)
+import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemDefinition (stackable), ItemId)
 import PotatoCactus.Game.Typing (Advance (advance))
 import PotatoCactus.Utils.Iterable (replaceAtIndex)
 import Prelude hiding (id)

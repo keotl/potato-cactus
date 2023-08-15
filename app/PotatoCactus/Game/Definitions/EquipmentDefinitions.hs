@@ -4,9 +4,10 @@ import Data.IORef (newIORef, readIORef, writeIORef)
 import Data.IntMap (IntMap, empty, insert, size, (!?))
 import GHC.IO (unsafePerformIO)
 import GHC.IORef (IORef)
-import PotatoCactus.Game.Definitions.ItemDefinitions (ItemId)
+import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemId)
 
 type EquipmentSlot = Int
+
 data EquipmentDefinition = EquipmentDefinition
   { itemId :: ItemId,
     slot :: EquipmentSlot,

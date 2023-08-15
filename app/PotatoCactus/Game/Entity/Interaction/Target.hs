@@ -1,6 +1,6 @@
 module PotatoCactus.Game.Entity.Interaction.Target where
 
-import PotatoCactus.Game.Definitions.ItemDefinitions (ItemId)
+import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemId)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc, NpcIndex)
 import PotatoCactus.Game.Entity.Object.GameObjectKey (GameObjectKey)
 import PotatoCactus.Game.Message.ItemOnObjectPayload (ItemOnObjectPayload)

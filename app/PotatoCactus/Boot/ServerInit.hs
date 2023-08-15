@@ -3,7 +3,7 @@ module PotatoCactus.Boot.ServerInit where
 import Control.Concurrent (threadDelay)
 import Data.Time (diffUTCTime, getCurrentTime)
 import PotatoCactus.Boot.WorldInit (initializeWorld)
-import PotatoCactus.Config.Constants (objectDefinitionsFile)
+import PotatoCactus.Config.Constants (itemDefinitionsFile, objectDefinitionsFile)
 import PotatoCactus.Game.Definitions.EquipmentDefinitions (initializeEquipmentDefs)
 import PotatoCactus.Game.Definitions.GameObjectDefinitions (initializeObjectDb)
 import PotatoCactus.Game.Definitions.ItemDefinitions (initializeDb)
@@ -17,7 +17,7 @@ initializeServer :: IO ()
 initializeServer = do
   startTime <- getCurrentTime
 
-  itemDefs <- initializeDb
+  itemDefs <- initializeDb itemDefinitionsFile
   logger_ Info $ "Loaded " ++ show itemDefs ++ " item definitions."
 
   equipmentDefs <- initializeEquipmentDefs

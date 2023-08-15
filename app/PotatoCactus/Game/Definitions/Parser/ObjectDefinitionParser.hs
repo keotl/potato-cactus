@@ -6,6 +6,7 @@ import Data.Aeson (FromJSON, decode)
 import Data.Aeson.Types (parse)
 import qualified Data.ByteString.Lazy as B
 import GHC.Generics (Generic)
+import PotatoCactus.Config.Constants (itemDefinitionsFile)
 import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectDefinition (GameObjectDefinition))
 import PotatoCactus.Utils.Logging (LogLevel (Error), logger)
 import Prelude hiding (id)
@@ -16,7 +17,7 @@ parseObjectDefinitionFile filename = do
 
   case decode content :: Maybe [ExtractedGameObjectDefinition] of
     Nothing -> do
-      logger_ Error "Parsing error on definitions/objects.json"
+      logger_ Error $ "Parsing error on " ++ itemDefinitionsFile
       return []
     Just extracted -> return $ map assembleDefinition_ extracted
 
