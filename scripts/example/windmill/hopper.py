@@ -1,11 +1,13 @@
 from potato_cactus import Context, EventHandler, GameEvent
 from potato_cactus.api.actions import (ClearPlayerInteraction, GiveItem,
                                        SendMessage, SetPlayerAnimation,
-                                       SetPlayerEntityData, SetVarbit,
-                                       SubtractItem)
+                                       SetPlayerEntityData, SubtractItem)
 from potato_cactus.api.dto.player import Player
 from potato_cactus.api.events import (ItemOnObjectInteractionEventPayload,
                                       ObjectInteractionEventPayload)
+from potato_cactus.helper.varp import Varbit
+
+FLOUR_VARP = Varbit(203, 0, 4)
 
 
 @EventHandler(GameEvent.ItemOnObjectInteractionEvent, objectId=2714)
@@ -40,7 +42,7 @@ def on_interact_controls(e: ObjectInteractionEventPayload, context: Context):
             SetPlayerEntityData(e.playerIndex, "windmill.grain", 0),
             SetPlayerEntityData(e.playerIndex, "windmill.flour",
                                 current_grain + current_flour),
-            SetVarbit(player.serverIndex, 203, 0, 4, 1),
+            FLOUR_VARP.set(e.playerIndex, 1),
             SendMessage(e.playerIndex,
                         f"Current flour: {current_grain + current_flour}"),
             SetPlayerAnimation(e.playerIndex, 832),
@@ -76,7 +78,7 @@ def on_interact_flour_bin(e: ObjectInteractionEventPayload, context: Context):
         SendMessage(e.playerIndex, f"Current flour: {current_flour - 1}"),
         SetPlayerAnimation(e.playerIndex, 832)
     ] + ([
-        SetVarbit(player.serverIndex, 203, 0, 4, 0),
+        FLOUR_VARP.set(e.playerIndex, 0),
     ] if current_flour == 1 else [])
 
 

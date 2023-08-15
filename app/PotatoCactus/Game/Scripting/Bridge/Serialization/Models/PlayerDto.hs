@@ -11,6 +11,7 @@ import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.EntityDataDto (en
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.InteractionDto (interactionToDto)
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.ItemContainerDto (itemContainerDto)
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.MovementDto (MovementDto, playerMovementDto)
+import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.VarpsetDto (varpsetDto)
 
 data PlayerDto = PlayerDto
   { serverIndex :: Int,
@@ -20,7 +21,8 @@ data PlayerDto = PlayerDto
     interaction :: Value,
     inventory :: [Value],
     equipment :: [Value],
-    entityData :: Value
+    entityData :: Value,
+    varps :: Value
   }
   deriving (Show, Generic)
 
@@ -36,5 +38,6 @@ playerDto p =
       interaction = interactionToDto . P.interaction $ p,
       inventory = itemContainerDto . P.inventory $ p,
       equipment = itemContainerDto . EQ.container . P.equipment $ p,
-      entityData = entityDataDto . P.entityData $ p
+      entityData = entityDataDto . P.entityData $ p,
+      varps = varpsetDto . P.varps $ p
     }
