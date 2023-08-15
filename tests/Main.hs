@@ -11,6 +11,7 @@ import GetMonadTests (getTests)
 import IterableTests (testReplaceAt)
 import MobListTests (testMobList)
 import Test.HUnit
+import Game.Player.VarpSetTests (testVarpSet)
 
 tests =
   TestList
@@ -33,7 +34,8 @@ tests =
       testMobList,
       testObjectDiff,
       testGroundItemCollection,
-      groundItemsUpdateDiffTests
+      groundItemsUpdateDiffTests,
+      testVarpSet
     ]
 
 main :: IO ()

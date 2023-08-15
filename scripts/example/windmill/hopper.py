@@ -1,7 +1,7 @@
 from potato_cactus import Context, EventHandler, GameEvent
 from potato_cactus.api.actions import (ClearPlayerInteraction, GiveItem,
                                        SendMessage, SetPlayerAnimation,
-                                       SetPlayerEntityData, SpawnGameObject,
+                                       SetPlayerEntityData, SetVarbit,
                                        SubtractItem)
 from potato_cactus.api.dto.player import Player
 from potato_cactus.api.events import (ItemOnObjectInteractionEventPayload,
@@ -35,15 +35,12 @@ def on_interact_controls(e: ObjectInteractionEventPayload, context: Context):
 
     current_grain = player.entityData.get("windmill.grain", 0)
     current_flour = player.entityData.get("windmill.flour", 0)
-    controls_pos = e.interaction.target.position
     if current_grain + current_flour > 0:
         return [
             SetPlayerEntityData(e.playerIndex, "windmill.grain", 0),
             SetPlayerEntityData(e.playerIndex, "windmill.flour",
                                 current_grain + current_flour),
-            SpawnGameObject(
-                1782, (controls_pos.x, controls_pos.y + 1, 0), 10, 0
-            ),  # TODO - This object should be instanced  - keotl 2023-05-13
+            SetVarbit(player.serverIndex, 203, 0, 4, 1),
             SendMessage(e.playerIndex,
                         f"Current flour: {current_grain + current_flour}"),
             SetPlayerAnimation(e.playerIndex, 832),
@@ -55,7 +52,7 @@ def on_interact_controls(e: ObjectInteractionEventPayload, context: Context):
     ]
 
 
-@EventHandler(GameEvent.ObjectInteractionEvent, objectId=1782)
+@EventHandler(GameEvent.ObjectInteractionEvent, objectId=1781)
 def on_interact_flour_bin(e: ObjectInteractionEventPayload, context: Context):
     player = context.find_player_by_index(e.playerIndex)
     if player is None or e.interaction.target is None:
@@ -71,8 +68,6 @@ def on_interact_flour_bin(e: ObjectInteractionEventPayload, context: Context):
                         "You need an empty pot to hold the flour in.")
         ]
 
-    pos = e.interaction.target.position
-
     return [
         SetPlayerEntityData(e.playerIndex, "windmill.flour",
                             current_flour - 1),
@@ -81,9 +76,7 @@ def on_interact_flour_bin(e: ObjectInteractionEventPayload, context: Context):
         SendMessage(e.playerIndex, f"Current flour: {current_flour - 1}"),
         SetPlayerAnimation(e.playerIndex, 832)
     ] + ([
-        SpawnGameObject(
-            1781, (pos.x, pos.y, pos.z), 10,
-            0)  # TODO - This object should be instanced  - keotl 2023-05-13
+        SetVarbit(player.serverIndex, 203, 0, 4, 0),
     ] if current_flour == 1 else [])
 
 

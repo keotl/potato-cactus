@@ -231,13 +231,13 @@ def SetVarp(playerIndex: int, varpId: int, value: int) -> ScriptAction:
     })
 
 
-def SetVarbit(playerIndex: int, varpId: int, msb: int, length: int,
+def SetVarbit(playerIndex: int, varpId: int, lsb: int, length: int,
               value: int) -> ScriptAction:
     return ScriptAction(
         "setVarp", {
             "playerIndex": playerIndex,
             "varpId": varpId,
-            "msb": msb,
+            "lsb": lsb,
             "length": length,
             "value": value
         })

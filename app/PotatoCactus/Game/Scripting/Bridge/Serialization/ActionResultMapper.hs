@@ -349,10 +349,10 @@ decodeBody "setVarbit" body =
     ( \obj -> do
         playerIndex <- obj .: "playerIndex"
         varpId <- obj .: "varpId"
-        msb <- obj .: "msb"
+        lsb <- obj .: "lsb"
         length <- obj .: "length"
         value <- obj .: "value"
-        return (SetPlayerVarbit playerIndex (varpId, msb, length, value))
+        return (SetPlayerVarbit playerIndex (varpId, lsb, length, value))
     )
     body of
     Error msg -> trace msg InternalNoop

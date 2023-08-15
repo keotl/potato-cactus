@@ -1,10 +1,12 @@
 module PotatoCactus.Game.PlayerUpdate.VarpSet (VarpSet, VarpId, Varp (varpId, value), updated, setVarp, setVarbit, allValues, create) where
 
 import Data.Binary (Word32, Word8)
+import Data.Bits (complement, shiftL, (.&.), (.|.))
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as IntMap
 import Data.Maybe (mapMaybe)
 import PotatoCactus.Game.Typing (Advance (advance))
+import PotatoCactus.Network.Binary (toWord_)
 
 type VarpId = Int
 
@@ -50,8 +52,21 @@ setVarp (varpId, value) set =
         }
 
 setVarbit :: (VarpId, Word8, Word8, Word32) -> VarpSet -> VarpSet
-setVarbit (varpId, msb, length, value) set =
-  set -- TODO - implement  - keotl 2023-08-14
+setVarbit (varpId, lsb, length, value) set =
+  let oldValue = getVarpValue_ varpId set
+   in let mask = varbitMask_ lsb length
+       in let updated =
+                (complement mask .&. oldValue)
+                  .|. (mask .&. (value `shiftL` fromIntegral lsb))
+           in setVarp (varpId, updated) set
+
+getVarpValue_ :: VarpId -> VarpSet -> Word32
+getVarpValue_ varpId set =
+  maybe 0 value (IntMap.lookup varpId $ content_ set)
+
+varbitMask_ :: Word8 -> Word8 -> Word32
+varbitMask_ msb length =
+  ((1 `shiftL` fromIntegral length) - 1) `shiftL` fromIntegral msb
 
 isIdentical_ :: (VarpId, Word32) -> VarpSet -> Bool
 isIdentical_ (varpId, newValue) set =
