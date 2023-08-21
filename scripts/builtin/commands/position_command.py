@@ -22,7 +22,7 @@ def on_command(e: PlayerCommandEventPayload, context: Context):
             SendMessage(
                 e.playerIndex,
                 f"Map ({player.movement.position.x // 64},{player.movement.position.y // 64}); "
-                "Offset ({player.movement.position.x - (player.movement.position.x // 64) * 64},{player.movement.position.y - (player.movement.position.y // 64) * 64})"
+                f"Offset ({player.movement.position.x - (player.movement.position.x // 64) * 64},{player.movement.position.y - (player.movement.position.y // 64) * 64})"
             ),
         ]
     return [

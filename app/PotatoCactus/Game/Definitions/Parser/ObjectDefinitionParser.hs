@@ -8,6 +8,7 @@ import qualified Data.ByteString.Lazy as B
 import GHC.Generics (Generic)
 import PotatoCactus.Config.Constants (itemDefinitionsFile)
 import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectDefinition (GameObjectDefinition))
+import qualified PotatoCactus.Game.Definitions.Types.GameObjectDefinition as Def
 import PotatoCactus.Utils.Logging (LogLevel (Error), logger)
 import Prelude hiding (id)
 
@@ -23,7 +24,15 @@ parseObjectDefinitionFile filename = do
 
 assembleDefinition_ :: ExtractedGameObjectDefinition -> GameObjectDefinition
 assembleDefinition_ extracted =
-  GameObjectDefinition (id extracted)
+  Def.GameObjectDefinition
+    { Def.id = id extracted,
+      Def.sizeX = sizeX extracted,
+      Def.sizeY = sizeY extracted,
+      Def.wall = wall extracted,
+      Def.walkable = walkable extracted,
+      Def.solid = solid extracted,
+      Def.face = face extracted
+    }
 
 data ExtractedGameObjectDefinition = ExtractedGameObjectDefinition
   { id :: Int,

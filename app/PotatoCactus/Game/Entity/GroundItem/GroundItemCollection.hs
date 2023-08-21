@@ -4,13 +4,13 @@ import qualified Data.IntMap as IntMap
 import Data.List (delete, find, partition)
 import qualified Data.Map as Map
 import Data.Maybe (fromJust, fromMaybe, mapMaybe, maybeToList)
-import PotatoCactus.Config.Constants (groundItemGlobalDespawnDelay)
+import PotatoCactus.Config.Constants (groundItemGlobalDespawnDelay, positionBoundExponentXY_)
+import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemId)
 import PotatoCactus.Game.Entity.GroundItem.GroundItem (GroundItem)
 import qualified PotatoCactus.Game.Entity.GroundItem.GroundItem as GroundItem
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as IntMap
 import PotatoCactus.Game.ItemContainer (ItemStack (Empty))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, y, z), chunkX, chunkY)
-import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemId)
 
 type PlayerVisibilityKey = String
 
@@ -148,11 +148,15 @@ key_ pos = chunkKey_ (chunkX pos, chunkY pos, z pos)
 chunkKey_ :: (Int, Int, Int) -> Int
 chunkKey_ (x, y, z) =
   x
-    + y * 10 ^ 5
-    + z * 10 ^ 10
+    + y * 10 ^ keyExponentY_
+    + z * 10 ^ keyExponentZ_
 
 visibilityKey_ :: GroundItem -> PlayerVisibilityKey
 visibilityKey_ GroundItem.GroundItem {GroundItem.player = Nothing} =
   everyone
 visibilityKey_ GroundItem.GroundItem {GroundItem.player = Just username} =
   username
+
+keyExponentY_ = positionBoundExponentXY_
+
+keyExponentZ_ = 2 * positionBoundExponentXY_

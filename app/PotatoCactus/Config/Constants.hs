@@ -23,3 +23,7 @@ scriptWorkers = 1
 
 objectDefinitionsFile = "game-data/definitions/objects.json"
 itemDefinitionsFile = "game-data/definitions/items.json"
+
+-- Hashing function config
+positionBoundExponentXY_ = 6 -- X or Y will be less than 10^6
+positionBoundExponentZ_ = 1 -- Z will be less than 10^1
