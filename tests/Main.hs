@@ -12,6 +12,7 @@ import IterableTests (testReplaceAt)
 import MobListTests (testMobList)
 import Test.HUnit
 import Game.Player.VarpSetTests (testVarpSet)
+import Game.DynamicObjectCollectionTests (testDynamicObjectCollection)
 
 tests =
   TestList
@@ -35,7 +36,8 @@ tests =
       testObjectDiff,
       testGroundItemCollection,
       groundItemsUpdateDiffTests,
-      testVarpSet
+      testVarpSet,
+      testDynamicObjectCollection
     ]
 
 main :: IO ()
