@@ -28,56 +28,67 @@ addDynamicObject :: GameObject -> DynamicObjectCollection -> DynamicObjectCollec
 addDynamicObject object collection =
   let updatedElements =
         alter
-          (insertInChunkMap_ object)
+          (addObjectInChunkMap_ object)
           (objChunkKey_ object)
           (elements_ collection)
    in collection {elements_ = updatedElements}
 
-insertInChunkMap_ :: DynamicObject -> Maybe (IntMap [DynamicObject]) -> Maybe (IntMap [DynamicObject])
-insertInChunkMap_ obj chunkMap =
+addObjectInChunkMap_ :: GameObject -> Maybe (IntMap [DynamicObject]) -> Maybe (IntMap [DynamicObject])
+addObjectInChunkMap_ obj chunkMap =
   Just $
     alter
-      (alterChunkMapInsert_ obj)
+      (addObjectToTile_ obj)
       (key_ obj)
       (fromMaybe empty chunkMap)
 
-alterChunkMapInsert_ :: DynamicObject -> Maybe [DynamicObject] -> Maybe [DynamicObject]
-alterChunkMapInsert_ newObj Nothing = Just [newObj]
-alterChunkMapInsert_ newObj (Just l) = Just (newObj : l)
+addObjectToTile_ :: GameObject -> Maybe [DynamicObject] -> Maybe [DynamicObject]
+addObjectToTile_ newObject Nothing = Just [Added newObject]
+addObjectToTile_ newObject (Just tileObjects) =
+  case matchingEntry_ newObject tileObjects of
+    Nothing -> Just $ Added newObject : tileObjects
+    Just existing -> case existing of
+      Added _ -> Just tileObjects
+      Removed _ -> Just $ filter ((/=) newObject . unwrap_) tileObjects
 
-removeDynamicObject :: GameObjectId -> (Position, GameObjectType) -> DynamicObjectCollection -> DynamicObjectCollection
-removeDynamicObject objectId (pos, objType) collection =
+matchingEntry_ :: GameObject -> [DynamicObject] -> Maybe DynamicObject
+matchingEntry_ _ [] = Nothing
+matchingEntry_ predicateObject (x : xs) =
+  let object = unwrap_ x
+   in if predicateObject == object
+        then Just x
+        else matchingEntry_ predicateObject xs
+
+removeDynamicObject :: GameObject -> DynamicObjectCollection -> DynamicObjectCollection
+removeDynamicObject object collection =
   let updated =
         alter
-          (removeFromChunkMap_ objectId (pos, objType))
-          (posChunkKey_ pos)
+          (removeObjectFromChunkMap_ object)
+          (objChunkKey_ object)
           (elements_ collection)
    in collection {elements_ = updated}
 
-removeFromChunkMap_ :: GameObjectId -> (Position, GameObjectType) -> Maybe (IntMap [DynamicObject]) -> Maybe (IntMap [DynamicObject])
-removeFromChunkMap_ _ _ Nothing = Nothing
-removeFromChunkMap_ objectId keylike (Just chunkMap) =
+removeObjectFromChunkMap_ :: GameObject -> Maybe (IntMap [DynamicObject]) -> Maybe (IntMap [DynamicObject])
+removeObjectFromChunkMap_ object Nothing =
+  Just $
+    insert (key_ object) [Removed object] empty
+removeObjectFromChunkMap_ object (Just chunkMap) =
   Just $
     alter
-      (alterChunkMapRemove_ objectId keylike)
-      (gameObjectHash keylike)
+      (removeFromTileObjects_ object)
+      (key_ object)
       chunkMap
 
-alterChunkMapRemove_ :: GameObjectId -> (Position, GameObjectType) -> Maybe [DynamicObject] -> Maybe [DynamicObject]
-alterChunkMapRemove_ _ (pos, objType) Nothing = Nothing
-alterChunkMapRemove_ removedId (pos, objType) (Just l) =
-  Just $
-    filter
-      (not . matchesForRemoval_ removedId)
-      l
+removeFromTileObjects_ :: GameObject -> Maybe [DynamicObject] -> Maybe [DynamicObject]
+removeFromTileObjects_ removed Nothing = Just [Removed removed]
+removeFromTileObjects_ removed (Just tileObjects) =
+  case matchingEntry_ removed tileObjects of
+    Nothing -> Just $ Removed removed : tileObjects
+    Just existing -> case existing of
+      Added _ -> Just $ filter ((/=) removed . unwrap_) tileObjects
+      Removed _ -> Just tileObjects
 
-matchesForRemoval_ :: GameObjectId -> DynamicObject -> Bool
-matchesForRemoval_ objectId (Added obj) = id obj == objectId
-matchesForRemoval_ objectId (Removed obj) = id obj == objectId
-
-key_ :: DynamicObject -> Int
-key_ (Added object) = gameObjectHash (position object, objectType object)
-key_ (Removed object) = gameObjectHash (position object, objectType object)
+key_ :: GameObject -> Int
+key_ object = gameObjectHash (position object, objectType object)
 
 chunkKey_ :: Int -> Int -> Int -> Int
 chunkKey_ cx cy z =
@@ -89,7 +100,7 @@ posChunkKey_ :: Position -> Int
 posChunkKey_ pos =
   let cx = chunkX pos in let cy = chunkY pos in chunkKey_ cx cy (z pos)
 
-objChunkKey_ :: DynamicObject -> Int
+objChunkKey_ :: GetPosition a => a -> Int
 objChunkKey_ obj =
   posChunkKey_ (getPosition obj)
 
@@ -101,6 +112,10 @@ findByChunkXY cx cy z collection =
           (chunkKey_ cx cy z)
           (elements_ collection)
    in concatMap snd (toList chunkMap)
+
+unwrap_ :: DynamicObject -> GameObject
+unwrap_ (Added obj) = obj
+unwrap_ (Removed obj) = obj
 
 -- For serialization
 iter :: DynamicObjectCollection -> [DynamicObject]

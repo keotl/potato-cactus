@@ -32,7 +32,8 @@ data GameEvent
   deriving (Show)
 
 data ScriptActionResult
-  = AddGameObject DynamicObject
+  = SpawnGameObject GameObject
+  | RemoveGameObject GameObject
   | ClearPlayerInteraction PlayerIndex
   | DispatchAttackPlayerToNpc PlayerIndex NpcIndex Hit
   | DispatchAttackNpcToPlayer NpcIndex PlayerIndex Hit
