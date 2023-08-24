@@ -27,10 +27,10 @@ initializeServer = do
   logger_ Info $ "Loaded " ++ show objectDefs ++ " game object definitions."
 
   npcDefs <- initializeNpcDb
-  logger_ Info $ "Loaded " ++ show npcDefs ++ " game NPC definitions."
+  logger_ Info $ "Loaded " ++ show npcDefs ++ " NPC definitions."
 
   staticObjects <- initializeStaticGameSet
-  logger_ Info $ "Loaded " ++ show staticObjects ++ " static game objects."
+  logger_ Info $ "Loaded " ++ show staticObjects ++ " static game object placements."
 
   initializeWorld
   logger_ Info "Loaded world."

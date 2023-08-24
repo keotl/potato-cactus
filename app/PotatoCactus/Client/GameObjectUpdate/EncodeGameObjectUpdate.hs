@@ -1,9 +1,10 @@
-module PotatoCactus.Client.GameObjectUpdate.EncodeGameObjectUpdate where
+module PotatoCactus.Client.GameObjectUpdate.EncodeGameObjectUpdate (encodeGameObjectUpdate) where
 
 import Data.ByteString (ByteString, concat, empty)
 import PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateDiff (GameObjectDiff (Added, Removed, Retained), computeDiff)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject, findByChunkXY)
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as Object
+import PotatoCactus.Game.Entity.Object.GameObject (GameObject (objectType), gameObjectHash)
 import PotatoCactus.Game.Movement.MovementEntity (hasChangedRegion)
 import PotatoCactus.Game.Player (Player (movement))
 import PotatoCactus.Game.Position (GetPosition (getPosition), chunkX, chunkY)
@@ -13,6 +14,7 @@ import PotatoCactus.Network.Packets.Out.AddObjectPacket (addObjectPacket)
 import PotatoCactus.Network.Packets.Out.ClearChunkObjectsPacket (clearChunksAroundPlayer)
 import PotatoCactus.Network.Packets.Out.RemoveObjectPacket (removeObjectPacket)
 import PotatoCactus.Network.Packets.Out.SetPlacementReferencePacket (setPlacementReferencePacket)
+import PotatoCactus.Utils.Flow ((|>))
 
 encodeGameObjectUpdate :: [DynamicObject] -> World -> Player -> ([DynamicObject], ByteString)
 encodeGameObjectUpdate oldObjects world player =
@@ -22,38 +24,77 @@ encodeGameObjectUpdate oldObjects world player =
           ( newObjects,
             Data.ByteString.concat
               ( clearChunksAroundPlayer player :
-                map (encodeSingle player) (computeDiff [] newObjects)
+                encodeOperations player (map (selectOperation player) (computeDiff [] newObjects))
               )
           )
         else
           ( newObjects,
-            Data.ByteString.concat
-              (map (encodeSingle player) (computeDiff oldObjects newObjects))
+            Data.ByteString.concat $
+              encodeOperations player (map (selectOperation player) (computeDiff oldObjects newObjects))
           )
 
-encodeSingle :: Player -> GameObjectDiff -> ByteString
-encodeSingle p (Added object) =
+data OpType = RemoveObject GameObject | AddObject GameObject | Noop
+
+selectOperation :: Player -> GameObjectDiff -> OpType
+selectOperation p (Added object) =
   case object of
     Object.Added wrapped ->
-      Data.ByteString.concat
-        [ setPlacementReferencePacket p (getPosition wrapped),
-          addObjectPacket (getPosition wrapped) wrapped
-        ]
+      AddObject wrapped
     Object.Removed wrapped ->
-      Data.ByteString.concat
-        [ setPlacementReferencePacket p (getPosition wrapped),
-          removeObjectPacket (getPosition wrapped) wrapped
-        ]
-encodeSingle p (Removed object) =
+      RemoveObject wrapped
+selectOperation p (Removed object) =
   case object of
     Object.Added wrapped ->
-      Data.ByteString.concat
-        [ setPlacementReferencePacket p (getPosition wrapped),
-          removeObjectPacket (getPosition wrapped) wrapped
-          -- TODO - implement restoring an object from the static object set  - keotl 2023-03-13
-        ]
-    Object.Removed wrapped -> empty -- TODO - implement restoring an object from the static object set  - keotl 2023-03-13
-encodeSingle p (Retained _) = empty
+      RemoveObject wrapped
+    Object.Removed wrapped -> AddObject wrapped
+selectOperation p (Retained _) = Noop
+
+encodeOperations :: Player -> [OpType] -> [ByteString]
+encodeOperations p operations =
+  let removals = filter isRemoval operations
+   in let additions = filter isAddition operations
+       in (additions ++ removals)
+            |> deduplicateOperations []
+            |> map (encodeOp p)
+
+-- Selects the first seen operation per (tile/objectType) combo and
+-- ignores the rest. Used to ignore remove packets for replaced
+-- objects.
+deduplicateOperations :: [Int] -> [OpType] -> [OpType]
+deduplicateOperations _ [] = []
+deduplicateOperations seen (op : xs) =
+  let hash = seenHash_ op
+   in if hash `elem` seen
+        then deduplicateOperations seen xs
+        else op : deduplicateOperations (hash : seen) xs
+
+seenHash_ :: OpType -> Int
+seenHash_ (AddObject wrapped) =
+  gameObjectHash (getPosition wrapped, objectType wrapped)
+seenHash_ (RemoveObject wrapped) =
+  gameObjectHash (getPosition wrapped, objectType wrapped)
+seenHash_ _ = 0 -- Should not happen
+
+encodeOp :: Player -> OpType -> ByteString
+encodeOp p (AddObject wrapped) =
+  Data.ByteString.concat
+    [ setPlacementReferencePacket p (getPosition wrapped),
+      addObjectPacket (getPosition wrapped) wrapped
+    ]
+encodeOp p (RemoveObject wrapped) =
+  Data.ByteString.concat
+    [ setPlacementReferencePacket p (getPosition wrapped),
+      removeObjectPacket (getPosition wrapped) wrapped
+    ]
+encodeOp _ _ = empty
+
+isRemoval :: OpType -> Bool
+isRemoval (RemoveObject _) = True
+isRemoval _ = False
+
+isAddition :: OpType -> Bool
+isAddition (AddObject _) = True
+isAddition _ = False
 
 findObjectsAround :: (GetPosition a) => a -> World -> [DynamicObject]
 findObjectsAround player world =

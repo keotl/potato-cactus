@@ -15,9 +15,9 @@ mockPlayer_ :: String -> Player
 mockPlayer_ username = (Player.create username mockPosition_) {inventory = mockInventory_}
 
 mockPosition_ :: Position
-mockPosition_ = Position 3167 3304 0 -- windmill testing
+-- mockPosition_ = Position 3167 3304 0 -- windmill testing
 -- mockPosition_ = Position 3165 3307 2 -- windmill top
--- mockPosition_ = Position 3222 3218 0 -- lumbridge castle courtyard
+mockPosition_ = Position 3222 3218 0 -- lumbridge castle courtyard
 
 mockInventory_ :: ItemContainer
 mockInventory_ =
