@@ -2,6 +2,7 @@ module PotatoCactus.Client.GameObjectUpdate.EncodeGameObjectUpdate (encodeGameOb
 
 import Data.ByteString (ByteString, concat, empty)
 import PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateDiff (GameObjectDiff (Added, Removed, Retained), computeDiff)
+import PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateOperations (OpType (AddObject, RemoveObject), selectOperations)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject, findByChunkXY)
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as Object
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (objectType), gameObjectHash)
@@ -22,58 +23,30 @@ encodeGameObjectUpdate oldObjects world player =
    in if hasChangedRegion (movement player)
         then
           ( newObjects,
-            Data.ByteString.concat
-              ( clearChunksAroundPlayer player :
-                encodeOperations player (map (selectOperation player) (computeDiff [] newObjects))
+            Data.ByteString.concat $
+              clearChunksAroundPlayer player :
+              ( computeDiff [] newObjects
+                  |> selectOperations
+                  |> map (encodeOp player)
               )
           )
         else
           ( newObjects,
-            Data.ByteString.concat $
-              encodeOperations player (map (selectOperation player) (computeDiff oldObjects newObjects))
+            Data.ByteString.concat
+              ( computeDiff oldObjects newObjects
+                  |> selectOperations
+                  |> map (encodeOp player)
+              )
           )
 
-data OpType = RemoveObject GameObject | AddObject GameObject | Noop
-
-selectOperation :: Player -> GameObjectDiff -> OpType
-selectOperation p (Added object) =
-  case object of
-    Object.Added wrapped ->
-      AddObject wrapped
-    Object.Removed wrapped ->
-      RemoveObject wrapped
-selectOperation p (Removed object) =
-  case object of
-    Object.Added wrapped ->
-      RemoveObject wrapped
-    Object.Removed wrapped -> AddObject wrapped
-selectOperation p (Retained _) = Noop
-
-encodeOperations :: Player -> [OpType] -> [ByteString]
-encodeOperations p operations =
-  let removals = filter isRemoval operations
-   in let additions = filter isAddition operations
-       in (additions ++ removals)
-            |> deduplicateOperations []
-            |> map (encodeOp p)
-
--- Selects the first seen operation per (tile/objectType) combo and
--- ignores the rest. Used to ignore remove packets for replaced
--- objects.
-deduplicateOperations :: [Int] -> [OpType] -> [OpType]
-deduplicateOperations _ [] = []
-deduplicateOperations seen (op : xs) =
-  let hash = seenHash_ op
-   in if hash `elem` seen
-        then deduplicateOperations seen xs
-        else op : deduplicateOperations (hash : seen) xs
-
-seenHash_ :: OpType -> Int
-seenHash_ (AddObject wrapped) =
-  gameObjectHash (getPosition wrapped, objectType wrapped)
-seenHash_ (RemoveObject wrapped) =
-  gameObjectHash (getPosition wrapped, objectType wrapped)
-seenHash_ _ = 0 -- Should not happen
+findObjectsAround :: (GetPosition a) => a -> World -> [DynamicObject]
+findObjectsAround player world =
+  let refPos = getPosition player
+   in Prelude.concat
+        [ findByChunkXY (x + chunkX refPos) (y + chunkY refPos) (Pos.z refPos) (objects world)
+          | x <- [-2 .. 1],
+            y <- [-2 .. 1]
+        ]
 
 encodeOp :: Player -> OpType -> ByteString
 encodeOp p (AddObject wrapped) =
@@ -87,20 +60,3 @@ encodeOp p (RemoveObject wrapped) =
       removeObjectPacket (getPosition wrapped) wrapped
     ]
 encodeOp _ _ = empty
-
-isRemoval :: OpType -> Bool
-isRemoval (RemoveObject _) = True
-isRemoval _ = False
-
-isAddition :: OpType -> Bool
-isAddition (AddObject _) = True
-isAddition _ = False
-
-findObjectsAround :: (GetPosition a) => a -> World -> [DynamicObject]
-findObjectsAround player world =
-  let refPos = getPosition player
-   in Prelude.concat
-        [ findByChunkXY (x + chunkX refPos) (y + chunkY refPos) (Pos.z refPos) (objects world)
-          | x <- [-2 .. 1],
-            y <- [-2 .. 1]
-        ]
