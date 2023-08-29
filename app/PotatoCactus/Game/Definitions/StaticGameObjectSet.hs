@@ -1,13 +1,16 @@
-module PotatoCactus.Game.Definitions.StaticGameObjectSet (StaticGameObjectSet, initializeStaticGameSet, staticObjectAt) where
+module PotatoCactus.Game.Definitions.StaticGameObjectSet (StaticGameObjectSet, initializeStaticGameSet, staticObjectAt, objectAt) where
 
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as IntMap
-import Data.List (find)
+import Data.List (find, isSuffixOf)
 import Data.Maybe (fromMaybe)
 import GHC.IO (unsafePerformIO)
+import PotatoCactus.Game.Definitions.Parser.GameObjectPlacementParser (parseObjectPlacementFile)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, id, objectType), GameObjectType, gameObjectHash, hashObject)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
+import PotatoCactus.Utils.Flow ((|>))
+import System.Directory (getDirectoryContents)
 import Prelude hiding (id)
 
 data StaticGameObjectSet = StaticGameObjectSet
@@ -18,17 +21,21 @@ instance_ :: IORef StaticGameObjectSet
 {-# NOINLINE instance_ #-}
 instance_ = unsafePerformIO $ newIORef $ StaticGameObjectSet IntMap.empty
 
-initializeStaticGameSet :: IO Int
-initializeStaticGameSet = do
+initializeStaticGameSet :: String -> String -> IO Int
+initializeStaticGameSet mapDirectory objectFileSuffix = do
+  mapFiles <- getDirectoryContents mapDirectory
+  parsedObjects <-
+    mapFiles
+      |> filter (isSuffixOf objectFileSuffix)
+      |> map (mapDirectory ++)
+      |> mapM parseObjectPlacementFile
+
   let i =
         StaticGameObjectSet $
           IntMap.fromList $
             map
               (\obj -> (hashObject obj, [obj]))
-              [ GameObject 1530 (Position 3088 3251 0) 0 3, -- door example
-                GameObject 1530 (Position 3101 3258 0) 0 2, -- door example
-                GameObject 1530 (Position 3092 3274 0) 9 2 -- diagonal door example
-              ]
+              (concat parsedObjects)
   writeIORef instance_ i
 
   return (length . elements_ $ i)
@@ -38,7 +45,11 @@ staticObjectAt pos objType =
   unsafePerformIO
     ( do
         collection <- readIORef instance_
-        case elements_ collection IntMap.!? gameObjectHash (pos, objType) of
-          Nothing -> return []
-          Just x -> return x
+        return $ objectAt collection pos objType
     )
+
+objectAt :: StaticGameObjectSet -> Position -> GameObjectType -> [GameObject]
+objectAt collection pos objType =
+  fromMaybe
+    []
+    (elements_ collection IntMap.!? gameObjectHash (pos, objType))

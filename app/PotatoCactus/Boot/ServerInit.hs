@@ -3,7 +3,7 @@ module PotatoCactus.Boot.ServerInit where
 import Control.Concurrent (threadDelay)
 import Data.Time (diffUTCTime, getCurrentTime)
 import PotatoCactus.Boot.WorldInit (initializeWorld)
-import PotatoCactus.Config.Constants (itemDefinitionsFile, objectDefinitionsFile)
+import PotatoCactus.Config.Constants (itemDefinitionsFile, mapFilesDirectory, mapObjectPlacementFileSuffix, objectDefinitionsFile)
 import PotatoCactus.Game.Definitions.EquipmentDefinitions (initializeEquipmentDefs)
 import PotatoCactus.Game.Definitions.GameObjectDefinitions (initializeObjectDb)
 import PotatoCactus.Game.Definitions.ItemDefinitions (initializeDb)
@@ -29,7 +29,7 @@ initializeServer = do
   npcDefs <- initializeNpcDb
   logger_ Info $ "Loaded " ++ show npcDefs ++ " NPC definitions."
 
-  staticObjects <- initializeStaticGameSet
+  staticObjects <- initializeStaticGameSet mapFilesDirectory mapObjectPlacementFileSuffix
   logger_ Info $ "Loaded " ++ show staticObjects ++ " static game object placements."
 
   initializeWorld
