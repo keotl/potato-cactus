@@ -9,7 +9,7 @@ import PotatoCactus.Game.Entity.GroundItem.GroundItemCollection (GroundItemColle
 import qualified PotatoCactus.Game.Entity.GroundItem.GroundItemCollection as GroundItemCollection
 import PotatoCactus.Game.Entity.Npc.AdvanceNpc (advanceNpc)
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
-import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCollection (DynamicObjectCollection), create)
+import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCollection, create)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload)
 import PotatoCactus.Game.Player (PlayerIndex)
@@ -76,7 +76,7 @@ defaultWorldValue =
       players = PotatoCactus.Game.World.MobList.create maxPlayers,
       npcs = PotatoCactus.Game.World.MobList.create maxNpcs,
       clients = [],
-      objects = PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create,
+      objects = PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create (\_ _ -> Nothing), -- TODO - use actual static set  - keotl 2023-08-31
       groundItems = GroundItemCollection.create,
       triggeredEvents = [],
       pendingEvents_ = [],

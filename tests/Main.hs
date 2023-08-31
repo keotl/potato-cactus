@@ -3,18 +3,18 @@ module Main where
 import Base37Test (testDecode, testEncode)
 import BinaryTest (testByte, testByteNegate, testIntME, testMixedBitMode, testPack, testShortAdd, testShortBE, testShortLE)
 import DecodeChatTests (decodeChatTests, encodeChatTests, testNibbles)
+import Game.DynamicObjectCollectionTests (testDynamicObjectCollection)
 import Game.GameObjectUpdateDiffTests (testObjectDiff)
+import Game.GameObjectUpdateOperationsTests (testGameObjectUpdateOperations)
 import Game.GroudItemCollectionTests (testGroundItemCollection)
 import Game.GroundItemsUpdateDiffTests (groundItemsUpdateDiffTests)
 import Game.InterpolatePathTests (interpolatePathTests)
+import Game.Objects.TileObjectsTests (testTileObjects)
+import Game.Player.VarpSetTests (testVarpSet)
 import GetMonadTests (getTests)
 import IterableTests (testReplaceAt)
 import MobListTests (testMobList)
 import Test.HUnit
-import Game.Player.VarpSetTests (testVarpSet)
-import Game.DynamicObjectCollectionTests (testDynamicObjectCollection)
-import Game.GameObjectUpdateOperationsTests (testGameObjectUpdateOperations)
-import Game.Objects.TileObjectsTests (testTileObjects)
 
 tests =
   TestList
@@ -39,7 +39,7 @@ tests =
       testGroundItemCollection,
       groundItemsUpdateDiffTests,
       testVarpSet,
-      -- testDynamicObjectCollection,
+      testDynamicObjectCollection,
       testTileObjects,
       testGameObjectUpdateOperations
     ]

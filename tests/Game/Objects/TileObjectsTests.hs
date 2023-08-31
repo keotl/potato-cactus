@@ -1,7 +1,8 @@
 module Game.Objects.TileObjectsTests where
 
+import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject (..))
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject), GameObjectType)
-import PotatoCactus.Game.Entity.Object.TileObjects (DynamicObject (Added, Removed, Replacing), TileObjects, addObject, create, objects, removeObject)
+import PotatoCactus.Game.Entity.Object.TileObjects (TileObjects, addObject, create, objects, removeObject)
 import PotatoCactus.Game.Position (Position (Position))
 import PotatoCactus.Utils.Flow ((|>))
 import Test.HUnit
@@ -31,7 +32,7 @@ testTileObjects =
       TestCase
         ( assertEqual
             "remove an object from the static set"
-            [Removed 10]
+            [Removed staticObj]
             ( create populatedStaticSet
                 |> removeObject 10
                 |> objects
@@ -39,8 +40,17 @@ testTileObjects =
         ),
       TestCase
         ( assertEqual
+            "removing a non-existent static object should do nothing"
+            []
+            ( create emptyStaticSet
+                |> removeObject 10
+                |> objects
+            )
+        ),
+      TestCase
+        ( assertEqual
             "replace an object of the static set"
-            [Replacing replacingObj]
+            [Replacing replacingObj staticObj]
             ( create populatedStaticSet
                 |> addObject replacingObj
                 |> objects
@@ -59,7 +69,7 @@ testTileObjects =
       TestCase
         ( assertEqual
             "adding a different object over a removed static set element yields a Replacing"
-            [Replacing replacingObj]
+            [Replacing replacingObj staticObj]
             ( create populatedStaticSet
                 |> removeObject 10
                 |> addObject replacingObj

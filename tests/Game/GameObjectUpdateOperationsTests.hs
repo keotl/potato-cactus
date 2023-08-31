@@ -2,11 +2,11 @@ module Game.GameObjectUpdateOperationsTests where
 
 import qualified PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateDiff as Diff
 import PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateOperations (OpType (AddObject, RemoveObject), selectOperations)
-import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject)
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as Object
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject))
 import PotatoCactus.Game.Position (Position (Position))
 import Test.HUnit
+import qualified PotatoCactus.Game.Entity.Object.DynamicObject as Object
 
 testGameObjectUpdateOperations :: Test
 testGameObjectUpdateOperations =
@@ -48,8 +48,8 @@ removed = 4321
 mockObject :: Int -> GameObject
 mockObject id = GameObject id (Position 0 0 0) 10 0
 
-mockAddedObject :: DynamicObject
+mockAddedObject :: Object.DynamicObject
 mockAddedObject = Object.Added $ mockObject added
 
-mockRemovedObject :: DynamicObject
+mockRemovedObject :: Object.DynamicObject
 mockRemovedObject = Object.Removed $ mockObject removed

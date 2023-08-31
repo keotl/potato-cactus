@@ -1,4 +1,5 @@
 module PotatoCactus.Game.Position where
+import PotatoCactus.Config.Constants (positionBoundExponentXY_, positionBoundExponentZ_)
 
 data Position = Position
   { x :: Int,
@@ -53,3 +54,15 @@ isNextTo a b =
 faraway :: Position -> Position
 faraway refPos =
   refPos {x = 666666, y = 666666}
+
+positionHash :: Position -> Int
+positionHash position =
+    x position
+    + y position * 10 ^ keyExponentY_
+    + z position * 10 ^ keyExponentZ_
+
+keyExponentY_ = positionBoundExponentXY_
+
+keyExponentZ_ = 2 * positionBoundExponentXY_
+
+keyExponentObjType_ = (2 * positionBoundExponentXY_) + positionBoundExponentZ_

@@ -115,6 +115,7 @@ executable potato-cactus
                    PotatoCactus.Game.Entity.Npc.NpcUpdateMask
                    PotatoCactus.Game.Entity.Npc.NpcMovement
                    PotatoCactus.Game.Entity.Npc.RespawnStrategy
+                   PotatoCactus.Game.Entity.Object.DynamicObject
                    PotatoCactus.Game.Entity.Object.DynamicObjectCollection
                    PotatoCactus.Game.Entity.Object.GameObject
                    PotatoCactus.Game.Entity.Object.GameObjectKey
@@ -221,6 +222,6 @@ executable potato-cactus
 test-suite tests
     type: exitcode-stdio-1.0
     main-is: Main.hs
-    build-depends: HUnit ^>=1.6, base ^>=4.14.3.0, network, bytestring, utf8-string, binary, binary-strict, time, containers, aeson
+    build-depends: HUnit ^>=1.6, base ^>=4.14.3.0, network, bytestring, utf8-string, binary, binary-strict, time, containers, aeson, directory
     hs-source-dirs: tests, app
     default-language: Haskell2010

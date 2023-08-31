@@ -1,12 +1,9 @@
-module PotatoCactus.Game.Entity.Object.TileObjects (create, TileObjects, DynamicObject (..), addObject, removeObject, objects) where
+module PotatoCactus.Game.Entity.Object.TileObjects (create, TileObjects, addObject, removeObject, objects) where
 
 import Data.IntMap (IntMap, empty)
 import qualified Data.IntMap as IntMap
+import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject (Added, Removed, Replacing))
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (objectType), GameObjectType)
-
--- Represents an overlay over the static object set at any given time.
--- Static Set + Dynamic Set = Objects as they are visible to clients
-data DynamicObject = Added GameObject | Replacing GameObject | Removed GameObjectType deriving (Show, Eq)
 
 type StaticObjectOnTile = Maybe GameObject
 
@@ -16,6 +13,9 @@ data TileObjects = TileObjects
   { objects_ :: IntMap DynamicObject, -- objectType -> Object
     staticObject_ :: StaticObjectLookup
   }
+
+instance Show TileObjects where
+  show = show . objects_
 
 create :: StaticObjectLookup -> TileObjects
 create = TileObjects empty
@@ -35,7 +35,7 @@ addObject obj collection =
 alterEntryForAddition_ :: GameObject -> StaticObjectOnTile -> Maybe DynamicObject -> Maybe DynamicObject
 alterEntryForAddition_ newObject Nothing _ = Just $ Added newObject
 alterEntryForAddition_ newObject (Just staticObj) _ =
-  if newObject == staticObj then Nothing else Just $ Replacing newObject
+  if newObject == staticObj then Nothing else Just $ Replacing newObject staticObj
 
 removeObject :: GameObjectType -> TileObjects -> TileObjects
 removeObject objType collection =
@@ -49,7 +49,7 @@ removeObject objType collection =
 
 alterEntryForRemoval_ :: StaticObjectOnTile -> Maybe DynamicObject -> Maybe DynamicObject
 alterEntryForRemoval_ Nothing _ = Nothing
-alterEntryForRemoval_ (Just staticItem) _ = Just $ Removed . objectType $ staticItem
+alterEntryForRemoval_ (Just staticItem) _ = Just $ Removed staticItem
 
 objects :: TileObjects -> [DynamicObject]
 objects collection =

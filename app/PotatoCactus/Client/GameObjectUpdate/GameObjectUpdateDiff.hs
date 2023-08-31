@@ -2,7 +2,7 @@ module PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateDiff (computeDiff, G
 
 import Data.List (find)
 import Data.Maybe (mapMaybe)
-import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject)
+import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject)
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as Object
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (objectType))
 import PotatoCactus.Game.Position (getPosition)
@@ -26,7 +26,3 @@ mapOldObject newSet object =
   if object `elem` newSet
     then Nothing
     else Just $ Removed object
-
-unwrap_ :: DynamicObject -> GameObject
-unwrap_ (Object.Added obj) = obj
-unwrap_ (Object.Removed obj) = obj

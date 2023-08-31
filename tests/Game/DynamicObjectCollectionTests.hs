@@ -1,9 +1,10 @@
 module Game.DynamicObjectCollectionTests where
 
 import Debug.Trace (trace)
-import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject (Added, Removed), DynamicObjectCollection)
+import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject (..))
+import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCollection)
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as ObjectCollection
-import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject), GameObjectType)
+import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, objectType, position), GameObjectType)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position), chunkX, chunkY)
 import PotatoCactus.Utils.Flow ((|>))
 import Test.HUnit
@@ -14,14 +15,14 @@ testDynamicObjectCollection =
         ( assertEqual
             "add brand new object should create Added dynamic object"
             [Added obj]
-            (ObjectCollection.iter (ObjectCollection.addDynamicObject dummyStaticSetLookup obj ObjectCollection.create))
+            (ObjectCollection.iter (ObjectCollection.addDynamicObject obj emptyCollection))
         ),
       TestCase
         ( assertEqual
             "remove Added object"
             []
             ( ObjectCollection.iter $
-                ObjectCollection.removeDynamicObject dummyStaticSetLookup obj collection
+                ObjectCollection.removeDynamicObject (position obj, objectType obj) collection
             )
         ),
       TestCase
@@ -29,7 +30,7 @@ testDynamicObjectCollection =
             "removing an object not in the static set should do nothing"
             []
             ( ObjectCollection.iter $
-                ObjectCollection.removeDynamicObject dummyStaticSetLookup obj ObjectCollection.create
+                ObjectCollection.removeDynamicObject (position obj, objectType obj) emptyCollection
             )
         ),
       TestCase
@@ -37,9 +38,9 @@ testDynamicObjectCollection =
             "add over another dynamic object replaces in-place"
             [Added obj]
             ( ObjectCollection.iter
-                ( ObjectCollection.create
-                    |> ObjectCollection.addDynamicObject dummyStaticSetLookup staticObj
-                    |> ObjectCollection.addDynamicObject dummyStaticSetLookup obj
+                ( emptyCollection
+                    |> ObjectCollection.addDynamicObject staticObj
+                    |> ObjectCollection.addDynamicObject obj
                 )
             )
         ),
@@ -48,11 +49,9 @@ testDynamicObjectCollection =
             "adding over Removed object should remove that entry"
             []
             ( ObjectCollection.iter
-                ( ObjectCollection.removeDynamicObject
-                    (\_ _ -> [obj])
-                    obj
-                    ObjectCollection.create
-                    |> ObjectCollection.addDynamicObject dummyStaticSetLookup obj
+                ( ObjectCollection.create populatedStaticSet
+                    |> ObjectCollection.removeDynamicObject (position staticObj, objectType staticObj)
+                    |> ObjectCollection.addDynamicObject staticObj
                 )
             )
         ),
@@ -64,11 +63,11 @@ testDynamicObjectCollection =
         ),
       TestCase
         ( assertEqual
-            "addDynamicObject with replaced object in static set, should mark static object as removed"
-            [Added obj, Removed staticObj]
+            "addDynamicObject with replaced object in static set, should mark static object as Replaced"
+            [Replacing obj staticObj]
             ( ObjectCollection.iter
-                ( ObjectCollection.create
-                    |> ObjectCollection.addDynamicObject (\_ _ -> [staticObj]) obj
+                ( ObjectCollection.create populatedStaticSet
+                    |> ObjectCollection.addDynamicObject obj
                 )
             )
         ),
@@ -77,42 +76,35 @@ testDynamicObjectCollection =
             "re-adding a replaced static object resets to initial state"
             []
             ( ObjectCollection.iter
-                ( ObjectCollection.create
-                    |> ObjectCollection.addDynamicObject (\_ _ -> [staticObj]) obj
-                    |> ObjectCollection.addDynamicObject (\_ _ -> [staticObj]) staticObj
+                ( ObjectCollection.create populatedStaticSet
+                    |> ObjectCollection.addDynamicObject obj
+                    |> ObjectCollection.addDynamicObject staticObj
                 )
             )
         ),
       TestCase
         ( assertEqual
-            "addDynamicObject with replaced object in static set AND existing chunkmap, should mark static object as removed"
-            [Added obj, Removed staticObj]
+            "removeDynamicObject on an Replacing object should leave static object as Removed"
+            -- TODO - What is the most reasonable intended behaviour here?  - keotl 2023-08-31
+            -- Either revert to default state (i.e. static object) or with static object removed
+            [Removed staticObj]
             ( ObjectCollection.iter
-                ( ObjectCollection.create
-                    |> ObjectCollection.addDynamicObject dummyStaticSetLookup obj
-                    |> ObjectCollection.removeDynamicObject dummyStaticSetLookup obj
-                    |> ObjectCollection.addDynamicObject (\_ _ -> [staticObj]) obj
-                )
-            )
-        ),
-      TestCase
-        ( assertEqual
-            "removeDynamicObject on an Added object replacing a static object, should remove both the Added and Removed objects"
-            []
-            ( ObjectCollection.iter
-                ( ObjectCollection.create
-                    |> ObjectCollection.addDynamicObject (\_ _ -> [staticObj]) obj
-                    |> ObjectCollection.removeDynamicObject (\_ _ -> [staticObj]) obj
+                ( ObjectCollection.create populatedStaticSet
+                    |> ObjectCollection.addDynamicObject obj
+                    |> ObjectCollection.removeDynamicObject (position obj, objectType obj)
                 )
             )
         )
     ]
 
+emptyCollection :: DynamicObjectCollection
+emptyCollection = ObjectCollection.create emptyStaticSet
+
 collection :: DynamicObjectCollection
 collection =
   foldl
-    (flip (ObjectCollection.addDynamicObject dummyStaticSetLookup))
-    ObjectCollection.create
+    (flip ObjectCollection.addDynamicObject)
+    emptyCollection
     [obj]
 
 obj :: GameObject
@@ -121,5 +113,8 @@ obj = GameObject 123 (Position 3167 3304 0) 0 0
 staticObj :: GameObject
 staticObj = GameObject 456 (Position 3167 3304 0) 0 0
 
-dummyStaticSetLookup :: Position -> GameObjectType -> [GameObject]
-dummyStaticSetLookup _ _ = []
+emptyStaticSet :: Position -> GameObjectType -> Maybe GameObject
+emptyStaticSet _ _ = Nothing
+
+populatedStaticSet :: Position -> GameObjectType -> Maybe GameObject
+populatedStaticSet _ _ = Just staticObj

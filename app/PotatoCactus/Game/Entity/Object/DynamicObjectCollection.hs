@@ -1,110 +1,75 @@
-module PotatoCactus.Game.Entity.Object.DynamicObjectCollection where
+module PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCollection, create, addDynamicObject, removeDynamicObject, findByChunkXY, iter) where
 
-import Data.IntMap (IntMap, alter, delete, empty, findWithDefault, toList)
-import Data.IntMap.Lazy (insert)
+import qualified Data.IntMap as IntMap
 import Data.Maybe (fromMaybe)
-import Debug.Trace (trace)
 import PotatoCactus.Config.Constants (chunkBoundExponentXY_)
-import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectId)
-import PotatoCactus.Game.Entity.Object.GameObject (GameObject (id, objectType, position), GameObjectType, gameObjectHash)
-import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position, x, y, z), chunkX, chunkY)
+import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject)
+import PotatoCactus.Game.Entity.Object.GameObject (GameObject (objectType, position), GameObjectType)
+import PotatoCactus.Game.Entity.Object.TileObjects (TileObjects)
+import qualified PotatoCactus.Game.Entity.Object.TileObjects as Tile
+import PotatoCactus.Game.Position (GetPosition (getPosition), Position (z), chunkX, chunkY, positionHash)
 import qualified PotatoCactus.Game.Position as Pos
 import PotatoCactus.Utils.Flow ((|>))
 import Prelude hiding (id)
 
-data DynamicObject = Added GameObject | Removed GameObject deriving (Eq, Show)
-
-instance GetPosition DynamicObject where
-  getPosition (Added object) = getPosition object
-  getPosition (Removed object) = getPosition object
+type StaticObjectLookup = Position -> GameObjectType -> Maybe GameObject
 
 data DynamicObjectCollection = DynamicObjectCollection
-  { elements_ :: IntMap (IntMap [DynamicObject])
+  { chunkMaps_ :: IntMap.IntMap (IntMap.IntMap TileObjects), -- chunk key -> pos/type key -> TileObjects
+    staticObjectAt_ :: StaticObjectLookup
   }
-  deriving (Show)
 
-create :: DynamicObjectCollection
-create = DynamicObjectCollection empty
+instance Show DynamicObjectCollection where
+  show = show . chunkMaps_
 
-addDynamicObject :: (Position -> GameObjectType -> [GameObject]) -> GameObject -> DynamicObjectCollection -> DynamicObjectCollection
-addDynamicObject staticObjectAt object collection =
-  let updatedElements =
-        alter
-          (addObjectInChunkMap_ object (staticObjectAt (getPosition object) (objectType object)))
-          (objChunkKey_ object)
-          (elements_ collection)
-   in collection {elements_ = updatedElements}
+create :: StaticObjectLookup -> DynamicObjectCollection
+create = DynamicObjectCollection IntMap.empty
 
-addObjectInChunkMap_ :: GameObject -> [GameObject] -> Maybe (IntMap [DynamicObject]) -> Maybe (IntMap [DynamicObject])
-addObjectInChunkMap_ obj matchingStaticObjects chunkMap =
-  Just $
-    alter
-      (addObjectToTile_ obj matchingStaticObjects)
-      (key_ obj)
-      (fromMaybe empty chunkMap)
-
-addObjectToTile_ :: GameObject -> [GameObject] -> Maybe [DynamicObject] -> Maybe [DynamicObject]
-addObjectToTile_ newObject matchingStaticObjects Nothing = Just $ Added newObject : map Removed matchingStaticObjects
-addObjectToTile_ newObject matchingStaticObjects (Just tileObjects) =
-  case matchingEntry_ newObject tileObjects of
-    Nothing -> Just $ Added newObject : tileObjects ++ map Removed matchingStaticObjects
-    (Just existing) -> case existing of
-      Added replaced -> Just $ Added newObject : filter ((/=) replaced . unwrap_) tileObjects
-      Removed _ -> Just $ filter ((/=) newObject . unwrap_) tileObjects
-
-matchingEntry_ :: GameObject -> [DynamicObject] -> Maybe DynamicObject
-matchingEntry_ _ [] = Nothing
-matchingEntry_ predicateObject (x : xs) =
-  let object = unwrap_ x
-   in if objectType predicateObject == objectType object
-        then Just x
-        else matchingEntry_ predicateObject xs
-
-removeDynamicObject :: (Position -> GameObjectType -> [GameObject]) -> GameObject -> DynamicObjectCollection -> DynamicObjectCollection
-removeDynamicObject staticObjectAt object collection =
-  let matchingStaticObjects =
-        staticObjectAt (getPosition object) (objectType object)
-          |> filter ((==) (id object) . id)
-   in let updated =
-            alter
-              (removeObjectFromChunkMap_ object matchingStaticObjects)
-              (objChunkKey_ object)
-              (elements_ collection)
-       in collection {elements_ = updated}
-
-removeObjectFromChunkMap_ :: GameObject -> [GameObject] -> Maybe (IntMap [DynamicObject]) -> Maybe (IntMap [DynamicObject])
-removeObjectFromChunkMap_ _ [] Nothing = Nothing
-removeObjectFromChunkMap_ object (matchingStaticObject : _) Nothing =
-  Just $
-    insert (key_ object) [Removed object] empty
-removeObjectFromChunkMap_ object staticObjects (Just chunkMap) =
-  Just $
-    alter
-      (removeFromTileObjects_ object staticObjects)
-      (key_ object)
-      chunkMap
-
-removeFromTileObjects_ :: GameObject -> [GameObject] -> Maybe [DynamicObject] -> Maybe [DynamicObject]
-removeFromTileObjects_ _ [] Nothing = Nothing
-removeFromTileObjects_ removed (matchingStaticObject : _) Nothing = Just [Removed removed]
-removeFromTileObjects_ removed staticObjects (Just tileObjects) =
-  case (matchingEntry_ removed tileObjects, staticObjects) of
-    (Nothing, []) -> Just tileObjects
-    (Nothing, _) -> Just $ Removed removed : tileObjects
-    (Just existing, []) -> case existing of
-      Added _ -> Just (tileObjects |> filter ((/=) removed . unwrap_))
-      Removed _ -> Just tileObjects
-    (Just existing, matchingStaticObject : _) -> case existing of
-      Added _ ->
-        Just
-          ( tileObjects
-              |> filter ((/=) removed . unwrap_)
-              |> filter ((/=) matchingStaticObject . unwrap_)
+addDynamicObject :: GameObject -> DynamicObjectCollection -> DynamicObjectCollection
+addDynamicObject object collection =
+  let updated =
+        IntMap.alter
+          ( Just
+              . addToChunkMap_ object (staticObjectAt_ collection)
+              . fromMaybe IntMap.empty
           )
-      Removed _ -> Just tileObjects
+          (objChunkKey_ object)
+          (chunkMaps_ collection)
+   in collection {chunkMaps_ = updated}
+
+addToChunkMap_ :: GameObject -> StaticObjectLookup -> IntMap.IntMap TileObjects -> IntMap.IntMap TileObjects
+addToChunkMap_ obj staticLookup =
+  IntMap.alter
+    ( Just
+        . Tile.addObject obj
+        . fromMaybe
+          (Tile.create (staticLookup (getPosition obj)))
+    )
+    (key_ obj)
+
+removeDynamicObject :: (Position, GameObjectType) -> DynamicObjectCollection -> DynamicObjectCollection
+removeDynamicObject (pos, objType) collection =
+  let updated =
+        IntMap.alter
+          ( Just
+              . removeFromChunkMap_ (pos, objType) (staticObjectAt_ collection)
+              . fromMaybe IntMap.empty
+          )
+          (posChunkKey_ pos)
+          (chunkMaps_ collection)
+   in collection {chunkMaps_ = updated}
+
+removeFromChunkMap_ :: (Position, GameObjectType) -> StaticObjectLookup -> IntMap.IntMap TileObjects -> IntMap.IntMap TileObjects
+removeFromChunkMap_ (pos, objType) staticLookup =
+  IntMap.alter
+    ( Just
+        . Tile.removeObject objType
+        . fromMaybe (Tile.create (staticLookup pos))
+    )
+    (positionHash pos)
 
 key_ :: GameObject -> Int
-key_ object = gameObjectHash (position object, objectType object)
+key_ object = positionHash (position object)
 
 chunkKey_ :: Int -> Int -> Int -> Int
 chunkKey_ cx cy z =
@@ -123,21 +88,21 @@ objChunkKey_ obj =
 findByChunkXY :: Int -> Int -> Int -> DynamicObjectCollection -> [DynamicObject]
 findByChunkXY cx cy z collection =
   let chunkMap =
-        findWithDefault
-          empty
+        IntMap.findWithDefault
+          IntMap.empty
           (chunkKey_ cx cy z)
-          (elements_ collection)
-   in concatMap snd (toList chunkMap)
+          (chunkMaps_ collection)
+   in iterateOverChunkMap_ chunkMap
 
-unwrap_ :: DynamicObject -> GameObject
-unwrap_ (Added obj) = obj
-unwrap_ (Removed obj) = obj
+iterateOverChunkMap_ :: IntMap.IntMap TileObjects -> [DynamicObject]
+iterateOverChunkMap_ chunkMap =
+  chunkMap
+    |> IntMap.toList
+    |> map snd
+    |> concatMap Tile.objects
 
 -- For serialization
 iter :: DynamicObjectCollection -> [DynamicObject]
 iter collection =
-  let chunkMaps = map snd $ toList (elements_ collection)
-   in concat $
-        concatMap
-          (map snd . toList)
-          chunkMaps
+  let chunkMaps = map snd $ IntMap.toList (chunkMaps_ collection)
+   in concatMap iterateOverChunkMap_ chunkMaps

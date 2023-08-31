@@ -2,11 +2,11 @@ module PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateOperations (selectOp
 
 import Data.ByteString (ByteString, concat)
 import PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateDiff (GameObjectDiff (Added, Removed, Retained))
-import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as Object
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, objectType), gameObjectHash)
 import PotatoCactus.Game.Player (Player (Player))
 import PotatoCactus.Game.Position (getPosition)
 import PotatoCactus.Utils.Flow ((|>))
+import qualified PotatoCactus.Game.Entity.Object.DynamicObject as Object
 
 data OpType = RemoveObject GameObject | AddObject GameObject | Noop deriving (Eq, Show)
 
@@ -25,6 +25,7 @@ selectOperation (Added object) =
       AddObject wrapped
     Object.Removed wrapped ->
       RemoveObject wrapped
+      -- TODO - add missing cases  - keotl 2023-08-31
 selectOperation (Removed object) =
   case object of
     Object.Added wrapped ->
