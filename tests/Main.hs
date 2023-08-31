@@ -14,6 +14,7 @@ import Test.HUnit
 import Game.Player.VarpSetTests (testVarpSet)
 import Game.DynamicObjectCollectionTests (testDynamicObjectCollection)
 import Game.GameObjectUpdateOperationsTests (testGameObjectUpdateOperations)
+import Game.Objects.TileObjectsTests (testTileObjects)
 
 tests =
   TestList
@@ -38,7 +39,8 @@ tests =
       testGroundItemCollection,
       groundItemsUpdateDiffTests,
       testVarpSet,
-      testDynamicObjectCollection,
+      -- testDynamicObjectCollection,
+      testTileObjects,
       testGameObjectUpdateOperations
     ]
 
