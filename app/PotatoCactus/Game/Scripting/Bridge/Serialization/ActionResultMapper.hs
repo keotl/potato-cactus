@@ -220,13 +220,11 @@ decodeBody "spawnObject" body =
 decodeBody "removeObject" body =
   case parse
     ( \obj -> do
-        objectId <- obj .: "objectId"
         positionObj <- obj .: "position"
         objectType <- obj .: "objectType"
-        facingDirection <- obj .: "facingDirection"
         return
-          ( RemoveGameObject $
-              GameObject objectId (decodePos_ positionObj) objectType facingDirection
+          ( RemoveGameObject
+              (decodePos_ positionObj, objectType)
           )
     )
     body of

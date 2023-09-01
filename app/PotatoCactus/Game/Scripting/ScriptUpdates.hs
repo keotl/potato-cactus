@@ -9,7 +9,7 @@ import PotatoCactus.Game.Entity.Animation.Animation (Animation)
 import PotatoCactus.Game.Entity.GroundItem.GroundItem (GroundItem (GroundItem))
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc, NpcIndex)
-import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
+import PotatoCactus.Game.Entity.Object.GameObject (GameObject, GameObjectType)
 import PotatoCactus.Game.Player (Player, PlayerIndex)
 import PotatoCactus.Game.PlayerUpdate.VarpSet (VarpId)
 import PotatoCactus.Game.Position (Position (Position))
@@ -32,7 +32,7 @@ data GameEvent
 
 data ScriptActionResult
   = SpawnGameObject GameObject
-  | RemoveGameObject GameObject
+  | RemoveGameObject (Position, GameObjectType)
   | ClearPlayerInteraction PlayerIndex
   | DispatchAttackPlayerToNpc PlayerIndex NpcIndex Hit
   | DispatchAttackNpcToPlayer NpcIndex PlayerIndex Hit

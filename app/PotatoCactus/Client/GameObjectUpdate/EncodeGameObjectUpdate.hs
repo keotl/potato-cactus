@@ -3,7 +3,8 @@ module PotatoCactus.Client.GameObjectUpdate.EncodeGameObjectUpdate (encodeGameOb
 import Data.ByteString (ByteString, concat, empty)
 import PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateDiff (GameObjectDiff (Added, Removed, Retained), computeDiff)
 import PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateOperations (OpType (AddObject, RemoveObject), selectOperations)
-import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject, findByChunkXY)
+import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject)
+import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (findByChunkXY)
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as Object
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (objectType), gameObjectHash)
 import PotatoCactus.Game.Movement.MovementEntity (hasChangedRegion)

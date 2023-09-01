@@ -17,7 +17,7 @@ import PotatoCactus.Client.Interface.EncodeInterfaceUpdate (encodeInterfaceUpdat
 import PotatoCactus.Client.LocalEntityList (LocalEntityList, updateLocalEntities)
 import PotatoCactus.Game.Entity.GroundItem.GroundItem (GroundItem)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc)
-import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject)
+import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject))
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload (ObjectClickPayload))
 import PotatoCactus.Game.Movement.MovementEntity (MovementEntity (PlayerWalkMovement_), hasChangedRegion)

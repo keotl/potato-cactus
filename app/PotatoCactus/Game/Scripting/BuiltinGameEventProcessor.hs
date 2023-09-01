@@ -10,7 +10,6 @@ import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (NpcTarget
 import PotatoCactus.Game.Entity.Npc.Npc (Npc (definitionId))
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Npc.NpcMovement (doMovement)
-import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject (Added))
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, facingDirection))
 import PotatoCactus.Game.Entity.Object.GameObjectKey (GameObjectKey (GameObjectKey))
 import PotatoCactus.Game.Message.RegisterClientPayload (RegisterClientPayload (player))

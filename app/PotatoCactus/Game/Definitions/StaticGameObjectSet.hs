@@ -1,4 +1,4 @@
-module PotatoCactus.Game.Definitions.StaticGameObjectSet (StaticGameObjectSet, initializeStaticGameSet, staticObjectAt, objectAt) where
+module PotatoCactus.Game.Definitions.StaticGameObjectSet (StaticGameObjectSet, initializeStaticGameSet, staticObjectAt, objectAt, getStaticObjectSetInstance) where
 
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.IntMap (IntMap)
@@ -21,6 +21,10 @@ instance_ :: IORef StaticGameObjectSet
 {-# NOINLINE instance_ #-}
 instance_ = unsafePerformIO $ newIORef $ StaticGameObjectSet IntMap.empty
 
+getStaticObjectSetInstance :: IO StaticGameObjectSet
+getStaticObjectSetInstance =
+  readIORef instance_
+
 initializeStaticGameSet :: String -> String -> IO Int
 initializeStaticGameSet mapDirectory objectFileSuffix = do
   mapFiles <- getDirectoryContents mapDirectory
@@ -40,7 +44,7 @@ initializeStaticGameSet mapDirectory objectFileSuffix = do
 
   return (length . elements_ $ i)
 
-staticObjectAt :: Position -> GameObjectType -> [GameObject]
+staticObjectAt :: Position -> GameObjectType -> Maybe GameObject
 staticObjectAt pos objType =
   unsafePerformIO
     ( do
@@ -48,8 +52,11 @@ staticObjectAt pos objType =
         return $ objectAt collection pos objType
     )
 
-objectAt :: StaticGameObjectSet -> Position -> GameObjectType -> [GameObject]
+objectAt :: StaticGameObjectSet -> Position -> GameObjectType -> Maybe GameObject
 objectAt collection pos objType =
-  fromMaybe
-    []
-    (elements_ collection IntMap.!? gameObjectHash (pos, objType))
+  case fromMaybe [] (elements_ collection IntMap.!? gameObjectHash (pos, objType)) of
+    [] -> Nothing
+    x : xs -> Just x
+
+-- TODO - Not sure whether multiple items on the same tile is
+-- possible. Might be worth at least logging.  - keotl 2023-08-31

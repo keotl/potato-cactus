@@ -4,7 +4,7 @@ module PotatoCactus.Game.Scripting.Bridge.Serialization.Models.GameObjectDto (Ga
 
 import Data.Aeson (ToJSON)
 import GHC.Generics (Generic)
-import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as D
+import qualified PotatoCactus.Game.Entity.Object.DynamicObject as D
 import qualified PotatoCactus.Game.Entity.Object.GameObject as O
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PositionDto (PositionDto, toDto)
 import Prelude hiding (id)
@@ -28,4 +28,6 @@ gameObjectToDto (D.Added obj) =
         objectType = O.objectType obj,
         facingDirection = O.facingDirection obj
       }
+-- TODO - Send Removed/Replacing objects to the script engine  - keotl 2023-08-31
+-- TODO - Worth considering as part of a global static/dynamic object strategy  - keotl 2023-08-31
 gameObjectToDto _ = Nothing

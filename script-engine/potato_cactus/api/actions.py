@@ -78,9 +78,12 @@ def SpawnNpc(npcId: int,
         })
 
 
-def SpawnGameObject(objectId: int, position: Union[Position, Tuple[int, int,
-                                                                   int]],
-                    objectType: int, facingDirection: int) -> ScriptAction:
+def SpawnGameObject(
+    objectId: int,
+    position: Union[Position, Tuple[int, int, int]],
+    objectType: int,
+    facingDirection: int,
+) -> ScriptAction:
     return ScriptAction(
         "spawnObject", {
             "objectId": objectId,
@@ -90,17 +93,14 @@ def SpawnGameObject(objectId: int, position: Union[Position, Tuple[int, int,
         })
 
 
-def RemoveGameObject(objectId: int,
-                     position: Union[Position, Tuple[int, int, int]],
-                     objectType: int,
-                     facingDirection: int = 0) -> ScriptAction:
-    return ScriptAction(
-        "removeObject", {
-            "objectId": objectId,
-            "position": _map_position(position),
-            "objectType": objectType,
-            "facingDirection": facingDirection
-        })
+def RemoveGameObject(
+    position: Union[Position, Tuple[int, int, int]],
+    objectType: int,
+) -> ScriptAction:
+    return ScriptAction("removeObject", {
+        "position": _map_position(position),
+        "objectType": objectType,
+    })
 
 
 def SendMessage(playerIndex: int, text: str) -> ScriptAction:

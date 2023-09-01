@@ -2,11 +2,11 @@ module PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateOperations (selectOp
 
 import Data.ByteString (ByteString, concat)
 import PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateDiff (GameObjectDiff (Added, Removed, Retained))
-import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, objectType), gameObjectHash)
-import PotatoCactus.Game.Player (Player (Player))
-import PotatoCactus.Game.Position (getPosition)
-import PotatoCactus.Utils.Flow ((|>))
 import qualified PotatoCactus.Game.Entity.Object.DynamicObject as Object
+import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, objectType), GameObjectType, gameObjectHash)
+import PotatoCactus.Game.Player (Player (Player))
+import PotatoCactus.Game.Position (Position, getPosition)
+import PotatoCactus.Utils.Flow ((|>))
 
 data OpType = RemoveObject GameObject | AddObject GameObject | Noop deriving (Eq, Show)
 
@@ -23,14 +23,18 @@ selectOperation (Added object) =
   case object of
     Object.Added wrapped ->
       AddObject wrapped
+    Object.Replacing newObj replaced ->
+      AddObject newObj
     Object.Removed wrapped ->
       RemoveObject wrapped
-      -- TODO - add missing cases  - keotl 2023-08-31
 selectOperation (Removed object) =
   case object of
     Object.Added wrapped ->
       RemoveObject wrapped
-    Object.Removed wrapped -> AddObject wrapped
+    Object.Removed wrapped ->
+      AddObject wrapped
+    Object.Replacing newObject oldObject ->
+      AddObject oldObject
 selectOperation (Retained _) = Noop
 
 -- Selects the first seen operation per (tile/objectType) combination

@@ -1,10 +1,11 @@
 module PotatoCactus.Game.World where
 
 import Control.Concurrent (Chan)
-import Data.IORef (newIORef)
+import Data.IORef (IORef, newIORef, writeIORef)
 import Data.List (find)
 import GHC.IO (unsafePerformIO)
 import PotatoCactus.Config.Constants (maxNpcs, maxPlayers)
+import PotatoCactus.Game.Definitions.StaticGameObjectSet (staticObjectAt)
 import PotatoCactus.Game.Entity.GroundItem.GroundItemCollection (GroundItemCollection)
 import qualified PotatoCactus.Game.Entity.GroundItem.GroundItemCollection as GroundItemCollection
 import PotatoCactus.Game.Entity.Npc.AdvanceNpc (advanceNpc)
@@ -76,13 +77,14 @@ defaultWorldValue =
       players = PotatoCactus.Game.World.MobList.create maxPlayers,
       npcs = PotatoCactus.Game.World.MobList.create maxNpcs,
       clients = [],
-      objects = PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create (\_ _ -> Nothing), -- TODO - use actual static set  - keotl 2023-08-31
+      objects = PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create staticObjectAt,
       groundItems = GroundItemCollection.create,
       triggeredEvents = [],
       pendingEvents_ = [],
       scheduler = Scheduler.create
     }
 
+worldInstance :: IORef World
 worldInstance = unsafePerformIO $ newIORef defaultWorldValue
 {-# NOINLINE worldInstance #-}
 

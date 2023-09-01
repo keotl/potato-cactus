@@ -1,6 +1,5 @@
 module Game.DynamicObjectCollectionTests where
 
-import Debug.Trace (trace)
 import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject (..))
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCollection)
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as ObjectCollection

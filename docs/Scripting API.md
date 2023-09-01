@@ -51,7 +51,7 @@ Action constructors are imported from `potato_cactus.api.actions`.
 | NpcSetAnimation        | Sets the NPC animation.                                                                                                                                                   |
 | NpcSetForcedChat       | Sets a forced chat message for an NPC.                                                                                                                                    |
 | SpawnGameObject        | Adds a dynamic game object to the world, overriding an existing object of the same type at that position.                                                                 |
-| RemoveGameObject       | Adds a "removed" dynamic game object, which can be used to subtract an object from the static object set or remove a dynamically added one.                               |
+| RemoveGameObject       | Marks the tile as vacant of game object of type.                                                                                                                          |
 | ServerPrintMessage     | Prints to the server console. For testing.                                                                                                                                |
 | SpawnNpc               | Spawns an NPC at a point.                                                                                                                                                 |
 | SendMessage            | Sends a server message to the player's chatbox                                                                                                                            |
