@@ -18,8 +18,6 @@ initializeWorld = do
     ( world
         { objects =
             PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create
-              (objectAt staticObjectSet) -- explicitly set to pure
-              -- function to avoid unsafePerformIO at runtime. Not
-              -- sure whether that makes a difference
+              (objectAt staticObjectSet)
         }
     )

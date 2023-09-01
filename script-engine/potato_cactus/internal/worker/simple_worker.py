@@ -33,6 +33,8 @@ class SimpleWorker(WorkerHandle):
         elif message.op == "updateWorld":
             world = cast(World, message.body)
             ContextImpl.INSTANCE.set_world(world)
+        elif message.op == "setStaticObjectSet":
+            ContextImpl.INSTANCE.load_static_objects(message.body.objects)
         elif message.op == "invokeScript":
             try:
                 modulename, function = message.body.event.rsplit(".", 1)

@@ -1,4 +1,4 @@
-module PotatoCactus.Game.Definitions.StaticGameObjectSet (StaticGameObjectSet, initializeStaticGameSet, staticObjectAt, objectAt, getStaticObjectSetInstance) where
+module PotatoCactus.Game.Definitions.StaticGameObjectSet (StaticGameObjectSet, initializeStaticGameSet, objectAt, getStaticObjectSetInstance, allEntries) where
 
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.IntMap (IntMap)
@@ -44,14 +44,6 @@ initializeStaticGameSet mapDirectory objectFileSuffix = do
 
   return (length . elements_ $ i)
 
-staticObjectAt :: Position -> GameObjectType -> Maybe GameObject
-staticObjectAt pos objType =
-  unsafePerformIO
-    ( do
-        collection <- readIORef instance_
-        return $ objectAt collection pos objType
-    )
-
 objectAt :: StaticGameObjectSet -> Position -> GameObjectType -> Maybe GameObject
 objectAt collection pos objType =
   case fromMaybe [] (elements_ collection IntMap.!? gameObjectHash (pos, objType)) of
@@ -60,3 +52,6 @@ objectAt collection pos objType =
 
 -- TODO - Not sure whether multiple items on the same tile is
 -- possible. Might be worth at least logging.  - keotl 2023-08-31
+allEntries :: StaticGameObjectSet -> [GameObject]
+allEntries staticObjects =
+  concatMap snd (IntMap.toList . elements_ $ staticObjects)
