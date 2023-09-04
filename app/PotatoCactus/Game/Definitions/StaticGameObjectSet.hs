@@ -12,6 +12,7 @@ import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position
 import PotatoCactus.Utils.Flow ((|>))
 import System.Directory (getDirectoryContents)
 import Prelude hiding (id)
+import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectId)
 
 data StaticGameObjectSet = StaticGameObjectSet
   { elements_ :: IntMap [GameObject]
@@ -49,9 +50,15 @@ objectAt collection pos objType =
   case fromMaybe [] (elements_ collection IntMap.!? gameObjectHash (pos, objType)) of
     [] -> Nothing
     x : xs -> Just x
-
 -- TODO - Not sure whether multiple items on the same tile is
 -- possible. Might be worth at least logging.  - keotl 2023-08-31
+
 allEntries :: StaticGameObjectSet -> [GameObject]
 allEntries staticObjects =
+  -- TODO - Probably worth removing  - keotl 2023-09-04
   concatMap snd (IntMap.toList . elements_ $ staticObjects)
+
+findObjectById :: StaticGameObjectSet -> Position -> GameObjectId -> Maybe GameObject
+findObjectById staticObjects pos objId =
+  -- TODO - Rework hashmap structure to allow efficient lookups  - keotl 2023-09-04
+  Nothing

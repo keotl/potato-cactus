@@ -1,9 +1,10 @@
 module Game.DynamicObjectCollectionTests where
 
-import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject (..))
+import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject (..), VisibleObject (None, Visible))
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCollection)
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as ObjectCollection
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, objectType, position), GameObjectType)
+import PotatoCactus.Game.Entity.Object.TileObjects (findVisibleObjectById)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position), chunkX, chunkY)
 import PotatoCactus.Utils.Flow ((|>))
 import Test.HUnit
@@ -93,6 +94,28 @@ testDynamicObjectCollection =
                     |> ObjectCollection.removeDynamicObject (position obj, objectType obj)
                 )
             )
+        ),
+      TestCase
+        ( assertEqual
+            "findVisibleObjectById yields object with ID at pos"
+            (Visible obj)
+            ( ObjectCollection.findVisibleObjectById
+                pos
+                123
+                ( ObjectCollection.create emptyStaticSet
+                    |> ObjectCollection.addDynamicObject obj
+                )
+            )
+        ),
+      TestCase
+        ( assertEqual
+            "findVisibleObjectById defaults to None"
+            None
+            ( ObjectCollection.findVisibleObjectById
+                pos
+                123
+                (ObjectCollection.create emptyStaticSet)
+            )
         )
     ]
 
@@ -106,11 +129,14 @@ collection =
     emptyCollection
     [obj]
 
+pos :: Position
+pos = Position 3167 3304 0
+
 obj :: GameObject
-obj = GameObject 123 (Position 3167 3304 0) 0 0
+obj = GameObject 123 pos 0 0
 
 staticObj :: GameObject
-staticObj = GameObject 456 (Position 3167 3304 0) 0 0
+staticObj = GameObject 456 pos 0 0
 
 emptyStaticSet :: Position -> GameObjectType -> Maybe GameObject
 emptyStaticSet _ _ = Nothing

@@ -1,9 +1,13 @@
-module PotatoCactus.Game.Entity.Object.TileObjects (create, TileObjects, addObject, removeObject, objects) where
+module PotatoCactus.Game.Entity.Object.TileObjects (create, TileObjects, addObject, removeObject, objects, findVisibleObjectById) where
 
 import Data.IntMap (IntMap, empty)
 import qualified Data.IntMap as IntMap
-import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject (Added, Removed, Replacing))
+import Data.Maybe (listToMaybe)
+import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectId)
+import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject (Added, Removed, Replacing), VisibleObject (Hidden, None, Visible), hasFoundMatch)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (objectType), GameObjectType)
+import qualified PotatoCactus.Game.Entity.Object.GameObject as GameObject
+import PotatoCactus.Utils.Flow ((|>))
 
 type StaticObjectOnTile = Maybe GameObject
 
@@ -54,3 +58,25 @@ alterEntryForRemoval_ (Just staticItem) _ = Just $ Removed staticItem
 objects :: TileObjects -> [DynamicObject]
 objects collection =
   map snd (IntMap.toList (objects_ collection))
+
+findVisibleObjectById :: GameObjectId -> TileObjects -> VisibleObject
+findVisibleObjectById objectId collection =
+  case objects collection
+    |> map (matchVisibleObjectById_ objectId)
+    |> filter hasFoundMatch of
+    [] -> None
+    x : xs -> x
+
+matchVisibleObjectById_ :: GameObjectId -> DynamicObject -> VisibleObject
+matchVisibleObjectById_ objId (Added object) =
+  if GameObject.id object == objId
+    then Visible object
+    else None
+matchVisibleObjectById_ objId (Replacing newObj _) =
+  if GameObject.id newObj == objId
+    then Visible newObj
+    else None
+matchVisibleObjectById_ objId (Removed removedObj) =
+  if GameObject.id removedObj == objId
+    then Hidden
+    else None

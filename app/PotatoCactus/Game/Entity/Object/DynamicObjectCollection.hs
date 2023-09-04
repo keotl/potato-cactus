@@ -1,9 +1,10 @@
-module PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCollection, create, addDynamicObject, removeDynamicObject, findByChunkXY, iter) where
+module PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCollection, create, addDynamicObject, removeDynamicObject, findByChunkXY, iter, findVisibleObjectById) where
 
 import qualified Data.IntMap as IntMap
 import Data.Maybe (fromMaybe)
 import PotatoCactus.Config.Constants (chunkBoundExponentXY_)
-import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject)
+import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectId)
+import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject, VisibleObject (None))
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (objectType, position), GameObjectType)
 import PotatoCactus.Game.Entity.Object.TileObjects (TileObjects)
 import qualified PotatoCactus.Game.Entity.Object.TileObjects as Tile
@@ -100,6 +101,13 @@ iterateOverChunkMap_ chunkMap =
     |> IntMap.toList
     |> map snd
     |> concatMap Tile.objects
+
+findVisibleObjectById :: Position -> GameObjectId -> DynamicObjectCollection -> VisibleObject
+findVisibleObjectById pos objectId collection =
+  let chunkMap = fromMaybe IntMap.empty (chunkMaps_ collection IntMap.!? posChunkKey_ pos)
+   in case chunkMap IntMap.!? positionHash pos of
+        Nothing -> None
+        Just tileObjects -> Tile.findVisibleObjectById objectId tileObjects
 
 -- For serialization
 iter :: DynamicObjectCollection -> [DynamicObject]

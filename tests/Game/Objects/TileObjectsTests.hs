@@ -1,8 +1,8 @@
 module Game.Objects.TileObjectsTests where
 
-import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject (..))
+import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject (..), VisibleObject (Hidden, Visible))
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject), GameObjectType)
-import PotatoCactus.Game.Entity.Object.TileObjects (TileObjects, addObject, create, objects, removeObject)
+import PotatoCactus.Game.Entity.Object.TileObjects (TileObjects, addObject, create, findVisibleObjectById, objects, removeObject)
 import PotatoCactus.Game.Position (Position (Position))
 import PotatoCactus.Utils.Flow ((|>))
 import Test.HUnit
@@ -74,6 +74,33 @@ testTileObjects =
                 |> removeObject 10
                 |> addObject replacingObj
                 |> objects
+            )
+        ),
+      TestCase
+        ( assertEqual
+            "findVisibleObjectById yields reference to added object"
+            (Visible obj)
+            ( create emptyStaticSet
+                |> addObject obj
+                |> findVisibleObjectById 1
+            )
+        ),
+      TestCase
+        ( assertEqual
+            "findVisibleObjectById yields reference to replaced object"
+            (Visible obj)
+            ( create populatedStaticSet
+                |> addObject obj
+                |> findVisibleObjectById 1
+            )
+        ),
+      TestCase
+        ( assertEqual
+            "findVisibleObjectById yields reference to removed object"
+            Hidden
+            ( create populatedStaticSet
+                |> removeObject 10
+                |> findVisibleObjectById 2
             )
         )
     ]

@@ -16,7 +16,7 @@ initializeScriptEngineContext = do
 
   -- TODO - Send static definitions  - keotl 2023-04-27
   staticObjects <- getStaticObjectSetInstance
-  send handle (setStaticObjectSetMessage staticObjects)
+  -- send handle (setStaticObjectSetMessage staticObjects)
 
   send handle (updateWorldContextMessage world)
   send handle (mapEvent ServerInitEvent)

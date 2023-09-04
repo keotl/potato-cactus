@@ -15,6 +15,7 @@ import GetMonadTests (getTests)
 import IterableTests (testReplaceAt)
 import MobListTests (testMobList)
 import Test.HUnit
+import Game.World.SelectorsTests (worldSelectorsTest)
 
 tests =
   TestList
@@ -41,7 +42,8 @@ tests =
       testVarpSet,
       testDynamicObjectCollection,
       testTileObjects,
-      testGameObjectUpdateOperations
+      testGameObjectUpdateOperations,
+      worldSelectorsTest
     ]
 
 main :: IO ()
