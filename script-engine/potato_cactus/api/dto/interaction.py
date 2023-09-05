@@ -2,6 +2,8 @@ from typing import Generic, Literal, Optional, TypeVar
 
 from potato_cactus.api.dto.position import Position
 
+from .object import GameObject
+
 T = TypeVar("T")
 
 
@@ -11,16 +13,14 @@ class PlayerInteraction(Generic[T]):
 
 
 class ObjectInteractionTarget(object):
-    type: Literal["object"]
-    objectId: int
-    position: Position
+    type: Literal["objectAction"]
+    object: GameObject
     actionIndex: int
 
 
 class ItemOnObjectInteractionTarget(object):
     type: Literal["itemOnObject"]
-    objectId: int
-    position: Position
+    object: GameObject
     itemId: int
     itemIndex: int
     interfaceId: int

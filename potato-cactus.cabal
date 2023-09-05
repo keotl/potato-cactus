@@ -118,7 +118,6 @@ executable potato-cactus
                    PotatoCactus.Game.Entity.Object.DynamicObject
                    PotatoCactus.Game.Entity.Object.DynamicObjectCollection
                    PotatoCactus.Game.Entity.Object.GameObject
-                   PotatoCactus.Game.Entity.Object.GameObjectKey
                    PotatoCactus.Game.Entity.Object.TileObjects
                    PotatoCactus.Game.Definitions.EquipmentDefinitions
                    PotatoCactus.Game.Definitions.GameObjectDefinitions

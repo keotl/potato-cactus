@@ -33,6 +33,7 @@ advanceInteraction findNpc (Interaction (NpcTarget npcId interactionType) Pendin
       (_, True) -> Interaction (NpcTarget npcId interactionType) InProgress
       _ -> Interaction (NpcTarget npcId interactionType) PendingPathing
 advanceInteraction _ (Interaction (ObjectTarget objectKey actionIndex) Pending) (pos, isStopped) =
+  -- TODO - Handle case where the target object is removed while the interaction is in progress.  - keotl 2023-09-05
   case (isStopped, canStartInteractionFromPos (getPosition objectKey) pos) of
     (True, True) -> Interaction (ObjectTarget objectKey actionIndex) InProgress
     (False, _) -> Interaction (ObjectTarget objectKey actionIndex) Pending

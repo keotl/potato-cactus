@@ -2,16 +2,19 @@ module PotatoCactus.Game.Entity.Interaction.Target where
 
 import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemId)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc, NpcIndex)
-import PotatoCactus.Game.Entity.Object.GameObjectKey (GameObjectKey)
+import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Message.ItemOnObjectPayload (ItemOnObjectPayload)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position, isNextTo, isWithin)
+import PotatoCactus.Game.Scripting.Actions.CreateInterface (WidgetId)
 
 data InteractionTarget
-  = ObjectTarget GameObjectKey (Either Int ItemOnObjectPayload)
+  = ObjectTarget GameObject ObjectInteractionType
   | NpcTarget NpcIndex NpcInteractionType
   | GroundItemTarget ItemId Int Position GroundItemInteractionType
   | None
   deriving (Show)
+
+data ObjectInteractionType = ObjectAction Int | ItemOnObject WidgetId Int ItemId deriving (Show)
 
 data NpcInteractionType = NpcAttack | NpcAction Int deriving (Show)
 

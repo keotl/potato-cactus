@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module PotatoCactus.Game.Scripting.Bridge.Serialization.Models.GameObjectDto (GameObjectDto, gameObjectToDto, objectPlacementToDto) where
+module PotatoCactus.Game.Scripting.Bridge.Serialization.Models.GameObjectDto (GameObjectDto, dynamicGameObjectToDto, gameObjectToDto) where
 
 import Data.Aeson (ToJSON)
 import GHC.Generics (Generic)
@@ -20,15 +20,15 @@ data GameObjectDto = GameObjectDto
 
 instance ToJSON GameObjectDto
 
-gameObjectToDto :: D.DynamicObject -> Maybe GameObjectDto
-gameObjectToDto (D.Added obj) =
-  Just $ objectPlacementToDto obj
+dynamicGameObjectToDto :: D.DynamicObject -> Maybe GameObjectDto
+dynamicGameObjectToDto (D.Added obj) =
+  Just $ gameObjectToDto obj
 -- TODO - Send Removed/Replacing objects to the script engine  - keotl 2023-08-31
 -- TODO - Worth considering as part of a global static/dynamic object strategy  - keotl 2023-08-31
-gameObjectToDto _ = Nothing
+dynamicGameObjectToDto _ = Nothing
 
-objectPlacementToDto :: GameObject -> GameObjectDto
-objectPlacementToDto obj =
+gameObjectToDto :: GameObject -> GameObjectDto
+gameObjectToDto obj =
   GameObjectDto
     { id = O.id obj,
       position = toDto . O.position $ obj,

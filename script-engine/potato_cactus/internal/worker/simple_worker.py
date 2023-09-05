@@ -33,8 +33,7 @@ class SimpleWorker(WorkerHandle):
         elif message.op == "updateWorld":
             world = cast(World, message.body)
             ContextImpl.INSTANCE.set_world(world)
-        elif message.op == "setStaticObjectSet":
-            ContextImpl.INSTANCE.load_static_objects(message.body.objects)
+
         elif message.op == "invokeScript":
             try:
                 modulename, function = message.body.event.rsplit(".", 1)
@@ -48,6 +47,7 @@ class SimpleWorker(WorkerHandle):
                 _logger.error(
                     f"Unhandled exception while invoking script '{message.body.event}'. {e}"
                 )
+
         elif message.op == "gameEvent":
             _enrich_message(ContextImpl.INSTANCE, message.body)  # type: ignore
             handlers = Registry.INSTANCE.get_handlers(_event_key(message.body))
@@ -79,9 +79,9 @@ def _event_key(payload) -> Tuple[Optional[Union[str, int]], ...]:
     if payload.event == GameEvent.ServerInitEvent:
         return GameEvent.ServerInitEvent,
     if payload.event == GameEvent.ObjectInteractionEvent:
-        return GameEvent.ObjectInteractionEvent, payload.body.interaction.target.objectId
+        return GameEvent.ObjectInteractionEvent, payload.body.interaction.target.object.id
     if payload.event == GameEvent.ItemOnObjectInteractionEvent:
-        return GameEvent.ItemOnObjectInteractionEvent, payload.body.interaction.target.objectId
+        return GameEvent.ItemOnObjectInteractionEvent, payload.body.interaction.target.object.id
     if payload.event == GameEvent.NpcInteractionEvent:
         return GameEvent.NpcInteractionEvent, payload.body.interaction.target.npcId
     if payload.event == GameEvent.NpcAttackInteractionEvent:

@@ -15,7 +15,7 @@ initializeScriptEngineContext = do
   world <- readIORef worldInstance
 
   -- TODO - Send static definitions  - keotl 2023-04-27
-  staticObjects <- getStaticObjectSetInstance
+  -- staticObjects <- getStaticObjectSetInstance
   -- send handle (setStaticObjectSetMessage staticObjects)
 
   send handle (updateWorldContextMessage world)
