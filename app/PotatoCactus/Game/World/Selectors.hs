@@ -42,4 +42,4 @@ findObjectAt world pos objectId =
     |> DynamicObjectCollection.findVisibleObjectById pos objectId of
     VisibleObject.Visible obj -> Just obj
     VisibleObject.Hidden -> Nothing
-    VisibleObject.None -> Nothing -- TODO - static lookup  - keotl 2023-09-04
+    VisibleObject.None -> W.staticObjectLookup_ world pos objectId

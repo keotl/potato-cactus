@@ -20,13 +20,13 @@ itemOnObjectPacket playerId packet =
         objectX,
         itemId
         ) = runGet readPayload_ (fromStrict . payload $ packet)
-   in ItemOnObjectMessage playerId $
-        ItemOnObjectPayload
-          (fromIntegral itemInterfaceId)
-          (fromIntegral objectId)
-          (PositionXY (fromIntegral objectX) (fromIntegral objectY))
-          (fromIntegral itemIndexId)
-          (fromIntegral itemId)
+   in ItemOnObjectMessage
+        playerId
+        (fromIntegral itemInterfaceId)
+        (fromIntegral objectId)
+        (PositionXY (fromIntegral objectX) (fromIntegral objectY))
+        (fromIntegral itemIndexId)
+        (fromIntegral itemId)
 
 readPayload_ :: Get (Word16, Word16, Int16, Word16, Int16, Word16)
 readPayload_ = do

@@ -5,6 +5,7 @@ import Data.IORef (IORef, newIORef, writeIORef)
 import Data.List (find)
 import GHC.IO (unsafePerformIO)
 import PotatoCactus.Config.Constants (maxNpcs, maxPlayers)
+import qualified PotatoCactus.Game.Definitions.StaticGameObjectSet as StaticObject
 import PotatoCactus.Game.Entity.GroundItem.GroundItemCollection (GroundItemCollection)
 import qualified PotatoCactus.Game.Entity.GroundItem.GroundItemCollection as GroundItemCollection
 import PotatoCactus.Game.Entity.Npc.AdvanceNpc (advanceNpc)
@@ -44,7 +45,8 @@ data World = World
     groundItems :: GroundItemCollection,
     triggeredEvents :: [GameEvent], -- Additional events to dispatch on this tick. For events not tied to a specific entity.
     pendingEvents_ :: [GameEvent], -- Additional events to dispatch on the next tick.
-    scheduler :: CallbackScheduler
+    scheduler :: CallbackScheduler,
+    staticObjectLookup_ :: StaticObject.FindStaticObjectById
   }
   deriving (Show)
 
@@ -80,7 +82,8 @@ defaultWorldValue =
       groundItems = GroundItemCollection.create,
       triggeredEvents = [],
       pendingEvents_ = [],
-      scheduler = Scheduler.create
+      scheduler = Scheduler.create,
+      staticObjectLookup_ = \_ _ -> Nothing
     }
 
 worldInstance :: IORef World
