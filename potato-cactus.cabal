@@ -184,7 +184,6 @@ executable potato-cactus
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PlayerAttackDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PlayerDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PositionDto
-                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.StaticGameObjectSetDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.VarpsetDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.WorldDto
                    PotatoCactus.Game.Scripting.BuiltinGameEventProcessor
