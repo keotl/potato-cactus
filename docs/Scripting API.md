@@ -28,9 +28,15 @@ Event names and payload types can be imported from
 To register an event handler, annotate a function with `@EventHandler`
 supplying the event name and the required key attribute.
 
+For events with a key argument, a fallback handler can be configured by
+passing `"unhandled"` as the required key parameter. The fallback handler
+is **only invoked when no specific handler is found**.
+
 For events with a key argument, a default handler can be configured by
 passing `"default"` as the required key parameter. The default handler
-is **only invoked when no specific handler is found**.
+is **invoked after all registered handlers have been processed**. To
+prevent invoking the default handler, return `PreventDefault()` as
+part of a registered handler.
 
 
 ```python
@@ -64,4 +70,5 @@ Action constructors are imported from `potato_cactus.api.actions`.
 | RemoveGroundItem       | Removes a ground item at pos. e.g. Player picking up an item. If `removedByPlayer`is specified, will look for items visible to that player and add it to their inventory. |
 | SetPlayerVarp          | Set an entire player variable (VarP) to a Word32 value.                                                                                                                   |
 | SetPlayerVarbit        | Within a VarP, set bit values. Marks the VarP as updated.                                                                                                                 |
+| PreventDefault         | Prevent invoking default handler for event. (Python scripting engine only)                                                                                                |
 

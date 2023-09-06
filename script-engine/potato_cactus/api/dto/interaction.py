@@ -8,7 +8,7 @@ T = TypeVar("T")
 
 
 class PlayerInteraction(Generic[T]):
-    target: Optional[T]
+    target: T
     state: Literal["pending", "pendingPathing", "inProgress"]
 
 

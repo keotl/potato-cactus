@@ -4,7 +4,7 @@ from potato_cactus.api.actions import (RemoveItemStack, SendMessage,
 from potato_cactus.api.events import DropItemEventPayload
 
 
-@EventHandler(GameEvent.DropItemEvent, itemId="default")
+@EventHandler(GameEvent.DropItemEvent, itemId="unhandled")
 def drop_item_default_handler(e: DropItemEventPayload, ctx: Context):
     player = ctx.find_player_by_index(e.playerIndex)
     if player is None:

@@ -19,13 +19,10 @@ from potato_cactus.api.events import ObjectInteractionEventPayload
 @EventHandler(GameEvent.ObjectInteractionEvent, objectId=1530)
 @EventHandler(GameEvent.ObjectInteractionEvent, objectId=1533)
 def on_door_open(e: ObjectInteractionEventPayload, context: Context):
-    if (e.interaction.target is None):
-        return [ClearPlayerInteraction(e.playerIndex)]
     door = e.interaction.target.object
     return [
         SpawnGameObject(*matching_open_door(door, door_variant.get(door.id))),
         RemoveGameObject(door.position, door.objectType),
-        ClearPlayerInteraction(e.playerIndex)
     ]
 
 
@@ -39,14 +36,11 @@ door_variant: Dict[int, Literal["left", "right"]] = {1516: "left"}
 @EventHandler(GameEvent.ObjectInteractionEvent, objectId=1554)  # Gate left
 @EventHandler(GameEvent.ObjectInteractionEvent, objectId=1534)
 def on_door_close(e: ObjectInteractionEventPayload, context: Context):
-    if (e.interaction.target is None):
-        return [ClearPlayerInteraction(e.playerIndex)]
     door = e.interaction.target.object
     return [
         SpawnGameObject(
             *matching_closed_door(door, door_variant.get(door.id - 1))),
         RemoveGameObject(door.position, door.objectType),
-        ClearPlayerInteraction(e.playerIndex)
     ]
 
 

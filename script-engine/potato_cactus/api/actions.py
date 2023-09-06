@@ -243,6 +243,10 @@ def SetVarbit(playerIndex: int, varpId: int, lsb: int, length: int,
         })
 
 
+def PreventDefault() -> ScriptAction:
+    return ScriptAction("preventDefault", {})
+
+
 def _map_position(position: Union[Position, Tuple[int, int, int]]) -> dict:
     if hasattr(position, "x") or isinstance(position, Position):
         return {
