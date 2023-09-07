@@ -1,5 +1,6 @@
 module PotatoCactus.Game.PlayerUpdate.AdvancePlayer where
 
+import PotatoCactus.Game.Entity.Interaction.AdvanceInteractionDeps (AdvanceInteractionSelectors, locateInteractionTarget)
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction (state, target), advanceInteraction, create)
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (PendingPathing))
 import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (NpcTarget))
@@ -10,45 +11,33 @@ import qualified PotatoCactus.Game.Movement.MovementEntity as Movement
 import PotatoCactus.Game.Movement.PathPlanner (findPathNaive)
 import PotatoCactus.Game.Player (Player (..))
 import PotatoCactus.Game.PlayerUpdate.ProcessPlayerUpdate (processPlayerUpdate)
-import PotatoCactus.Game.Position (getPosition)
+import PotatoCactus.Game.Position (Position, getPosition)
 import PotatoCactus.Game.Typing (Advance (advance))
 import PotatoCactus.Utils.Flow ((|>))
 
-advancePlayer :: (NpcIndex -> Maybe Npc) -> Player -> Player
-advancePlayer findNpc p =
+advancePlayer :: AdvanceInteractionSelectors -> Player -> Player
+advancePlayer advanceInteractionDeps p =
   if skipUpdate_ p
     then p {skipUpdate_ = False}
     else
       let updated =
             p |> processPendingUpdates_
               |> commonUpdates_
-       in let updatedInteraction =
-                advanceInteraction
-                  findNpc
-                  (interaction updated)
-                  (getPosition updated, isStopped . movement $ updated)
-           in case (state updatedInteraction, target updatedInteraction) of
-                (PendingPathing, NpcTarget npcId _) ->
-                  case findNpc npcId of
-                    Nothing ->
-                      updated
-                        { movement = advance (movement updated),
-                          interaction = create,
-                          pendingUpdates = []
-                        }
-                    Just npc ->
-                      let desiredPath = findPathNaive 666 (getPosition p) (getPosition npc)
-                       in updated
-                            { movement = Movement.immediatelyQueueMovement (movement updated) desiredPath,
-                              interaction = updatedInteraction,
-                              pendingUpdates = []
-                            }
-                _ ->
-                  updated
-                    { movement = advance (movement updated),
-                      interaction = updatedInteraction,
-                      pendingUpdates = []
-                    }
+       in updated
+            { movement = advance (movement updated),
+              interaction =
+                advanceInteraction_
+                  advanceInteractionDeps
+                  (isStopped . movement $ p)
+                  (getPosition p)
+                  (interaction p),
+              pendingUpdates = []
+            }
+
+advanceInteraction_ :: AdvanceInteractionSelectors -> Bool -> Position -> Interaction -> Interaction
+advanceInteraction_ _ False _ = id
+advanceInteraction_ deps True playerPos =
+  advanceInteraction (locateInteractionTarget deps playerPos)
 
 clearTransientProperties_ :: Player -> Player
 clearTransientProperties_ p =

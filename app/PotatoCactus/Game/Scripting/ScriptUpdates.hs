@@ -16,13 +16,15 @@ import PotatoCactus.Game.Position (Position (Position))
 import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest, WidgetId)
 import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation)
 import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest)
+import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget)
 
 data GameEvent
   = ServerInitEvent
   | PlayerInteractionEvent Player Interaction -- maps to NpcInteractionEvent, ObjectInteractionEvent, ItemOnObjectInteractionEvent, NpcAttackInteractionEvent and PickupItemInteractionEvent
+  | InternalPlayerInteractionPendingPathingEvent Player InteractionTarget
   | PlayerAttackEvent Player CombatTarget
   | NpcAttackEvent Npc CombatTarget
-  | NpcCannotReachTargetEvent Npc CombatTarget
+  | InternalNpcCannotReachTargetEvent Npc CombatTarget
   | NpcDeadEvent Npc
   | NpcEntityTickEvent Npc
   | PlayerCommandEvent PlayerIndex String [String]
@@ -44,7 +46,6 @@ data ScriptActionResult
   | SendMessage PlayerIndex String
   | SetPlayerPosition PlayerIndex Position
   | SetPlayerAnimation PlayerIndex Animation
-  | InternalRemoveNpcTargetReferences NpcIndex
   | InternalProcessingComplete -- Sentinel token to indicate script execution complete
   | InvokeScript ScriptInvocation Int
   | CreateInterface PlayerIndex CreateInterfaceRequest
@@ -59,4 +60,6 @@ data ScriptActionResult
   | SetPlayerVarbit PlayerIndex (VarpId, Word8, Word8, Word32)
   | InternalNoop
   | ServerPrintMessage String -- for testing
+  | InternalSetPlayerInteractionPending PlayerIndex
+  | PlayerQueueWalk PlayerIndex Position
   deriving (Show)

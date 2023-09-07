@@ -4,10 +4,11 @@ import Data.Maybe (catMaybes)
 import PotatoCactus.Game.Combat.CombatEntity (CombatEntity (cooldown), CombatTarget (None))
 import qualified PotatoCactus.Game.Combat.CombatEntity as Combat
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction (state))
-import PotatoCactus.Game.Entity.Interaction.State (InteractionState (InProgress))
+import qualified PotatoCactus.Game.Entity.Interaction.Interaction as Interaction
+import PotatoCactus.Game.Entity.Interaction.State (InteractionState (InProgress, PendingPathing))
 import qualified PotatoCactus.Game.Interface.InterfaceController as IC
 import PotatoCactus.Game.Player (Player (Player, combat, interaction, interfaces))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (PlayerAttackEvent, PlayerInteractionEvent, ScriptInvokedEvent))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (InternalPlayerInteractionPendingPathingEvent, PlayerAttackEvent, PlayerInteractionEvent, ScriptInvokedEvent))
 
 createPlayerEvents :: Player -> [GameEvent]
 createPlayerEvents player =
@@ -21,6 +22,11 @@ interactionEvent_ :: Player -> Maybe GameEvent
 interactionEvent_ p =
   case state . interaction $ p of
     InProgress -> Just $ PlayerInteractionEvent p (interaction p)
+    PendingPathing ->
+      Just $
+        InternalPlayerInteractionPendingPathingEvent
+          p
+          (Interaction.target . interaction $ p)
     _ -> Nothing
 
 attackEvent_ :: Player -> Maybe GameEvent

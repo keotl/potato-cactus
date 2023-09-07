@@ -4,6 +4,7 @@ import Debug.Trace (trace)
 import qualified PotatoCactus.Game.Combat.CombatEntity as Combat
 import PotatoCactus.Game.Combat.Hit (DamageType (MeleeAttack), Hit (Hit))
 import PotatoCactus.Game.Entity.Animation.Animation (Animation (Animation), AnimationPriority (High))
+import PotatoCactus.Game.Entity.Interaction.AdvanceInteractionDeps (findClosestInteractableTile)
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction (state, target))
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (..))
 import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (NpcTarget, ObjectTarget), NpcInteractionType (NpcAttack))
@@ -15,11 +16,24 @@ import PotatoCactus.Game.Message.RegisterClientPayload (RegisterClientPayload (p
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
 import PotatoCactus.Game.Player (Player (serverIndex))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, z))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (DropItemEvent, NpcAttackEvent, NpcCannotReachTargetEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalRemoveNpcTargetReferences, NpcMoveTowardsTarget, NpcSetAnimation, RemoveItemStack))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (DropItemEvent, InternalNpcCannotReachTargetEvent, InternalPlayerInteractionPendingPathingEvent, NpcAttackEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalSetPlayerInteractionPending, NpcMoveTowardsTarget, NpcSetAnimation, PlayerQueueWalk, RemoveItemStack, SendMessage))
 import PotatoCactus.Game.Typing (key)
 import PotatoCactus.Game.World (World (tick))
+import qualified PotatoCactus.Game.World as W
 
 dispatchScriptEvent :: World -> GameEvent -> IO [ScriptActionResult]
+dispatchScriptEvent world (InternalPlayerInteractionPendingPathingEvent player target) = do
+  let deps = W.createAdvanceInteractionDeps_ world
+  return $
+    case findClosestInteractableTile deps (getPosition player) target of
+      Nothing ->
+        [ ClearPlayerInteraction (serverIndex player),
+          SendMessage (serverIndex player) "I can't reach that."
+        ]
+      Just newTargetPos ->
+        [ InternalSetPlayerInteractionPending (serverIndex player),
+          PlayerQueueWalk (serverIndex player) newTargetPos
+        ]
 dispatchScriptEvent world (PlayerInteractionEvent player interaction) =
   trace
     ("Dispatched interaction event " ++ show interaction)
@@ -31,7 +45,7 @@ dispatchScriptEvent world (PlayerInteractionEvent player interaction) =
             ]
         _ -> return []
     )
-dispatchScriptEvent world (NpcCannotReachTargetEvent npc target) =
+dispatchScriptEvent world (InternalNpcCannotReachTargetEvent npc target) =
   return [NpcMoveTowardsTarget npc]
 dispatchScriptEvent world (PlayerAttackEvent player target) =
   trace
@@ -58,8 +72,7 @@ dispatchScriptEvent world (NpcDeadEvent npc) =
   trace
     "dispatched NPC dead event"
     ( return
-        [ NpcSetAnimation (NPC.serverIndex npc) (Animation 2607 0 High),
-          InternalRemoveNpcTargetReferences (NPC.serverIndex npc)
+        [ NpcSetAnimation (NPC.serverIndex npc) (Animation 2607 0 High)
         ]
     )
 dispatchScriptEvent _ _ = return []

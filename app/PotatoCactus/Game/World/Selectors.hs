@@ -35,11 +35,3 @@ isNpcAt w pos =
   case findByPredicate (npcs w) ((==) pos . getPosition) of
     Nothing -> False
     Just _ -> True
-
-findObjectAt :: World -> Position -> GameObjectId -> Maybe GameObject
-findObjectAt world pos objectId =
-  case W.objects world
-    |> DynamicObjectCollection.findVisibleObjectById pos objectId of
-    VisibleObject.Visible obj -> Just obj
-    VisibleObject.Hidden -> Nothing
-    VisibleObject.None -> W.staticObjectLookup_ world pos objectId

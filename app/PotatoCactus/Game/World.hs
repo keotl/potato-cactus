@@ -6,11 +6,15 @@ import Data.List (find)
 import GHC.IO (unsafePerformIO)
 import PotatoCactus.Config.Constants (maxNpcs, maxPlayers)
 import qualified PotatoCactus.Game.Definitions.StaticGameObjectSet as StaticObject
+import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectId)
 import PotatoCactus.Game.Entity.GroundItem.GroundItemCollection (GroundItemCollection)
 import qualified PotatoCactus.Game.Entity.GroundItem.GroundItemCollection as GroundItemCollection
+import qualified PotatoCactus.Game.Entity.Interaction.AdvanceInteractionDeps as InteractionDeps
 import PotatoCactus.Game.Entity.Npc.AdvanceNpc (advanceNpc)
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
+import qualified PotatoCactus.Game.Entity.Object.DynamicObject as VisibleObject
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCollection, create)
+import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as DynamicObjectCollection
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload)
 import PotatoCactus.Game.Player (PlayerIndex)
@@ -24,6 +28,7 @@ import PotatoCactus.Game.World.CallbackScheduler (CallbackScheduler)
 import qualified PotatoCactus.Game.World.CallbackScheduler as Scheduler
 import PotatoCactus.Game.World.EntityPositionFinder (combatTargetPosOrDefault)
 import PotatoCactus.Game.World.MobList (MobList, add, create, findByIndex, findByPredicate, remove, removeByPredicate, updateAll, updateAtIndex, updateByPredicate)
+import PotatoCactus.Utils.Flow ((|>))
 import PotatoCactus.Utils.Iterable (replace)
 
 data ClientHandleMessage = WorldUpdatedMessage | CloseClientConnectionMessage
@@ -59,7 +64,7 @@ instance Advance World where
             )
      in w
           { tick = tick w + 1,
-            players = updateAll (players w) (advancePlayer (findByIndex newNpcs)),
+            players = updateAll (players w) (advancePlayer (createAdvanceInteractionDeps_ w)),
             npcs = removeByPredicate newNpcs shouldDiscard,
             groundItems = GroundItemCollection.advanceTime (groundItems w) (tick w + 1),
             triggeredEvents = pendingEvents_ w ++ invokedScripts_ w,
@@ -70,6 +75,18 @@ instance Advance World where
 invokedScripts_ :: World -> [GameEvent]
 invokedScripts_ w =
   map ScriptInvokedEvent $ Scheduler.callbacksForTick (scheduler w) (tick w + 1)
+
+createAdvanceInteractionDeps_ :: World -> InteractionDeps.AdvanceInteractionSelectors
+createAdvanceInteractionDeps_ w =
+  InteractionDeps.AdvanceInteractionSelectors (findByIndex (npcs w)) (findObjectAt w)
+
+findObjectAt :: World -> Position -> GameObjectId -> Maybe GameObject
+findObjectAt world pos objectId =
+  case objects world
+    |> DynamicObjectCollection.findVisibleObjectById pos objectId of
+    VisibleObject.Visible obj -> Just obj
+    VisibleObject.Hidden -> Nothing
+    VisibleObject.None -> staticObjectLookup_ world pos objectId
 
 defaultWorldValue :: World
 defaultWorldValue =

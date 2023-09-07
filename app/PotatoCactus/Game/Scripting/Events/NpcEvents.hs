@@ -4,7 +4,7 @@ import Data.Maybe (catMaybes)
 import PotatoCactus.Game.Combat.CombatEntity (CombatTarget (None), cooldown)
 import qualified PotatoCactus.Game.Combat.CombatEntity as Combat
 import PotatoCactus.Game.Entity.Npc.Npc (Npc (canReachTarget, combat))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (NpcAttackEvent, NpcCannotReachTargetEvent, NpcDeadEvent, NpcEntityTickEvent))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (InternalNpcCannotReachTargetEvent, NpcAttackEvent, NpcDeadEvent, NpcEntityTickEvent))
 import PotatoCactus.Utils.Flow ((|>))
 
 createNpcEvents :: Npc -> [GameEvent]
@@ -30,7 +30,7 @@ cannotReachEvent_ :: Npc -> Maybe GameEvent
 cannotReachEvent_ npc =
   if canReachTarget npc
     then Nothing
-    else Just $ NpcCannotReachTargetEvent npc (Combat.target . combat $ npc)
+    else Just $ InternalNpcCannotReachTargetEvent npc (Combat.target . combat $ npc)
 
 npcDeadEvent_ :: Npc -> Maybe GameEvent
 npcDeadEvent_ npc =

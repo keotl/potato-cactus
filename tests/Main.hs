@@ -10,12 +10,14 @@ import Game.GroudItemCollectionTests (testGroundItemCollection)
 import Game.GroundItemsUpdateDiffTests (groundItemsUpdateDiffTests)
 import Game.InterpolatePathTests (interpolatePathTests)
 import Game.Objects.TileObjectsTests (testTileObjects)
+import Game.Player.AdvancePlayerTests (advancePlayerTests)
+import Game.Player.InteractionTests (advanceInteractionTests)
 import Game.Player.VarpSetTests (testVarpSet)
+import Game.World.SelectorsTests (worldSelectorsTest)
 import GetMonadTests (getTests)
 import IterableTests (testReplaceAt)
 import MobListTests (testMobList)
 import Test.HUnit
-import Game.World.SelectorsTests (worldSelectorsTest)
 
 tests =
   TestList
@@ -43,7 +45,9 @@ tests =
       testDynamicObjectCollection,
       testTileObjects,
       testGameObjectUpdateOperations,
-      worldSelectorsTest
+      worldSelectorsTest,
+      advanceInteractionTests,
+      advancePlayerTests
     ]
 
 main :: IO ()

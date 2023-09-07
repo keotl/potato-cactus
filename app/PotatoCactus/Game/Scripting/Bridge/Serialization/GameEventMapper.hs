@@ -16,7 +16,7 @@ import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.InteractionDto (p
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.NpcAttackDto (npcAttackDto)
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.NpcReferenceDto (npcReferenceDto)
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PlayerAttackDto (playerAttackToDto)
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (DropItemEvent, NpcAttackEvent, NpcCannotReachTargetEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerCommandEvent, PlayerInteractionEvent, ScriptInvokedEvent, ServerInitEvent))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (..))
 
 mapEvent :: GameEvent -> BridgeMessage (GameEventDto Value)
 mapEvent ServerInitEvent =
@@ -31,7 +31,7 @@ mapEvent (PlayerAttackEvent p t) =
 mapEvent (NpcAttackEvent npc t) =
   bridgeMessage "gameEvent" $
     GameEventDto "NpcAttackEvent" (npcAttackDto npc t)
-mapEvent (NpcCannotReachTargetEvent npc t) =
+mapEvent (InternalNpcCannotReachTargetEvent npc t) =
   bridgeMessage "gameEvent" $
     GameEventDto "noop" Null
 mapEvent (NpcDeadEvent npc) =
@@ -46,6 +46,8 @@ mapEvent (DropItemEvent playerId widgetId itemId index) =
   bridgeMessage "gameEvent" $ GameEventDto "DropItemEvent" (dropItemDto playerId widgetId itemId index)
 mapEvent (ScriptInvokedEvent (ScriptInvocation functionName args)) =
   bridgeMessage "invokeScript" $ GameEventDto functionName (listValue id args)
+mapEvent (InternalPlayerInteractionPendingPathingEvent _ _) =
+  bridgeMessage "gameEvent" $ GameEventDto "noop" Null
 
 data GameEventDto b = GameEventDto
   { event :: String,

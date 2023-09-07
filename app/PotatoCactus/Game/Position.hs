@@ -44,8 +44,8 @@ isWithin distance a b =
        )
 
 -- isNextTo in 4-neighbour connectivity
-isNextTo :: Position -> Position -> Bool
-isNextTo a b =
+isAdjacent :: Position -> Position -> Bool
+isAdjacent a b =
   z a == z b
     && ( let (deltaX, deltaY) = (x a - x b, y a - y b)
           in (abs deltaX == 1 && abs deltaY == 0) || (abs deltaX == 0 && abs deltaY == 1)

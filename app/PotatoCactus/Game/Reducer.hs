@@ -20,6 +20,7 @@ import PotatoCactus.Game.Scripting.Actions.CreateInterface (InterfaceType (Stand
 import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (DropItemEvent, PlayerCommandEvent))
 import PotatoCactus.Game.Typing (advance)
 import PotatoCactus.Game.World (ClientHandle (username), World (World, clients, groundItems, players, tick), addPlayer, queueEvent, removePlayerByUsername, updatePlayer, updatePlayerByIndex)
+import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex)
 import qualified PotatoCactus.Game.World.Selectors as Selectors
 
@@ -43,7 +44,7 @@ reduceWorld world (ObjectClickMessage playerId objectId positionXY actionIndex) 
     world
     playerId
     ( \p ->
-        case Selectors.findObjectAt world (fromXY positionXY (z . getPosition $ p)) objectId of
+        case W.findObjectAt world (fromXY positionXY (z . getPosition $ p)) objectId of
           Nothing -> p
           Just obj -> P.queueUpdate p (InteractWithObject (ObjectClickPayload obj actionIndex))
     )
@@ -73,7 +74,7 @@ reduceWorld world (ItemOnObjectMessage playerId itemInterfaceId objectId positio
     world
     playerId
     ( \p ->
-        case Selectors.findObjectAt world (fromXY positionXY (z . getPosition $ p)) objectId of
+        case W.findObjectAt world (fromXY positionXY (z . getPosition $ p)) objectId of
           -- TODO - Also check for item to be in the inventory  - keotl 2023-09-05
           Nothing -> p
           Just obj ->

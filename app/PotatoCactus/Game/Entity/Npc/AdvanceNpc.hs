@@ -8,7 +8,7 @@ import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Npc.NpcMovement (create, immediatelyQueueMovement)
 import PotatoCactus.Game.Entity.Npc.RespawnStrategy (restart, tryRespawn)
 import PotatoCactus.Game.Movement.PathPlanner (CollisionMap, findPath)
-import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position), faraway, isNextTo, isWithin)
+import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position), faraway, isWithin, isAdjacent)
 import PotatoCactus.Game.Typing (IsEntityActive (isEntityActive), advance)
 import PotatoCactus.Game.World.EntityPositionFinder (CombatTargetPosOrDefault)
 import PotatoCactus.Game.World.MobList (findByIndex)
@@ -58,7 +58,7 @@ canReachCombatTarget_ npc targetPosOrDefault =
             (getPosition npc)
             (targetPosOrDefault (target . combat $ npc) (getPosition npc))
         else
-          isNextTo
+          isAdjacent
             (getPosition npc)
             (targetPosOrDefault (target . combat $ npc) (getPosition npc))
 
