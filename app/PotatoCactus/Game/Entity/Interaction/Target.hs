@@ -19,9 +19,3 @@ data ObjectInteractionType = ObjectAction Int | ItemOnObject WidgetId Int ItemId
 data NpcInteractionType = NpcAttack | NpcAction Int deriving (Show, Eq)
 
 data GroundItemInteractionType = ItemPickup deriving (Show, Eq)
-
--- TODO - Some entities are larger than 1 tile. e.g. trees.  - keotl 2023-03-15
--- TODO - For those entities, we have to somehow check the clickbox - keotl 2023-03-15
--- TODO - Some entities, e.g. stairs, can only start the interaction on from a single tile.  - keotl 2023-03-15
-canStartInteractionFromPos :: Position -> Position -> Bool
-canStartInteractionFromPos = isWithin 1

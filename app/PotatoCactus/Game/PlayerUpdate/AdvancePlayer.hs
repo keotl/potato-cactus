@@ -1,4 +1,4 @@
-module PotatoCactus.Game.PlayerUpdate.AdvancePlayer where
+module PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer) where
 
 import PotatoCactus.Game.Entity.Interaction.AdvanceInteractionDeps (AdvanceInteractionSelectors, locateInteractionTarget)
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction (state, target), advanceInteraction, create)
@@ -16,21 +16,26 @@ import PotatoCactus.Game.Typing (Advance (advance))
 import PotatoCactus.Utils.Flow ((|>))
 
 advancePlayer :: AdvanceInteractionSelectors -> Player -> Player
-advancePlayer advanceInteractionDeps p =
-  if skipUpdate_ p
-    then p {skipUpdate_ = False}
+advancePlayer advanceInteractionDeps old =
+  if skipUpdate_ old
+    then old {skipUpdate_ = False}
     else
-      let updated =
-            p |> processPendingUpdates_
-              |> commonUpdates_
-       in updated
-            { movement = advance (movement updated),
+      let p =
+            old
+              |> clearTransientProperties_
+              |> processPendingUpdates_
+       in p
+            { movement = advance (movement p),
               interaction =
                 advanceInteraction_
                   advanceInteractionDeps
                   (isStopped . movement $ p)
                   (getPosition p)
                   (interaction p),
+              inventory = advance . inventory $ p,
+              equipment = advance . equipment $ p,
+              combat = advance . combat $ p,
+              interfaces = advance . interfaces $ p,
               pendingUpdates = []
             }
 
@@ -50,16 +55,4 @@ clearTransientProperties_ p =
 
 processPendingUpdates_ :: Player -> Player
 processPendingUpdates_ p =
-  foldl
-    processPlayerUpdate
-    (clearTransientProperties_ p)
-    (pendingUpdates p)
-
-commonUpdates_ :: Player -> Player
-commonUpdates_ p =
-  p
-    { inventory = advance . inventory $ p,
-      equipment = advance . equipment $ p,
-      combat = advance . combat $ p,
-      interfaces = advance . interfaces $ p
-    }
+  foldl processPlayerUpdate p (pendingUpdates p)

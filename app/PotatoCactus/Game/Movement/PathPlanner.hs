@@ -11,7 +11,7 @@ findPath collisionMap start end =
   let mid = Position (x start) (y end) (z start)
    in case interpolatePath [start, mid, end] of
         [] -> []
-        [_] -> []
+        [x] -> [x]
         interpolated -> init interpolated
 
 -- For NPC combat pathing

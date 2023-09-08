@@ -69,7 +69,9 @@ instance Show (Position -> GameObjectId -> Maybe GameObject) where
 findObjectById :: StaticGameObjectSet -> FindStaticObjectById
 findObjectById staticObjects pos objId =
   -- TODO - Rework hashmap structure to allow more efficient lookups - keotl 2023-09-04
-  listToMaybe $ mapMaybe (objectAt staticObjects pos) lookupOrder_
+  mapMaybe (objectAt staticObjects pos) lookupOrder_
+    |> filter ((== objId) . id)
+    |> listToMaybe
 
 lookupOrder_ :: [GameObjectType]
 lookupOrder_ = [0, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] -- lookup 0/10 first, since they are the most likely to have an object interaction

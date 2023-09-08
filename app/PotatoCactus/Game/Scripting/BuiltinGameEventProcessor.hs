@@ -35,16 +35,13 @@ dispatchScriptEvent world (InternalPlayerInteractionPendingPathingEvent player t
           PlayerQueueWalk (serverIndex player) newTargetPos
         ]
 dispatchScriptEvent world (PlayerInteractionEvent player interaction) =
-  trace
-    ("Dispatched interaction event " ++ show interaction)
-    ( case (target interaction, state interaction) of
-        (NpcTarget npcId NpcAttack, InProgress) ->
-          return
-            [ DispatchAttackPlayerToNpc (serverIndex player) npcId (Hit 0 MeleeAttack),
-              ClearPlayerInteraction (serverIndex player)
-            ]
-        _ -> return []
-    )
+  case (target interaction, state interaction) of
+    (NpcTarget npcId NpcAttack, InProgress) ->
+      return
+        [ DispatchAttackPlayerToNpc (serverIndex player) npcId (Hit 0 MeleeAttack),
+          ClearPlayerInteraction (serverIndex player)
+        ]
+    _ -> return []
 dispatchScriptEvent world (InternalNpcCannotReachTargetEvent npc target) =
   return [NpcMoveTowardsTarget npc]
 dispatchScriptEvent world (PlayerAttackEvent player target) =

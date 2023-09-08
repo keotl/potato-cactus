@@ -1,8 +1,7 @@
 module PotatoCactus.Game.Entity.Interaction.Interaction where
 
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (InProgress, Pending, PendingPathing))
-import PotatoCactus.Game.Entity.Interaction.Target (GroundItemInteractionType (ItemPickup), InteractionTarget (GroundItemTarget, None, NpcTarget, ObjectTarget), canStartInteractionFromPos)
-import PotatoCactus.Game.Entity.Npc.Npc (Npc, NpcIndex)
+import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (None))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position)
 
 data Interaction = Interaction
@@ -18,7 +17,7 @@ createForTarget :: InteractionTarget -> Interaction
 createForTarget target =
   create {target = target}
 
-data InteractionTargetStatus = Distant | Adjacent | Removed
+data InteractionTargetStatus = Distant | Adjacent | Removed deriving (Show, Eq)
 
 type LocateInteractionTarget = InteractionTarget -> InteractionTargetStatus
 

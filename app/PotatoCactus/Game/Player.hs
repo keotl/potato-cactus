@@ -6,6 +6,7 @@ import Data.Foldable (fold)
 import PotatoCactus.Game.Combat.CombatEntity (CombatEntity, CombatTarget (NpcTarget), clearTargetIfEngagedWith)
 import qualified PotatoCactus.Game.Combat.CombatEntity as CombatEntity
 import PotatoCactus.Game.Combat.Hit (Hit)
+import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemId)
 import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
 import qualified PotatoCactus.Game.Entity.EntityData as EntityData
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction)
@@ -29,7 +30,6 @@ import qualified PotatoCactus.Game.PlayerUpdate.VarpSet as VarpSet
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
 import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest, InterfaceType)
 import PotatoCactus.Game.Typing (Keyable (key))
-import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemId)
 
 type PlayerIndex = Int
 

@@ -108,6 +108,8 @@ executable potato-cactus
                    PotatoCactus.Game.Entity.GroundItem.GroundItem
                    PotatoCactus.Game.Entity.GroundItem.GroundItemCollection
                    PotatoCactus.Game.Entity.Interaction.AdvanceInteractionDeps
+                   PotatoCactus.Game.Entity.Interaction.CanInteractWithEntity
+                   PotatoCactus.Game.Entity.Interaction.ClosestInteractableTileCalc
                    PotatoCactus.Game.Entity.Interaction.Interaction
                    PotatoCactus.Game.Entity.Interaction.State
                    PotatoCactus.Game.Entity.Interaction.Target

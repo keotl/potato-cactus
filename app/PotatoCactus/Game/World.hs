@@ -5,6 +5,7 @@ import Data.IORef (IORef, newIORef, writeIORef)
 import Data.List (find)
 import GHC.IO (unsafePerformIO)
 import PotatoCactus.Config.Constants (maxNpcs, maxPlayers)
+import PotatoCactus.Game.Definitions.GameObjectDefinitions (objectDefinition)
 import qualified PotatoCactus.Game.Definitions.StaticGameObjectSet as StaticObject
 import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectId)
 import PotatoCactus.Game.Entity.GroundItem.GroundItemCollection (GroundItemCollection)
@@ -78,7 +79,7 @@ invokedScripts_ w =
 
 createAdvanceInteractionDeps_ :: World -> InteractionDeps.AdvanceInteractionSelectors
 createAdvanceInteractionDeps_ w =
-  InteractionDeps.AdvanceInteractionSelectors (findByIndex (npcs w)) (findObjectAt w)
+  InteractionDeps.AdvanceInteractionSelectors (findByIndex (npcs w)) (findObjectAt w) objectDefinition
 
 findObjectAt :: World -> Position -> GameObjectId -> Maybe GameObject
 findObjectAt world pos objectId =

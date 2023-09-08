@@ -1,7 +1,10 @@
 module PotatoCactus.Game.Entity.Interaction.AdvanceInteractionDeps (AdvanceInteractionSelectors (..), locateInteractionTarget, findClosestInteractableTile) where
 
-import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectId)
+import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectDefinition, GameObjectId)
+import qualified PotatoCactus.Game.Definitions.Types.GameObjectDefinition as ObjDef
 import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemId)
+import PotatoCactus.Game.Entity.Interaction.CanInteractWithEntity (canInteractWithEntity, isInsideEntity)
+import PotatoCactus.Game.Entity.Interaction.ClosestInteractableTileCalc (selectClosestInteractableTile)
 import PotatoCactus.Game.Entity.Interaction.Interaction (InteractionTargetStatus (Adjacent, Distant, Removed))
 import PotatoCactus.Game.Entity.Interaction.Target (GroundItemInteractionType (ItemPickup), InteractionTarget (GroundItemTarget, None, NpcTarget, ObjectTarget))
 import PotatoCactus.Game.Entity.Npc.Npc (Npc, NpcIndex)
@@ -12,7 +15,8 @@ import PotatoCactus.Game.Typing (IsEntityActive (isEntityActive))
 
 data AdvanceInteractionSelectors = AdvanceInteractionSelectors
   { findNpc :: NpcIndex -> Maybe Npc,
-    findObject :: Position -> GameObjectId -> Maybe GameObject
+    findObject :: Position -> GameObjectId -> Maybe GameObject,
+    getObjectDefinition :: GameObjectId -> Maybe GameObjectDefinition
     -- findGroundItem :: Position -> ItemId -> Int ->
   }
 
@@ -25,7 +29,7 @@ locateInteractionTarget deps actorPos (NpcTarget npcId _) =
         then Adjacent
         else Distant
 locateInteractionTarget
-  AdvanceInteractionSelectors {findObject = findObject}
+  deps
   actorPos
   ( ObjectTarget
       GameObject.GameObject
@@ -34,40 +38,34 @@ locateInteractionTarget
         }
       _
     ) =
-    case findObject pos objectId of
+    case findObject deps pos objectId of
       Nothing -> Removed
       Just obj ->
-        -- TODO - Check sizeX and sizeY  - keotl 2023-09-06
-        if isAdjacent (getPosition obj) actorPos
-          then Adjacent
-          else Distant
+        let objDimensions = getObjectSize_ deps objectId
+         in if canInteractWithEntity objDimensions (getPosition obj) actorPos
+              || isInsideEntity objDimensions (getPosition obj) actorPos
+              then Adjacent
+              else Distant
 locateInteractionTarget _ actorPos (GroundItemTarget itemId quantity pos _) =
   -- TODO - Validate if object has been removed  - keotl 2023-09-06
   if pos == actorPos || isAdjacent pos actorPos then Adjacent else Removed
 locateInteractionTarget _ _ None = Removed
 
+getObjectSize_ :: AdvanceInteractionSelectors -> GameObjectId -> (Int, Int)
+getObjectSize_ AdvanceInteractionSelectors {getObjectDefinition = getObjectDefinition} objId =
+  case getObjectDefinition objId of
+    Nothing -> (1, 1)
+    Just def -> (ObjDef.sizeX def, ObjDef.sizeY def)
+
 findClosestInteractableTile :: AdvanceInteractionSelectors -> Position -> InteractionTarget -> Maybe Position
-findClosestInteractableTile
-  AdvanceInteractionSelectors {findObject = findObject}
-  actorPos
-  ( ObjectTarget
-      GameObject.GameObject
-        { GameObject.id = objectId,
-          GameObject.position = pos
-        }
-      _
-    ) = case findObject pos objectId of
-    Nothing -> Nothing
-    -- TODO - actually path to an interactable tile, not the object tile  - keotl 2023-09-07
-    Just obj -> Just $ getPosition obj
+findClosestInteractableTile _ _ (ObjectTarget GameObject.GameObject {} _) = Nothing -- GameObjects cannot move, so we should never need to recarculate a path
 findClosestInteractableTile
   AdvanceInteractionSelectors {findNpc = findNpc}
   actorPos
   (NpcTarget npcId _) = case findNpc npcId of
     Nothing -> Nothing
-    -- TODO - actually path to an interactable tile, not the current NPC tile  - keotl 2023-09-07
-    Just npc -> Just $ getPosition npc
-findClosestInteractableTile _ actorPos (GroundItemTarget _ _ pos ItemPickup) = Just pos
+    Just npc -> Just $ selectClosestInteractableTile (1, 1) (getPosition npc) actorPos
+findClosestInteractableTile _ actorPos (GroundItemTarget _ _ pos ItemPickup) = Nothing -- Ground items cannot move either
 findClosestInteractableTile _ _ _ = Nothing
 
 findActiveNpc_ :: AdvanceInteractionSelectors -> NpcIndex -> Maybe Npc

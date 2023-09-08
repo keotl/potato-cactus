@@ -49,7 +49,7 @@ player :: Player
 player = (create "the doctor" (Position 0 0 0)) {skipUpdate_ = False, interaction = pendingInteraction}
 
 interactionDeps :: AdvanceInteractionSelectors
-interactionDeps = AdvanceInteractionSelectors (const Nothing) (\_ _ -> Nothing)
+interactionDeps = AdvanceInteractionSelectors (const Nothing) (\_ _ -> Nothing) (\_ -> Nothing)
 
 movementPath :: [Position]
 movementPath =
