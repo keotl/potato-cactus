@@ -50,7 +50,8 @@ clearTransientProperties_ p =
     { chatMessage = Nothing,
       updateMask = 0,
       animation = Nothing,
-      chatboxMessages = []
+      chatboxMessages = [],
+      droppedItemIndices = []
     }
 
 processPendingUpdates_ :: Player -> Player

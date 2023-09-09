@@ -13,7 +13,7 @@ import qualified PotatoCactus.Game.Message.RegisterClientPayload as C
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
 import qualified PotatoCactus.Game.Movement.PositionXY as Position
 import qualified PotatoCactus.Game.Player as P
-import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (ContinueDialogue, EquipItem, InteractWithGroundItem, InteractWithNpc, InteractWithObject, InteractWithObjectWithItem, SayChatMessage, UnequipItem))
+import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (ContinueDialogue, DropItem, EquipItem, InteractWithGroundItem, InteractWithNpc, InteractWithObject, InteractWithObjectWithItem, SayChatMessage, UnequipItem))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (z))
 import qualified PotatoCactus.Game.Position as Position
 import PotatoCactus.Game.Scripting.Actions.CreateInterface (InterfaceType (Standard))
@@ -75,7 +75,6 @@ reduceWorld world (ItemOnObjectMessage playerId itemInterfaceId objectId positio
     playerId
     ( \p ->
         case W.findObjectAt world (fromXY positionXY (z . getPosition $ p)) objectId of
-          -- TODO - Also check for item to be in the inventory  - keotl 2023-09-05
           Nothing -> p
           Just obj ->
             P.queueUpdate
@@ -85,7 +84,7 @@ reduceWorld world (ItemOnObjectMessage playerId itemInterfaceId objectId positio
               )
     )
 reduceWorld world (DropItemMessage playerId widgetId itemId index) =
-  queueEvent world $ DropItemEvent playerId widgetId itemId index
+  updatePlayerByIndex world playerId (`P.queueUpdate` DropItem widgetId itemId index)
 reduceWorld world UpdateWorldMessage =
   advance world
 

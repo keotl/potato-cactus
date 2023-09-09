@@ -47,7 +47,6 @@ locateInteractionTarget
               then Adjacent
               else Distant
 locateInteractionTarget _ actorPos (GroundItemTarget itemId quantity pos _) =
-  -- TODO - Validate if object has been removed  - keotl 2023-09-06
   if pos == actorPos || isAdjacent pos actorPos then Adjacent else Removed
 locateInteractionTarget _ _ None = Removed
 

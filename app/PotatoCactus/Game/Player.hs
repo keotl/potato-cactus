@@ -50,6 +50,7 @@ data Player = Player
     interfaces :: InterfaceController,
     entityData :: EntityData.EntityData,
     varps :: VarpSet.VarpSet,
+    droppedItemIndices :: [Int],
     skipUpdate_ :: Bool
   }
   deriving (Show)
@@ -88,6 +89,7 @@ create username position =
       interfaces = IC.create,
       entityData = EntityData.create,
       varps = VarpSet.create,
+      droppedItemIndices = [],
       skipUpdate_ = True
     }
 

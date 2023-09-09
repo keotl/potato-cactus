@@ -19,13 +19,18 @@ removeGroundItemActionTests =
     [ TestCase
         ( assertEqual
             "does not allow picking up an item twice"
-            (Just $ ItemContainer.ItemStack 617 1)
+            (Just [ItemContainer.ItemStack 617 1, ItemContainer.Empty])
             ( world
                 |> flip applyScriptResult (RemoveGroundItem 617 1 pos (Just 1))
                 |> flip applyScriptResult (RemoveGroundItem 617 1 pos (Just 1))
                 |> W.players
                 |> flip MobList.findByIndex 1
-                |> fmap (ItemContainer.atIndex 0 . P.inventory)
+                |> fmap
+                  ( \p ->
+                      [ ItemContainer.atIndex 0 (P.inventory p),
+                        ItemContainer.atIndex 1 (P.inventory p)
+                      ]
+                  )
             )
         )
     ]

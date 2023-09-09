@@ -9,6 +9,7 @@ import PotatoCactus.Game.Message.ItemOnObjectPayload (ItemOnObjectPayload)
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload)
 import PotatoCactus.Game.PlayerUpdate.ChatMessage (ChatMessage)
 import PotatoCactus.Game.Position
+import PotatoCactus.Game.Scripting.Actions.CreateInterface (WidgetId)
 
 data PlayerUpdate
   = EquipItem EquipItemMessagePayload
@@ -20,5 +21,6 @@ data PlayerUpdate
   | InteractWithObjectWithItem ItemOnObjectPayload
   | InteractWithNpc NpcIndex NpcInteractionType
   | InteractWithGroundItem ItemId Int Position
+  | DropItem WidgetId ItemId Int
   | ContinueDialogue
   deriving (Show)

@@ -8,14 +8,15 @@ import qualified PotatoCactus.Game.Entity.Object.GameObject as Obj
 import PotatoCactus.Game.Interface.InterfaceController (clearStandardInterfaces)
 import qualified PotatoCactus.Game.Interface.InterfaceController as IC
 import PotatoCactus.Game.ItemContainer (ItemStack (Empty, ItemStack, itemId), StackPolicy (Standard), addItems, atIndex, canAddItems, replaceStack)
+import qualified PotatoCactus.Game.ItemContainer as IContainer
 import PotatoCactus.Game.Message.EquipItemMessagePayload (EquipItemMessagePayload (EquipItemMessagePayload, itemIndex))
 import qualified PotatoCactus.Game.Message.ItemOnObjectPayload as IonO
 import qualified PotatoCactus.Game.Message.ItemOnObjectPayload as ItemOnObject
 import qualified PotatoCactus.Game.Message.ObjectClickPayload as ObjectClick
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
-import PotatoCactus.Game.Player (Player (chatMessage, equipment, interaction, interfaces, inventory, updateMask))
+import PotatoCactus.Game.Player (Player (chatMessage, droppedItemIndices, equipment, interaction, interfaces, inventory, updateMask))
 import PotatoCactus.Game.PlayerUpdate.Equipment (Equipment (container), equipItem, unequipItem)
-import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (ContinueDialogue, EquipItem, InteractWithGroundItem, InteractWithNpc, InteractWithObject, InteractWithObjectWithItem, SayChatMessage, UnequipItem))
+import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (ContinueDialogue, DropItem, EquipItem, InteractWithGroundItem, InteractWithNpc, InteractWithObject, InteractWithObjectWithItem, SayChatMessage, UnequipItem))
 import PotatoCactus.Game.PlayerUpdate.UpdateMask (appearanceFlag, chatFlag)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (z))
 import qualified PotatoCactus.Game.Scripting.Actions.CreateInterface as I
@@ -80,15 +81,18 @@ processPlayerUpdate
           ItemOnObject.itemId = itemId
         }
     ) =
-    p
-      { interaction =
-          createForTarget
-            ( ITarget.ObjectTarget
-                object
-                (ITarget.ItemOnObject interfaceId itemIndex itemId)
-            ),
-        interfaces = clearStandardInterfaces . interfaces $ p
-      }
+    if IContainer.isItem itemId (IContainer.atIndex itemIndex (inventory p))
+      then
+        p
+          { interaction =
+              createForTarget
+                ( ITarget.ObjectTarget
+                    object
+                    (ITarget.ItemOnObject interfaceId itemIndex itemId)
+                ),
+            interfaces = clearStandardInterfaces . interfaces $ p
+          }
+      else p
 processPlayerUpdate p (InteractWithNpc npcId interactionType) =
   p
     { interaction = createForTarget (ITarget.NpcTarget npcId interactionType),
@@ -101,4 +105,9 @@ processPlayerUpdate p (InteractWithGroundItem itemId quantity pos) =
     }
 processPlayerUpdate p ContinueDialogue =
   p {interfaces = IC.closeInterface (interfaces p) I.Standard}
+processPlayerUpdate p (DropItem 3214 itemId index) =
+  if IContainer.isItem itemId (IContainer.atIndex index (inventory p))
+    && index `notElem` droppedItemIndices p
+    then p {droppedItemIndices = index : droppedItemIndices p}
+    else p
 processPlayerUpdate p _ = p
