@@ -7,18 +7,22 @@ import PotatoCactus.Game.Entity.Interaction.Target (NpcInteractionType (NpcActio
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject))
 import PotatoCactus.Game.Interface.InterfaceButtonDispatch (dispatchInterfaceButtonClick)
 import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (..))
-import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload (objectId))
+import PotatoCactus.Game.Message.ItemOnObjectPayload (ItemOnObjectPayload (ItemOnObjectPayload))
+import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload (ObjectClickPayload))
 import qualified PotatoCactus.Game.Message.RegisterClientPayload as C
+import PotatoCactus.Game.Movement.PositionXY (fromXY)
 import qualified PotatoCactus.Game.Movement.PositionXY as Position
 import qualified PotatoCactus.Game.Player as P
-import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (ContinueDialogue, EquipItem, InteractWithGroundItem, InteractWithNpc, InteractWithObject, InteractWithObjectWithItem, SayChatMessage, UnequipItem))
-import PotatoCactus.Game.Position (GetPosition (getPosition))
+import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (ContinueDialogue, DropItem, EquipItem, InteractWithGroundItem, InteractWithNpc, InteractWithObject, InteractWithObjectWithItem, SayChatMessage, UnequipItem))
+import PotatoCactus.Game.Position (GetPosition (getPosition), Position (z))
 import qualified PotatoCactus.Game.Position as Position
 import PotatoCactus.Game.Scripting.Actions.CreateInterface (InterfaceType (Standard))
 import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (DropItemEvent, PlayerCommandEvent))
 import PotatoCactus.Game.Typing (advance)
 import PotatoCactus.Game.World (ClientHandle (username), World (World, clients, groundItems, players, tick), addPlayer, queueEvent, removePlayerByUsername, updatePlayer, updatePlayerByIndex)
+import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex)
+import qualified PotatoCactus.Game.World.Selectors as Selectors
 
 reduceWorld :: World -> GameChannelMessage -> World
 reduceWorld world (RegisterClientMessage message) =
@@ -35,8 +39,15 @@ reduceWorld world (EquipItemMessage playerName payload) =
   updatePlayer world playerName (\p -> P.queueUpdate p (EquipItem payload))
 reduceWorld world (UnequipItemMessage playerName slot) =
   updatePlayer world playerName (\p -> P.queueUpdate p (UnequipItem slot))
-reduceWorld world (ObjectClickMessage playerId payload) =
-  updatePlayerByIndex world playerId (\p -> P.queueUpdate p (InteractWithObject payload))
+reduceWorld world (ObjectClickMessage playerId objectId positionXY actionIndex) =
+  updatePlayerByIndex
+    world
+    playerId
+    ( \p ->
+        case W.findObjectAt world (fromXY positionXY (z . getPosition $ p)) objectId of
+          Nothing -> p
+          Just obj -> P.queueUpdate p (InteractWithObject (ObjectClickPayload obj actionIndex))
+    )
 reduceWorld world (NpcAttackMessage playerId npcIndex) =
   updatePlayerByIndex world playerId (\p -> P.queueUpdate p (InteractWithNpc npcIndex NpcAttack))
 reduceWorld world (NpcClickMessage playerId npcIndex actionIndex) =
@@ -58,10 +69,22 @@ reduceWorld world (PlayerCommandMessage playerId cmd args) =
   queueEvent world $ PlayerCommandEvent playerId cmd args
 reduceWorld world (PlayerContinueDialogueMessage playerId _) =
   updatePlayerByIndex world playerId (`P.queueUpdate` ContinueDialogue)
-reduceWorld world (ItemOnObjectMessage playerId payload) =
-  updatePlayerByIndex world playerId (\p -> P.queueUpdate p (InteractWithObjectWithItem payload))
+reduceWorld world (ItemOnObjectMessage playerId itemInterfaceId objectId positionXY itemIndexId itemId) =
+  updatePlayerByIndex
+    world
+    playerId
+    ( \p ->
+        case W.findObjectAt world (fromXY positionXY (z . getPosition $ p)) objectId of
+          Nothing -> p
+          Just obj ->
+            P.queueUpdate
+              p
+              ( InteractWithObjectWithItem $
+                  ItemOnObjectPayload itemInterfaceId obj itemIndexId itemId
+              )
+    )
 reduceWorld world (DropItemMessage playerId widgetId itemId index) =
-  queueEvent world $ DropItemEvent playerId widgetId itemId index
+  updatePlayerByIndex world playerId (`P.queueUpdate` DropItem widgetId itemId index)
 reduceWorld world UpdateWorldMessage =
   advance world
 

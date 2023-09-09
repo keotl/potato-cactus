@@ -1,7 +1,8 @@
 module PotatoCactus.Game.Message.GameChannelMessage where
 
 import PotatoCactus.Game.Definitions.EquipmentDefinitions (EquipmentSlot)
-import PotatoCactus.Game.Definitions.ItemDefinitions (ItemId)
+import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectId)
+import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemId)
 import PotatoCactus.Game.Entity.Npc.Npc (NpcIndex)
 import PotatoCactus.Game.Message.EquipItemMessagePayload (EquipItemMessagePayload)
 import PotatoCactus.Game.Message.ItemOnObjectPayload (ItemOnObjectPayload)
@@ -23,8 +24,8 @@ data GameChannelMessage
   | PlayerContinueDialogueMessage PlayerIndex Int
   | EquipItemMessage String EquipItemMessagePayload
   | UnequipItemMessage String EquipmentSlot
-  | ObjectClickMessage PlayerIndex ObjectClickPayload
-  | ItemOnObjectMessage PlayerIndex ItemOnObjectPayload
+  | ObjectClickMessage PlayerIndex GameObjectId PositionXY Int
+  | ItemOnObjectMessage PlayerIndex WidgetId GameObjectId PositionXY Int ItemId
   | NpcAttackMessage PlayerIndex NpcIndex
   | NpcClickMessage PlayerIndex NpcIndex Int
   | DropItemMessage PlayerIndex WidgetId ItemId Int

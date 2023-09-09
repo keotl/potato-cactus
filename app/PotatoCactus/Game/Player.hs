@@ -1,11 +1,12 @@
 module PotatoCactus.Game.Player where
 
+import Data.Binary (Word32, Word8)
 import Data.Bits ((.&.), (.|.))
 import Data.Foldable (fold)
 import PotatoCactus.Game.Combat.CombatEntity (CombatEntity, CombatTarget (NpcTarget), clearTargetIfEngagedWith)
 import qualified PotatoCactus.Game.Combat.CombatEntity as CombatEntity
 import PotatoCactus.Game.Combat.Hit (Hit)
-import PotatoCactus.Game.Definitions.ItemDefinitions (ItemId)
+import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemId)
 import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
 import qualified PotatoCactus.Game.Entity.EntityData as EntityData
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction)
@@ -25,6 +26,7 @@ import PotatoCactus.Game.PlayerUpdate.Equipment (Equipment (Equipment))
 import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate)
 import PotatoCactus.Game.PlayerUpdate.UpdateMask (PlayerUpdateMask, animationFlag, appearanceFlag, primaryHealthUpdateFlag, secondaryHealthUpdateFlag)
 import qualified PotatoCactus.Game.PlayerUpdate.UpdateMask as Mask
+import qualified PotatoCactus.Game.PlayerUpdate.VarpSet as VarpSet
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
 import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest, InterfaceType)
 import PotatoCactus.Game.Typing (Keyable (key))
@@ -47,6 +49,8 @@ data Player = Player
     chatboxMessages :: [String],
     interfaces :: InterfaceController,
     entityData :: EntityData.EntityData,
+    varps :: VarpSet.VarpSet,
+    droppedItemIndices :: [Int],
     skipUpdate_ :: Bool
   }
   deriving (Show)
@@ -84,6 +88,8 @@ create username position =
       chatboxMessages = [],
       interfaces = IC.create,
       entityData = EntityData.create,
+      varps = VarpSet.create,
+      droppedItemIndices = [],
       skipUpdate_ = True
     }
 
@@ -127,7 +133,7 @@ clearTargetIfEngagedWithNpc npcId p =
 
 sendChatboxMessage :: Player -> String -> Player
 sendChatboxMessage p msg =
-  p {chatboxMessages = msg : chatboxMessages p}
+  p {chatboxMessages = chatboxMessages p ++ [msg]}
 
 setPosition :: Player -> Position -> Player
 setPosition p pos =
@@ -164,8 +170,21 @@ subtractItem p stack =
   p
     { inventory = Container.subtractItem (inventory p) stack
     }
+
 removeItemStack :: Player -> (ItemId, Int) -> Player
 removeItemStack p stack =
   p
     { inventory = Container.removeStack (inventory p) stack
+    }
+
+setVarp :: Player -> (VarpSet.VarpId, Word32) -> Player
+setVarp p operation =
+  p
+    { varps = VarpSet.setVarp operation (varps p)
+    }
+
+setVarbit :: Player -> (VarpSet.VarpId, Word8, Word8, Word32) -> Player
+setVarbit p operation =
+  p
+    { varps = VarpSet.setVarbit operation (varps p)
     }

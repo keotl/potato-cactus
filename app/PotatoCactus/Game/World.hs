@@ -1,15 +1,21 @@
 module PotatoCactus.Game.World where
 
 import Control.Concurrent (Chan)
-import Data.IORef (newIORef)
+import Data.IORef (IORef, newIORef, writeIORef)
 import Data.List (find)
 import GHC.IO (unsafePerformIO)
 import PotatoCactus.Config.Constants (maxNpcs, maxPlayers)
+import PotatoCactus.Game.Definitions.GameObjectDefinitions (objectDefinition)
+import qualified PotatoCactus.Game.Definitions.StaticGameObjectSet as StaticObject
+import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectId)
 import PotatoCactus.Game.Entity.GroundItem.GroundItemCollection (GroundItemCollection)
 import qualified PotatoCactus.Game.Entity.GroundItem.GroundItemCollection as GroundItemCollection
+import qualified PotatoCactus.Game.Entity.Interaction.AdvanceInteractionDeps as InteractionDeps
 import PotatoCactus.Game.Entity.Npc.AdvanceNpc (advanceNpc)
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
-import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCollection (DynamicObjectCollection), create)
+import qualified PotatoCactus.Game.Entity.Object.DynamicObject as VisibleObject
+import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCollection, create)
+import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as DynamicObjectCollection
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload)
 import PotatoCactus.Game.Player (PlayerIndex)
@@ -23,6 +29,7 @@ import PotatoCactus.Game.World.CallbackScheduler (CallbackScheduler)
 import qualified PotatoCactus.Game.World.CallbackScheduler as Scheduler
 import PotatoCactus.Game.World.EntityPositionFinder (combatTargetPosOrDefault)
 import PotatoCactus.Game.World.MobList (MobList, add, create, findByIndex, findByPredicate, remove, removeByPredicate, updateAll, updateAtIndex, updateByPredicate)
+import PotatoCactus.Utils.Flow ((|>))
 import PotatoCactus.Utils.Iterable (replace)
 
 data ClientHandleMessage = WorldUpdatedMessage | CloseClientConnectionMessage
@@ -44,7 +51,8 @@ data World = World
     groundItems :: GroundItemCollection,
     triggeredEvents :: [GameEvent], -- Additional events to dispatch on this tick. For events not tied to a specific entity.
     pendingEvents_ :: [GameEvent], -- Additional events to dispatch on the next tick.
-    scheduler :: CallbackScheduler
+    scheduler :: CallbackScheduler,
+    staticObjectLookup_ :: StaticObject.FindStaticObjectById
   }
   deriving (Show)
 
@@ -57,7 +65,7 @@ instance Advance World where
             )
      in w
           { tick = tick w + 1,
-            players = updateAll (players w) (advancePlayer (findByIndex newNpcs)),
+            players = updateAll (players w) (advancePlayer (createAdvanceInteractionDeps_ w)),
             npcs = removeByPredicate newNpcs shouldDiscard,
             groundItems = GroundItemCollection.advanceTime (groundItems w) (tick w + 1),
             triggeredEvents = pendingEvents_ w ++ invokedScripts_ w,
@@ -69,6 +77,18 @@ invokedScripts_ :: World -> [GameEvent]
 invokedScripts_ w =
   map ScriptInvokedEvent $ Scheduler.callbacksForTick (scheduler w) (tick w + 1)
 
+createAdvanceInteractionDeps_ :: World -> InteractionDeps.AdvanceInteractionSelectors
+createAdvanceInteractionDeps_ w =
+  InteractionDeps.AdvanceInteractionSelectors (findByIndex (npcs w)) (findObjectAt w) objectDefinition
+
+findObjectAt :: World -> Position -> GameObjectId -> Maybe GameObject
+findObjectAt world pos objectId =
+  case objects world
+    |> DynamicObjectCollection.findVisibleObjectById pos objectId of
+    VisibleObject.Visible obj -> Just obj
+    VisibleObject.Hidden -> Nothing
+    VisibleObject.None -> staticObjectLookup_ world pos objectId
+
 defaultWorldValue :: World
 defaultWorldValue =
   World
@@ -76,13 +96,15 @@ defaultWorldValue =
       players = PotatoCactus.Game.World.MobList.create maxPlayers,
       npcs = PotatoCactus.Game.World.MobList.create maxNpcs,
       clients = [],
-      objects = PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create,
+      objects = PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create (\_ _ -> Nothing),
       groundItems = GroundItemCollection.create,
       triggeredEvents = [],
       pendingEvents_ = [],
-      scheduler = Scheduler.create
+      scheduler = Scheduler.create,
+      staticObjectLookup_ = \_ _ -> Nothing
     }
 
+worldInstance :: IORef World
 worldInstance = unsafePerformIO $ newIORef defaultWorldValue
 {-# NOINLINE worldInstance #-}
 

@@ -3,42 +3,46 @@ module PotatoCactus.Game.Scripting.BuiltinGameEventProcessor where
 import Debug.Trace (trace)
 import qualified PotatoCactus.Game.Combat.CombatEntity as Combat
 import PotatoCactus.Game.Combat.Hit (DamageType (MeleeAttack), Hit (Hit))
-import PotatoCactus.Game.Definitions.StaticGameObjectSet (staticObjectAt)
 import PotatoCactus.Game.Entity.Animation.Animation (Animation (Animation), AnimationPriority (High))
+import PotatoCactus.Game.Entity.Interaction.AdvanceInteractionDeps (findClosestInteractableTile)
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction (state, target))
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (..))
 import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (NpcTarget, ObjectTarget), NpcInteractionType (NpcAttack))
 import PotatoCactus.Game.Entity.Npc.Npc (Npc (definitionId))
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Npc.NpcMovement (doMovement)
-import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject (Added))
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, facingDirection))
-import PotatoCactus.Game.Entity.Object.GameObjectKey (GameObjectKey (GameObjectKey))
 import PotatoCactus.Game.Message.RegisterClientPayload (RegisterClientPayload (player))
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
 import PotatoCactus.Game.Player (Player (serverIndex))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, z))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (DropItemEvent, NpcAttackEvent, NpcCannotReachTargetEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalRemoveNpcTargetReferences, NpcMoveTowardsTarget, NpcSetAnimation, RemoveItemStack))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (DropItemEvent, InternalNpcCannotReachTargetEvent, InternalPlayerInteractionPendingPathingEvent, NpcAttackEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalSetPlayerInteractionPending, NpcMoveTowardsTarget, NpcSetAnimation, PlayerQueueWalk, RemoveItemStack, SendMessage))
 import PotatoCactus.Game.Typing (key)
 import PotatoCactus.Game.World (World (tick))
+import qualified PotatoCactus.Game.World as W
 
 dispatchScriptEvent :: World -> GameEvent -> IO [ScriptActionResult]
+dispatchScriptEvent world (InternalPlayerInteractionPendingPathingEvent player target) = do
+  let deps = W.createAdvanceInteractionDeps_ world
+  return $
+    case findClosestInteractableTile deps (getPosition player) target of
+      Nothing ->
+        [ ClearPlayerInteraction (serverIndex player),
+          SendMessage (serverIndex player) "I can't reach that."
+        ]
+      Just newTargetPos ->
+        [ InternalSetPlayerInteractionPending (serverIndex player),
+          PlayerQueueWalk (serverIndex player) newTargetPos
+        ]
 dispatchScriptEvent world (PlayerInteractionEvent player interaction) =
-  trace
-    ("Dispatched interaction event " ++ show interaction)
-    ( case (target interaction, state interaction) of
-        (ObjectTarget (GameObjectKey 1530 pos) (Left 1), InProgress) ->
-          return (ClearPlayerInteraction (serverIndex player) : openDoor_ pos)
-        (ObjectTarget (GameObjectKey 1531 pos) (Left 1), InProgress) ->
-          return (ClearPlayerInteraction (serverIndex player) : closeDoor_ pos)
-        (NpcTarget npcId NpcAttack, InProgress) ->
-          return
-            [ DispatchAttackPlayerToNpc (serverIndex player) npcId (Hit 0 MeleeAttack),
-              ClearPlayerInteraction (serverIndex player)
-            ]
-        _ -> return []
-    )
-dispatchScriptEvent world (NpcCannotReachTargetEvent npc target) =
+  case (target interaction, state interaction) of
+    (NpcTarget npcId NpcAttack, InProgress) ->
+      return
+        [ DispatchAttackPlayerToNpc (serverIndex player) npcId (Hit 0 MeleeAttack),
+          ClearPlayerInteraction (serverIndex player)
+        ]
+    _ -> return []
+dispatchScriptEvent world (InternalNpcCannotReachTargetEvent npc target) =
   return [NpcMoveTowardsTarget npc]
 dispatchScriptEvent world (PlayerAttackEvent player target) =
   trace
@@ -65,42 +69,7 @@ dispatchScriptEvent world (NpcDeadEvent npc) =
   trace
     "dispatched NPC dead event"
     ( return
-        [ NpcSetAnimation (NPC.serverIndex npc) (Animation 2607 0 High),
-          InternalRemoveNpcTargetReferences (NPC.serverIndex npc)
+        [ NpcSetAnimation (NPC.serverIndex npc) (Animation 2607 0 High)
         ]
     )
 dispatchScriptEvent _ _ = return []
-
--- dispatchScriptEvent world (NpcSe)
-
-objDirection_ :: Position -> Int -> Int
-objDirection_ pos objType =
-  case staticObjectAt pos objType of
-    Just obj -> trace ("got static object:" ++ show obj) facingDirection obj
-    Nothing -> 0
-
-openDoor_ :: Position -> [ScriptActionResult]
-openDoor_ pos =
-  case staticObjectAt pos 0 of
-    Just normalDoor ->
-      [AddGameObject (Added $ GameObject 1531 pos 0 ((objDirection_ pos 0 + 1) `mod` 4))]
-    Nothing ->
-      ( case staticObjectAt pos 9 of
-          Just diagonalDoor ->
-            [ AddGameObject (Added $ GameObject 1531 pos 9 ((objDirection_ pos 0 + 1) `mod` 4))
-            ]
-          _ -> []
-      )
-
-closeDoor_ :: Position -> [ScriptActionResult]
-closeDoor_ pos =
-  case staticObjectAt pos 0 of
-    Just normalDoor ->
-      [AddGameObject (Added $ GameObject 1530 pos 0 (objDirection_ pos 0))]
-    Nothing ->
-      ( case staticObjectAt pos 9 of
-          Just diagonalDoor ->
-            [ AddGameObject (Added $ GameObject 1530 pos 9 (objDirection_ pos 0))
-            ]
-          _ -> []
-      )

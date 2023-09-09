@@ -16,11 +16,9 @@ objectActionPacket playerId packet =
   let (actionIndex, objectId, x, y) = runGet (selectReader_ (opcode packet)) (fromStrict . payload $ packet)
    in ObjectClickMessage
         playerId
-        ( ObjectClickPayload
-            (fromIntegral objectId)
-            (PositionXY (fromIntegral x) (fromIntegral y))
-            actionIndex
-        )
+        (fromIntegral objectId)
+        (PositionXY (fromIntegral x) (fromIntegral y))
+        actionIndex
 
 selectReader_ :: Int -> Get (Int, Word16, Word16, Word16)
 selectReader_ 132 = readPayloadFirstIndex_

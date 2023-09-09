@@ -32,6 +32,7 @@ executable potato-cactus
                    PotatoCactus.Client.ClientUpdate
                    PotatoCactus.Client.GameObjectUpdate.EncodeGameObjectUpdate
                    PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateDiff
+                   PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateOperations
                    PotatoCactus.Client.GroundItemsUpdate.EncodeGroundItemsUpdate
                    PotatoCactus.Client.GroundItemsUpdate.GroundItemsUpdateDiff
                    PotatoCactus.Client.Interface.EncodeInterfaceUpdate
@@ -93,6 +94,7 @@ executable potato-cactus
                    PotatoCactus.Network.Packets.Out.RemoveGroundItemPacket
                    PotatoCactus.Network.Packets.Out.RemoveObjectPacket
                    PotatoCactus.Network.Packets.Out.SetPlacementReferencePacket
+                   PotatoCactus.Network.Packets.Out.SetVarpPacket
                    PotatoCactus.Network.Packets.Out.TabInterfacePacket
                    PotatoCactus.Network.Packets.Out.WalkableInterfacePacket
                    PotatoCactus.Network.ClientHandler
@@ -105,6 +107,9 @@ executable potato-cactus
                    PotatoCactus.Game.Entity.EntityData
                    PotatoCactus.Game.Entity.GroundItem.GroundItem
                    PotatoCactus.Game.Entity.GroundItem.GroundItemCollection
+                   PotatoCactus.Game.Entity.Interaction.AdvanceInteractionDeps
+                   PotatoCactus.Game.Entity.Interaction.CanInteractWithEntity
+                   PotatoCactus.Game.Entity.Interaction.ClosestInteractableTileCalc
                    PotatoCactus.Game.Entity.Interaction.Interaction
                    PotatoCactus.Game.Entity.Interaction.State
                    PotatoCactus.Game.Entity.Interaction.Target
@@ -113,14 +118,20 @@ executable potato-cactus
                    PotatoCactus.Game.Entity.Npc.NpcUpdateMask
                    PotatoCactus.Game.Entity.Npc.NpcMovement
                    PotatoCactus.Game.Entity.Npc.RespawnStrategy
+                   PotatoCactus.Game.Entity.Object.DynamicObject
                    PotatoCactus.Game.Entity.Object.DynamicObjectCollection
                    PotatoCactus.Game.Entity.Object.GameObject
-                   PotatoCactus.Game.Entity.Object.GameObjectKey
+                   PotatoCactus.Game.Entity.Object.TileObjects
                    PotatoCactus.Game.Definitions.EquipmentDefinitions
                    PotatoCactus.Game.Definitions.GameObjectDefinitions
                    PotatoCactus.Game.Definitions.ItemDefinitions
                    PotatoCactus.Game.Definitions.NpcDefinitions
+                   PotatoCactus.Game.Definitions.Parser.GameObjectPlacementParser
+                   PotatoCactus.Game.Definitions.Parser.ItemDefinitionParser
+                   PotatoCactus.Game.Definitions.Parser.ObjectDefinitionParser
                    PotatoCactus.Game.Definitions.StaticGameObjectSet
+                   PotatoCactus.Game.Definitions.Types.GameObjectDefinition
+                   PotatoCactus.Game.Definitions.Types.ItemDefinition
                    PotatoCactus.Game.Interface.FriendsList
                    PotatoCactus.Game.Interface.GameTabs
                    PotatoCactus.Game.Interface.InterfaceButtonDispatch
@@ -150,6 +161,7 @@ executable potato-cactus
                    PotatoCactus.Game.PlayerUpdate.PlayerUpdate
                    PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions
                    PotatoCactus.Game.PlayerUpdate.ProcessPlayerUpdate
+                   PotatoCactus.Game.PlayerUpdate.VarpSet
                    PotatoCactus.Game.Position
                    PotatoCactus.Game.Scripting.Actions.CreateInterface
                    PotatoCactus.Game.Scripting.Actions.ScriptInvocation
@@ -175,6 +187,7 @@ executable potato-cactus
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PlayerAttackDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PlayerDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PositionDto
+                   PotatoCactus.Game.Scripting.Bridge.Serialization.Models.VarpsetDto
                    PotatoCactus.Game.Scripting.Bridge.Serialization.Models.WorldDto
                    PotatoCactus.Game.Scripting.BuiltinGameEventProcessor
                    PotatoCactus.Game.Scripting.Events.ApplyScriptActionResult
@@ -199,7 +212,7 @@ executable potato-cactus
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
-    build-depends:    base ^>=4.14.3.0, network, bytestring, utf8-string, binary, binary-strict, time, containers, aeson, process
+    build-depends:    base ^>=4.14.3.0, network, bytestring, utf8-string, binary, binary-strict, time, containers, aeson, process, directory
     hs-source-dirs:   app
     default-language: Haskell2010
     ghc-options:
@@ -211,6 +224,6 @@ executable potato-cactus
 test-suite tests
     type: exitcode-stdio-1.0
     main-is: Main.hs
-    build-depends: HUnit ^>=1.6, base ^>=4.14.3.0, network, bytestring, utf8-string, binary, binary-strict, time, containers, aeson
+    build-depends: HUnit ^>=1.6, base ^>=4.14.3.0, network, bytestring, utf8-string, binary, binary-strict, time, containers, aeson, directory
     hs-source-dirs: tests, app
     default-language: Haskell2010

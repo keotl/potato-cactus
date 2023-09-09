@@ -9,7 +9,7 @@ from potato_cactus.internal.impl.context_impl import ContextImpl
 from potato_cactus.internal.messages.inbound import InboundMessage
 from potato_cactus.internal.messages.outbound import \
     internal_processingComplete
-from potato_cactus.internal.registry import Registry
+from potato_cactus.internal.registry import EventHandler, Registry
 
 from ..util.stderr_logger import Logger
 from . import OutboundMessageSender, WorkerHandle
@@ -33,6 +33,7 @@ class SimpleWorker(WorkerHandle):
         elif message.op == "updateWorld":
             world = cast(World, message.body)
             ContextImpl.INSTANCE.set_world(world)
+
         elif message.op == "invokeScript":
             try:
                 modulename, function = message.body.event.rsplit(".", 1)
@@ -46,40 +47,57 @@ class SimpleWorker(WorkerHandle):
                 _logger.error(
                     f"Unhandled exception while invoking script '{message.body.event}'. {e}"
                 )
+
         elif message.op == "gameEvent":
             _enrich_message(ContextImpl.INSTANCE, message.body)  # type: ignore
             handlers = Registry.INSTANCE.get_handlers(_event_key(message.body))
             if not handlers:
-                default_handler_key = _default_event_handler_key(message.body)
-                if default_handler_key:
+                fallback_handler_key = _unhandled_event_handler_key(
+                    message.body)
+                if fallback_handler_key:
                     handlers = Registry.INSTANCE.get_handlers(
-                        default_handler_key)
-            for h in handlers:
-                try:
-                    sig = signature(h)
-                    if len(sig.parameters) == 2:
-                        res = h(message.body.body, ContextImpl.INSTANCE)
-                    elif len(sig.parameters) == 1:
-                        res = h(message.body.body)
+                        fallback_handler_key)
+
+            default_prevented = self._invoke_handlers(handlers, message)
+            default_handler_key = _default_event_handler_key(message.body)
+            if not default_prevented and default_handler_key:
+                default_handlers = Registry.INSTANCE.get_handlers(
+                    default_handler_key)
+                self._invoke_handlers(default_handlers, message)
+
+    def _invoke_handlers(self, event_handlers: list,
+                         message: InboundMessage) -> bool:
+        default_prevented = False
+        for h in event_handlers:
+            try:
+                sig = signature(h)
+                if len(sig.parameters) == 2:
+                    res = h(message.body.body, ContextImpl.INSTANCE)
+                elif len(sig.parameters) == 1:
+                    res = h(message.body.body)
+                else:
+                    res = h()
+                for action in res or []:
+                    if action.op == "preventDefault":
+                        default_prevented = True
                     else:
-                        res = h()
-                    for action in res or []:
                         self._sender.send(action.__dict__)
-                except KeyboardInterrupt as e:
-                    raise e
-                except Exception as e:
-                    _logger.error(
-                        f"Unhandled exception while invoking script {message.body.event}. {e}"
-                    )
+            except KeyboardInterrupt as e:
+                raise e
+            except Exception as e:
+                _logger.error(
+                    f"Unhandled exception while invoking script {message.body.event}. {e}"
+                )
+        return default_prevented
 
 
 def _event_key(payload) -> Tuple[Optional[Union[str, int]], ...]:
     if payload.event == GameEvent.ServerInitEvent:
         return GameEvent.ServerInitEvent,
     if payload.event == GameEvent.ObjectInteractionEvent:
-        return GameEvent.ObjectInteractionEvent, payload.body.interaction.target.objectId
+        return GameEvent.ObjectInteractionEvent, payload.body.interaction.target.object.id
     if payload.event == GameEvent.ItemOnObjectInteractionEvent:
-        return GameEvent.ItemOnObjectInteractionEvent, payload.body.interaction.target.objectId
+        return GameEvent.ItemOnObjectInteractionEvent, payload.body.interaction.target.object.id
     if payload.event == GameEvent.NpcInteractionEvent:
         return GameEvent.NpcInteractionEvent, payload.body.interaction.target.npcId
     if payload.event == GameEvent.NpcAttackInteractionEvent:
@@ -127,6 +145,32 @@ def _default_event_handler_key(
         return GameEvent.PlayerCommandEvent, "default"
     if payload.event == GameEvent.DropItemEvent:
         return GameEvent.DropItemEvent, "default"
+
+    return None
+
+
+def _unhandled_event_handler_key(
+        payload) -> Optional[Tuple[Optional[Union[str, int]], ...]]:
+    if payload.event == GameEvent.ObjectInteractionEvent:
+        return GameEvent.ObjectInteractionEvent, "unhandled"
+    if payload.event == GameEvent.ItemOnObjectInteractionEvent:
+        return GameEvent.ItemOnObjectInteractionEvent, "unhandled"
+    if payload.event == GameEvent.NpcInteractionEvent:
+        return GameEvent.NpcInteractionEvent, "unhandled"
+    if payload.event == GameEvent.NpcAttackInteractionEvent:
+        return GameEvent.NpcAttackInteractionEvent, "unhandled"
+    if payload.event == GameEvent.PickupItemInteractionEvent:
+        return GameEvent.PickupItemInteractionEvent, "unhandled"
+    if payload.event == GameEvent.NpcAttackEvent:
+        return GameEvent.NpcAttackEvent, "unhandled"
+    if payload.event == GameEvent.NpcDeadEvent:
+        return GameEvent.NpcDeadEvent, "unhandled"
+    if payload.event == GameEvent.NpcEntityTickEvent:
+        return GameEvent.NpcEntityTickEvent, "unhandled"
+    if payload.event == GameEvent.PlayerCommandEvent:
+        return GameEvent.PlayerCommandEvent, "unhandled"
+    if payload.event == GameEvent.DropItemEvent:
+        return GameEvent.DropItemEvent, "unhandled"
 
     return None
 

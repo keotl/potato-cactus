@@ -17,15 +17,16 @@ import PotatoCactus.Client.Interface.EncodeInterfaceUpdate (encodeInterfaceUpdat
 import PotatoCactus.Client.LocalEntityList (LocalEntityList, updateLocalEntities)
 import PotatoCactus.Game.Entity.GroundItem.GroundItem (GroundItem)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc)
-import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject)
+import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject))
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload (ObjectClickPayload))
 import PotatoCactus.Game.Movement.MovementEntity (MovementEntity (PlayerWalkMovement_), hasChangedRegion)
 import PotatoCactus.Game.Movement.PlayerWalkMovement (PlayerWalkMovement (lastRegionUpdate_))
 import PotatoCactus.Game.Movement.PositionXY (fromXY, toXY)
-import PotatoCactus.Game.Player (Player (Player, equipment, interfaces, inventory, movement, serverIndex, username))
+import PotatoCactus.Game.Player (Player (Player, equipment, interfaces, inventory, movement, serverIndex, username, varps))
 import qualified PotatoCactus.Game.Player as P
 import PotatoCactus.Game.PlayerUpdate.Equipment (Equipment (container))
+import qualified PotatoCactus.Game.PlayerUpdate.VarpSet as VarpSet
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position, x, y))
 import qualified PotatoCactus.Game.World as W (ClientHandle, ClientHandleMessage (CloseClientConnectionMessage, WorldUpdatedMessage), World (players, tick), username, worldInstance)
 import PotatoCactus.Game.World.MobList (findByIndex, findByPredicate)
@@ -38,6 +39,7 @@ import PotatoCactus.Network.Packets.Out.NpcUpdate.NpcUpdatePacket (npcUpdatePack
 import PotatoCactus.Network.Packets.Out.PlayerUpdate.PlayerUpdatePacket (playerUpdatePacket)
 import PotatoCactus.Network.Packets.Out.RemoveObjectPacket (removeObjectPacket)
 import PotatoCactus.Network.Packets.Out.SetPlacementReferencePacket (setPlacementReferencePacket)
+import PotatoCactus.Network.Packets.Out.SetVarpPacket (encodeVarps)
 import PotatoCactus.Network.Packets.Out.UpdateItemContainerPacket (updateItemContainerPacket)
 import PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket (updateRunEnergyPacket)
 import PotatoCactus.Utils.Logging (LogLevel (Error, Info), logger)
@@ -85,6 +87,8 @@ updateClient sock client localState W.WorldUpdatedMessage = do
                 sendAll sock (updateRunEnergyPacket 100)
 
                 sendAll sock (encodeInterfaceUpdate (interfaces p))
+
+                sendAll sock (encodeVarps (VarpSet.updated . varps $ p))
 
                 -- case clickedEntity world of
                 --   Nothing -> pure ()

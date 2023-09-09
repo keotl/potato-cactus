@@ -4,16 +4,9 @@ import Data.IORef (IORef, readIORef, writeIORef)
 import Data.IntMap (IntMap, empty, insert, (!?))
 import GHC.IO (unsafePerformIO)
 import GHC.IORef (newIORef)
-
-type GameObjectId = Int
-
--- type GameObjectType = Int
-
-data GameObjectDefinition = GameObjectDefinition
-  { id :: GameObjectId
-  -- objectType :: GameObjectType
-  }
-  deriving (Show)
+import PotatoCactus.Game.Definitions.Parser.ObjectDefinitionParser (parseObjectDefinitionFile)
+import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectDefinition (id), GameObjectId)
+import Prelude hiding (id)
 
 objectDb :: IORef (IntMap GameObjectDefinition)
 {-# NOINLINE objectDb #-}
@@ -27,20 +20,18 @@ objectDefinition objectId =
         return (db !? objectId)
     )
 
-initializeObjectDb :: IO Int
-initializeObjectDb = do
+initializeObjectDb :: String -> IO Int
+initializeObjectDb definitionsFile = do
   db <- readIORef objectDb
+  extracted <- parseObjectDefinitionFile definitionsFile
   let updated =
         foldl
           (\a e -> e a)
           db
-          [ addMockObject_ 5553,
-            addMockObject_ 1530,
-            addMockObject_ 1531
-          ]
+          (map addObject_ extracted)
   writeIORef objectDb updated
   return $ length updated
 
-addMockObject_ :: GameObjectId -> (IntMap GameObjectDefinition -> IntMap GameObjectDefinition)
-addMockObject_ objectId =
-  insert objectId (GameObjectDefinition objectId)
+addObject_ :: GameObjectDefinition -> (IntMap GameObjectDefinition -> IntMap GameObjectDefinition)
+addObject_ object =
+  insert (id object) object

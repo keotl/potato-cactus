@@ -3,14 +3,25 @@ module Main where
 import Base37Test (testDecode, testEncode)
 import BinaryTest (testByte, testByteNegate, testIntME, testMixedBitMode, testPack, testShortAdd, testShortBE, testShortLE)
 import DecodeChatTests (decodeChatTests, encodeChatTests, testNibbles)
+import Game.DynamicObjectCollectionTests (testDynamicObjectCollection)
 import Game.GameObjectUpdateDiffTests (testObjectDiff)
+import Game.GameObjectUpdateOperationsTests (testGameObjectUpdateOperations)
 import Game.GroudItemCollectionTests (testGroundItemCollection)
 import Game.GroundItemsUpdateDiffTests (groundItemsUpdateDiffTests)
 import Game.InterpolatePathTests (interpolatePathTests)
+import Game.Objects.TileObjectsTests (testTileObjects)
+import Game.Player.AdvancePlayerTests (advancePlayerTests)
+import Game.Player.CanInteractWithEntityTests (canInteractWithEntityTests)
+import Game.Player.InteractionTests (advanceInteractionTests)
+import Game.Player.LocateInteractionTargetTests (locateInteractionTargetTests)
+import Game.Player.VarpSetTests (testVarpSet)
+import Game.World.SelectorsTests (worldSelectorsTest)
 import GetMonadTests (getTests)
 import IterableTests (testReplaceAt)
 import MobListTests (testMobList)
 import Test.HUnit
+import Game.Player.ClosestInteractableTileCalcTests (closestInteractableTileCalcTests)
+import Game.ApplyActions.RemoveGroundItemActionTests (removeGroundItemActionTests)
 
 tests =
   TestList
@@ -33,7 +44,18 @@ tests =
       testMobList,
       testObjectDiff,
       testGroundItemCollection,
-      groundItemsUpdateDiffTests
+      groundItemsUpdateDiffTests,
+      testVarpSet,
+      testDynamicObjectCollection,
+      testTileObjects,
+      testGameObjectUpdateOperations,
+      worldSelectorsTest,
+      advanceInteractionTests,
+      advancePlayerTests,
+      locateInteractionTargetTests,
+      closestInteractableTileCalcTests,
+      canInteractWithEntityTests,
+      removeGroundItemActionTests
     ]
 
 main :: IO ()

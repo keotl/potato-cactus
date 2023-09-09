@@ -1,14 +1,16 @@
 module PotatoCactus.Client.PlayerInit where
 
+import Data.Aeson (Options (constructorTagModifier))
 import Data.Binary.BitPut (BitPut, putByteString, putNBits)
 import Data.Binary.Put ()
 import Data.ByteString (ByteString)
 import PotatoCactus.Game.Interface.FriendsList (FriendsListStatus (Loading))
-import PotatoCactus.Game.Interface.GameTabs (TabDefinition (defaultTab, id), allTabs, combatTab)
+import PotatoCactus.Game.Interface.GameTabs (TabDefinition (defaultTab, id), allTabs, combatTab, unusedTab)
 import PotatoCactus.Game.Interface.PlayerInteraction (followInteraction, tradeInteraction)
 import PotatoCactus.Game.Interface.PlayerSettings (BrightnessLevel (Brightness4), MouseType (TwoButtons), PlayerSettings (PlayerSettings), VolumeLevel (Volume4))
-import PotatoCactus.Game.Player (Player (equipment, inventory))
+import PotatoCactus.Game.Player (Player (equipment, inventory, varps))
 import PotatoCactus.Game.PlayerUpdate.Equipment (Equipment (container))
+import qualified PotatoCactus.Game.PlayerUpdate.VarpSet as VarpSet
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
 import qualified PotatoCactus.Game.Skills as SK
 import PotatoCactus.Game.World
@@ -17,6 +19,7 @@ import PotatoCactus.Network.Packets.Out.InitializePlayerPacket (initializePlayer
 import PotatoCactus.Network.Packets.Out.LoadMapRegionPacket (loadMapRegionPacket)
 import PotatoCactus.Network.Packets.Out.PlayerInteractionPacket (showPlayerInteractionPacket)
 import PotatoCactus.Network.Packets.Out.PlayerSettingsPackets (allPlayerSettingsPackets)
+import PotatoCactus.Network.Packets.Out.SetVarpPacket (encodeVarps, setVarpPacket)
 import PotatoCactus.Network.Packets.Out.TabInterfacePacket (tabInterfacePacket)
 import PotatoCactus.Network.Packets.Out.UpdateFriendsListStatusPacket (updateFriendsListStatusPacket)
 import PotatoCactus.Network.Packets.Out.UpdateItemContainerPacket (updateItemContainerPacket)
@@ -56,6 +59,8 @@ playerInit client player = do
 
   -- load initial map region (opcode 73) (could move to main loop)
   putByteString $ loadMapRegionPacket $ getPosition player
+
+  putByteString $ encodeVarps (VarpSet.allValues . varps $ player)
 
 resetTab_ :: TabDefinition -> BitPut
 resetTab_ tab =

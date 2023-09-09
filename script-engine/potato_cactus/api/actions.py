@@ -78,9 +78,12 @@ def SpawnNpc(npcId: int,
         })
 
 
-def SpawnGameObject(objectId: int, position: Union[Position, Tuple[int, int,
-                                                                   int]],
-                    objectType: int, facingDirection: int) -> ScriptAction:
+def SpawnGameObject(
+    objectId: int,
+    position: Union[Position, Tuple[int, int, int]],
+    objectType: int,
+    facingDirection: int,
+) -> ScriptAction:
     return ScriptAction(
         "spawnObject", {
             "objectId": objectId,
@@ -90,17 +93,14 @@ def SpawnGameObject(objectId: int, position: Union[Position, Tuple[int, int,
         })
 
 
-def RemoveGameObject(objectId: int,
-                     position: Union[Position, Tuple[int, int, int]],
-                     objectType: int,
-                     facingDirection: int = 0) -> ScriptAction:
-    return ScriptAction(
-        "removeObject", {
-            "objectId": objectId,
-            "position": _map_position(position),
-            "objectType": objectType,
-            "facingDirection": facingDirection
-        })
+def RemoveGameObject(
+    position: Union[Position, Tuple[int, int, int]],
+    objectType: int,
+) -> ScriptAction:
+    return ScriptAction("removeObject", {
+        "position": _map_position(position),
+        "objectType": objectType,
+    })
 
 
 def SendMessage(playerIndex: int, text: str) -> ScriptAction:
@@ -119,7 +119,8 @@ def SetPlayerPosition(
     })
 
 
-def InvokeScript(callback: Union[Callable[[], List[ScriptAction]], ScriptInvocation],
+def InvokeScript(callback: Union[Callable[[], List[ScriptAction]],
+                                 ScriptInvocation],
                  delay: int = 1) -> ScriptAction:
     if isinstance(callback, Callable):
         callback = ScriptInvocation(callback)
@@ -220,6 +221,30 @@ def RemoveGroundItem(itemId: int,
             "removedByPlayer":
                 removedByPlayer  # For removing scoped items and giving to player
         })
+
+
+def SetVarp(playerIndex: int, varpId: int, value: int) -> ScriptAction:
+    return ScriptAction("setVarp", {
+        "playerIndex": playerIndex,
+        "varpId": varpId,
+        "value": value
+    })
+
+
+def SetVarbit(playerIndex: int, varpId: int, lsb: int, length: int,
+              value: int) -> ScriptAction:
+    return ScriptAction(
+        "setVarp", {
+            "playerIndex": playerIndex,
+            "varpId": varpId,
+            "lsb": lsb,
+            "length": length,
+            "value": value
+        })
+
+
+def PreventDefault() -> ScriptAction:
+    return ScriptAction("preventDefault", {})
 
 
 def _map_position(position: Union[Position, Tuple[int, int, int]]) -> dict:

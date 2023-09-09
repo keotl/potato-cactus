@@ -15,7 +15,6 @@ import GHC.Generics (Generic)
 import PotatoCactus.Config.Constants (groundItemGlobalDespawnDelay)
 import PotatoCactus.Game.Entity.Animation.Animation (Animation (Animation), AnimationPriority (High, Low, Normal))
 import PotatoCactus.Game.Entity.GroundItem.GroundItem (GroundItem (GroundItem, despawnTime))
-import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject (Added, Removed))
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject))
 import qualified PotatoCactus.Game.Entity.Object.GameObject as O
 import PotatoCactus.Game.Position (Position (Position))
@@ -23,7 +22,7 @@ import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceReque
 import qualified PotatoCactus.Game.Scripting.Actions.CreateInterface as I
 import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation (ScriptInvocation))
 import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest (SpawnNpcRequest))
-import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, GiveItem, InternalNoop, InternalProcessingComplete, InvokeScript, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, RemoveGroundItem, RemoveItemStack, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnGroundItem, SpawnNpc, SubtractItem))
+import PotatoCactus.Game.Scripting.ScriptUpdates (ScriptActionResult (ClearPlayerInteraction, ClearStandardInterface, CreateInterface, GiveItem, InternalNoop, InternalProcessingComplete, InvokeScript, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, RemoveGameObject, RemoveGroundItem, RemoveItemStack, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SetPlayerVarbit, SetPlayerVarp, SpawnGameObject, SpawnGroundItem, SpawnNpc, SubtractItem))
 
 mapResult :: ByteString -> ScriptActionResult
 mapResult bytes =
@@ -49,41 +48,6 @@ decodeBody "npcQueueWalk" body =
         npcIndex <- obj .: "npcIndex"
         posObject <- obj .: "position"
         return (NpcQueueWalk npcIndex (decodePos_ posObject))
-    )
-    body of
-    Error msg -> InternalNoop
-    Success decoded -> decoded
-decodeBody "addGameObject" body =
-  case parse
-    ( \obj -> do
-        op <- obj .: "op"
-        objectId <- obj .: "id"
-        posObject <- obj .: "position"
-        objType <- obj .: "objectType"
-        facingDirection <- obj .: "facingDirection"
-        return
-          ( if op == String "add"
-              then
-                AddGameObject $
-                  Added
-                    ( O.GameObject
-                        { O.id = objectId,
-                          O.position = decodePos_ posObject,
-                          O.objectType = objType,
-                          O.facingDirection = facingDirection
-                        }
-                    )
-              else
-                AddGameObject $
-                  Removed
-                    ( O.GameObject
-                        { O.id = objectId,
-                          O.position = decodePos_ posObject,
-                          O.objectType = objType,
-                          O.facingDirection = facingDirection
-                        }
-                    )
-          )
     )
     body of
     Error msg -> InternalNoop
@@ -246,9 +210,8 @@ decodeBody "spawnObject" body =
         objectType <- obj .: "objectType"
         facingDirection <- obj .: "facingDirection"
         return
-          ( AddGameObject $
-              Added $
-                GameObject objectId (decodePos_ positionObj) objectType facingDirection
+          ( SpawnGameObject $
+              GameObject objectId (decodePos_ positionObj) objectType facingDirection
           )
     )
     body of
@@ -257,14 +220,11 @@ decodeBody "spawnObject" body =
 decodeBody "removeObject" body =
   case parse
     ( \obj -> do
-        objectId <- obj .: "objectId"
         positionObj <- obj .: "position"
         objectType <- obj .: "objectType"
-        facingDirection <- obj .: "facingDirection"
         return
-          ( AddGameObject $
-              Removed $
-                GameObject objectId (decodePos_ positionObj) objectType facingDirection
+          ( RemoveGameObject
+              (decodePos_ positionObj, objectType)
           )
     )
     body of
@@ -333,7 +293,31 @@ decodeBody "removeGroundItem" body =
     body of
     Error msg -> trace msg InternalNoop
     Success decoded -> decoded
-decodeBody _ _ = InternalNoop
+decodeBody "setVarp" body =
+  case parse
+    ( \obj -> do
+        playerIndex <- obj .: "playerIndex"
+        varpId <- obj .: "varpId"
+        value <- obj .: "value"
+        return (SetPlayerVarp playerIndex (varpId, value))
+    )
+    body of
+    Error msg -> trace msg InternalNoop
+    Success decoded -> decoded
+decodeBody "setVarbit" body =
+  case parse
+    ( \obj -> do
+        playerIndex <- obj .: "playerIndex"
+        varpId <- obj .: "varpId"
+        lsb <- obj .: "lsb"
+        length <- obj .: "length"
+        value <- obj .: "value"
+        return (SetPlayerVarbit playerIndex (varpId, lsb, length, value))
+    )
+    body of
+    Error msg -> trace msg InternalNoop
+    Success decoded -> decoded
+decodeBody opcode _ = trace ("Unsupported script action " ++ opcode) InternalNoop
 
 data DecodedMessage = DecodedMessage
   { op :: String,

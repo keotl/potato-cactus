@@ -2,11 +2,11 @@ module PotatoCactus.Client.GameObjectUpdate.GameObjectUpdateDiff (computeDiff, G
 
 import Data.List (find)
 import Data.Maybe (mapMaybe)
-import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObject)
+import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject)
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as Object
+import PotatoCactus.Game.Entity.Object.GameObject (GameObject (objectType))
 import PotatoCactus.Game.Position (getPosition)
 import Prelude hiding (id)
-import PotatoCactus.Game.Entity.Object.GameObject (GameObject (objectType))
 
 data GameObjectDiff = Added DynamicObject | Retained DynamicObject | Removed DynamicObject deriving (Eq, Show)
 
@@ -23,23 +23,6 @@ mapNewObject oldSet object =
 
 mapOldObject :: [DynamicObject] -> DynamicObject -> Maybe GameObjectDiff
 mapOldObject newSet object =
-  if not $ hasOtherInSameSpot object newSet
-    then Just $ Removed object
-    else Nothing
-
-hasOtherInSameSpot :: DynamicObject -> [DynamicObject] -> Bool
-hasOtherInSameSpot (Object.Added obj) set =
-  any
-    ( ( \other ->
-          getPosition other == getPosition obj
-            && objectType obj == objectType other
-      )
-        . unwrap_
-    )
-    set
-hasOtherInSameSpot (Object.Removed _) _ =
-  False
-
-unwrap_ :: DynamicObject -> GameObject
-unwrap_ (Object.Added obj) = obj
-unwrap_ (Object.Removed obj) = obj
+  if object `elem` newSet
+    then Nothing
+    else Just $ Removed object

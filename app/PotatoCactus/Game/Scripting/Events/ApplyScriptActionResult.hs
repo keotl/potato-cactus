@@ -7,20 +7,24 @@ import qualified PotatoCactus.Game.Entity.Animation.Animation as Anim
 import qualified PotatoCactus.Game.Entity.EntityData as EntityData
 import qualified PotatoCactus.Game.Entity.GroundItem.GroundItemCollection as GroundItemCollection
 import PotatoCactus.Game.Entity.Interaction.Interaction (create)
+import qualified PotatoCactus.Game.Entity.Interaction.Interaction as Interaction
+import qualified PotatoCactus.Game.Entity.Interaction.State as InteractionState
 import PotatoCactus.Game.Entity.Npc.Npc (Npc (respawn))
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Npc.NpcMovement (immediatelyQueueMovement)
 import qualified PotatoCactus.Game.Entity.Npc.NpcMovement as NM
 import PotatoCactus.Game.Entity.Npc.RespawnStrategy (RespawnStrategy (Never), respawning)
-import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (addDynamicObject)
+import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (addDynamicObject, removeDynamicObject)
 import qualified PotatoCactus.Game.ItemContainer as ItemContainer
+import qualified PotatoCactus.Game.Movement.MovementEntity as PM
 import PotatoCactus.Game.Movement.PathPlanner (findPath, findPathNaive)
 import PotatoCactus.Game.Player (Player (interaction), clearTargetIfEngagedWithNpc)
 import qualified PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions as PAnim
+import PotatoCactus.Game.PlayerUpdate.VarpSet (Varp (varpId))
 import PotatoCactus.Game.Position (GetPosition (getPosition))
 import qualified PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest as SpawnReq
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (AddGameObject, ClearPlayerInteraction, ClearStandardInterface, CreateInterface, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, GiveItem, InternalNoop, InternalProcessingComplete, InternalRemoveNpcTargetReferences, InvokeScript, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, RemoveGroundItem, RemoveItemStack, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SpawnGroundItem, SpawnNpc, SubtractItem))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (ClearPlayerInteraction, ClearStandardInterface, CreateInterface, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, GiveItem, InternalNoop, InternalProcessingComplete, InternalSetPlayerInteractionPending, InvokeScript, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, PlayerQueueWalk, RemoveGameObject, RemoveGroundItem, RemoveItemStack, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SetPlayerVarbit, SetPlayerVarp, SpawnGameObject, SpawnGroundItem, SpawnNpc, SubtractItem))
 import PotatoCactus.Game.World (World (npcs, objects, players), groundItems)
 import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAll, updateAtIndex)
@@ -28,9 +32,13 @@ import PotatoCactus.Game.World.Selectors (isNpcAt)
 import PotatoCactus.Utils.Flow ((|>))
 
 applyScriptResult :: World -> ScriptActionResult -> World
-applyScriptResult world (AddGameObject obj) =
+applyScriptResult world (SpawnGameObject obj) =
   world
     { objects = addDynamicObject obj (objects world)
+    }
+applyScriptResult world (RemoveGameObject obj) =
+  world
+    { objects = removeDynamicObject obj (objects world)
     }
 applyScriptResult world (ClearPlayerInteraction playerId) =
   world
@@ -100,10 +108,6 @@ applyScriptResult world (NpcMoveTowardsTarget npc) =
                     }
         Nothing -> world
     _ -> world
-applyScriptResult world (InternalRemoveNpcTargetReferences npcId) =
-  world
-    { players = updateAll (W.players world) (clearTargetIfEngagedWithNpc npcId)
-    }
 applyScriptResult world (SpawnNpc options) =
   let respawn = case SpawnReq.respawnDelay options of
         -1 -> Never
@@ -219,3 +223,47 @@ applyScriptResult world (RemoveGroundItem itemId quantity position removedByPlay
                                   "You need more inventory space to carry that item."
                               )
                         }
+applyScriptResult world (SetPlayerVarp playerIndex operation) =
+  world
+    { players =
+        updateAtIndex
+          (players world)
+          playerIndex
+          (`P.setVarp` operation)
+    }
+applyScriptResult world (SetPlayerVarbit playerIndex operation) =
+  world
+    { players =
+        updateAtIndex
+          (players world)
+          playerIndex
+          (`P.setVarbit` operation)
+    }
+applyScriptResult world (PlayerQueueWalk playerIndex targetPos) =
+  world
+    { players =
+        updateAtIndex
+          (W.players world)
+          playerIndex
+          ( \player ->
+              player
+                { P.movement =
+                    PM.immediatelyQueueMovement
+                      (P.movement player)
+                      (findPath 666 (getPosition player) targetPos)
+                }
+          )
+    }
+applyScriptResult world (InternalSetPlayerInteractionPending playerIndex) =
+  world
+    { players =
+        updateAtIndex
+          (W.players world)
+          playerIndex
+          ( \player ->
+              player
+                { P.interaction =
+                    (P.interaction player) {Interaction.state = InteractionState.Pending}
+                }
+          )
+    }

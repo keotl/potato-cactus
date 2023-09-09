@@ -22,22 +22,18 @@ Takes some inspiration from
 - [x] Players can drop and pick up items
 - [x] Dialogue interfaces can be invoked and trigger callbacks
 - [x] Scripts can be invoked dynamically through timeouts or callbacks
+- [x] Scripts can set VarP/Varbit variables to control client
+      behaviour such as instanced game objects or NPCs.
+- [x] Scripts can access accurate game object placement information
 
 ## Priorities
-- [ ] Instanced game objects
-- [ ] Game data loading
-  - [ ] Item, NPC, Object definitions
+- [x] Game data loading
+  - [x] Item, NPC, Object definitions
   - [ ] Collision map and pathing
-  - [ ] Static object set
+  - [x] Static object set
 - [ ] Persistence mechanism
 
 ## Running requirements
 - Revision-317 cache files
 - Revision-317 client with encryption disabled
 
-## Debugging
-### Running with stacktraces
-```
-cabal configure --enable-profiling --profiling-detail toplevel-functions
-cabal run potato-cactus -- +RTS -xc
-```

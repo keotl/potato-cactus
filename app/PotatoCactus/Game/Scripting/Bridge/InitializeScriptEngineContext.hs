@@ -13,11 +13,9 @@ initializeScriptEngineContext = do
   handle <- getInstance
   world <- readIORef worldInstance
 
-  -- TODO - Send static definitions  - keotl 2023-04-27
-
-  send handle (updateWorldContextMessage world)
+  send handle $ Just (updateWorldContextMessage world)
   send handle (mapEvent ServerInitEvent)
-  send handle doneSendingEventsMessage
+  send handle $ Just doneSendingEventsMessage
 
   newWorld <- readBridgeEventsUntilDone world handle
   writeIORef worldInstance newWorld

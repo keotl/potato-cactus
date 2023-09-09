@@ -1,8 +1,8 @@
 module PotatoCactus.Game.Entity.GroundItem.GroundItem where
 
-import PotatoCactus.Game.Definitions.ItemDefinitions (ItemId)
 import qualified PotatoCactus.Game.ItemContainer as ItemStack
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position)
+import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemId)
 
 data GroundItem = GroundItem
   { itemId :: ItemId,

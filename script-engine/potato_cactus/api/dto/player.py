@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from potato_cactus.api.dto.combat import Combat
 from potato_cactus.api.dto.interaction import PlayerInteraction
@@ -15,3 +15,4 @@ class Player(object):
     inventory: List[Optional[ItemStack]]
     equipment: List[Optional[ItemStack]]
     entityData: dict
+    varps: Dict[str, int]
