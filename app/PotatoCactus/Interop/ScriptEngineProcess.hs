@@ -8,12 +8,12 @@ import Data.ByteString.Lazy.Char8 (hPutStrLn)
 import qualified Data.ByteString.Lazy.UTF8 as Lazy
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import GHC.IO (unsafePerformIO)
+import PotatoCactus.Config.Constants (scriptWorkers)
 import PotatoCactus.Game.Scripting.Bridge.BridgeMessage (BridgeMessage)
 import PotatoCactus.Game.Scripting.Bridge.ControlMessages (BridgeInitOptions (BridgeInitOptions), initializeBridgeMessage)
 import PotatoCactus.Utils.Logging (LogLevel (Info), logger)
 import System.IO (BufferMode (LineBuffering), Handle, hSetBuffering)
 import System.Process (CreateProcess (env, std_in, std_out), ProcessHandle, StdStream (CreatePipe), createProcess, proc)
-import PotatoCactus.Config.Constants (scriptWorkers)
 
 data ScriptEngineHandle = ScriptEngineHandle
   { stdin_ :: Handle,
@@ -31,12 +31,13 @@ spawnScriptEngineProcess = do
   let handle = ScriptEngineHandle stdin stdout p
   hSetBuffering (stdin_ handle) LineBuffering
   hSetBuffering (stdout_ handle) LineBuffering
-  send handle $ initializeBridgeMessage (BridgeInitOptions scriptWorkers ["scripts/"])
+  send handle $ Just $ initializeBridgeMessage (BridgeInitOptions scriptWorkers ["scripts/"])
   writeIORef instance_ (Just handle)
   return handle
 
-send :: forall b. ToJSON b => ScriptEngineHandle -> BridgeMessage b -> IO ()
-send handle msg = hPutStrLn (stdin_ handle) (encode msg)
+send :: forall b. ToJSON b => ScriptEngineHandle -> Maybe (BridgeMessage b) -> IO ()
+send handle Nothing = pure ()
+send handle (Just msg) = hPutStrLn (stdin_ handle) (encode msg)
 
 recv :: ScriptEngineHandle -> IO ByteString
 recv handle = hGetLine (stdout_ handle)

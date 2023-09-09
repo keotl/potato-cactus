@@ -13,9 +13,9 @@ initializeScriptEngineContext = do
   handle <- getInstance
   world <- readIORef worldInstance
 
-  send handle (updateWorldContextMessage world)
+  send handle $ Just (updateWorldContextMessage world)
   send handle (mapEvent ServerInitEvent)
-  send handle doneSendingEventsMessage
+  send handle $ Just doneSendingEventsMessage
 
   newWorld <- readBridgeEventsUntilDone world handle
   writeIORef worldInstance newWorld

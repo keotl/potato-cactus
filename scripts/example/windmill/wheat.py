@@ -13,14 +13,14 @@ def on_interaction(e: ObjectInteractionEventPayload):
     if e.interaction.target is None:
         return [ClearPlayerInteraction(e.playerIndex)]
 
-    target = e.interaction.target
+    target = e.interaction.target.object
     return [
         GiveItem(e.playerIndex, 1947, 1),
         SetPlayerAnimation(e.playerIndex, 827),
-        RemoveGameObject(target.objectId, target.position, 10),
+        RemoveGameObject(target.position, target.objectType),
         ClearPlayerInteraction(e.playerIndex),
         InvokeScript(
-            ScriptInvocation(respawn, (target.objectId, target.position.x,
+            ScriptInvocation(respawn, (target.id, target.position.x,
                                        target.position.y, target.position.z)),
             RESPAWN_DELAY)
     ]

@@ -31,10 +31,10 @@ sendEventsAsync world evts = do
 sendEventsThreadMain_ :: World -> [GameEvent] -> IO ()
 sendEventsThreadMain_ world evts = do
   handle <- getInstance
-  send handle (updateWorldContextMessage world)
+  send handle (Just $ updateWorldContextMessage world)
   sendEvents handle evts
   logger_ Debug $ "Sent " ++ show (length evts) ++ " game events."
-  send handle doneSendingEventsMessage
+  send handle $ Just doneSendingEventsMessage
   return ()
 
 logger_ = logger "ScriptingBridge"
