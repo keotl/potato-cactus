@@ -6,7 +6,11 @@ import PotatoCactus.Game.Typing (Advance (advance))
 
 data CombatTarget = PlayerTarget Int | NpcTarget Int | None deriving (Show, Eq)
 
-data CombatState = Alive | Dying | Dead deriving (Show)
+data CombatState = Alive | Dying | Dead deriving (Show, Eq)
+
+data CombatTargetStatus = InRange | ShouldPathTo | ShouldDisengage deriving (Show, Eq)
+
+data CombatAction = MoveTowardsTarget | AttackTarget deriving (Show, Eq)
 
 data CombatEntity = CombatEntity
   { hitpoints :: Int,
@@ -14,7 +18,8 @@ data CombatEntity = CombatEntity
     maxHitpoints :: Int,
     target :: CombatTarget,
     hits :: [Hit],
-    cooldown :: Int
+    cooldown :: Int,
+    pendingActions :: [CombatAction]
   }
   deriving (Show)
 
@@ -26,7 +31,8 @@ create hitpoints =
       maxHitpoints = hitpoints,
       target = None,
       hits = [],
-      cooldown = 0
+      cooldown = 0,
+      pendingActions = []
     }
 
 applyHit :: CombatEntity -> CombatTarget -> Hit -> CombatEntity
@@ -39,18 +45,6 @@ applyHit c damageSource hit =
         _ -> target c -- TODO - Retaliation logic  - keotl 2023-03-20
     }
 
-instance Advance CombatEntity where
-  advance c =
-    case state c of
-      Dying -> c {state = Dead}
-      Dead -> c
-      Alive ->
-        c
-          { hits = [],
-            cooldown = max 0 (cooldown c - 1),
-            state = if hitpoints c == 0 then Dying else Alive
-          }
-
 clearTarget :: CombatEntity -> CombatEntity
 clearTarget c = c {target = None}
 
@@ -61,7 +55,3 @@ setAttackCooldown c cooldown =
 setTarget :: CombatEntity -> CombatTarget -> CombatEntity
 setTarget c target =
   c {target = target}
-
-clearTargetIfEngagedWith :: CombatTarget -> CombatEntity -> CombatEntity
-clearTargetIfEngagedWith desiredTarget c =
-  if target c == desiredTarget then clearTarget c else c

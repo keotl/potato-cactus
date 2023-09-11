@@ -3,7 +3,7 @@ module PotatoCactus.Game.Player where
 import Data.Binary (Word32, Word8)
 import Data.Bits ((.&.), (.|.))
 import Data.Foldable (fold)
-import PotatoCactus.Game.Combat.CombatEntity (CombatEntity, CombatTarget (NpcTarget), clearTargetIfEngagedWith)
+import PotatoCactus.Game.Combat.CombatEntity (CombatEntity, CombatTarget (NpcTarget))
 import qualified PotatoCactus.Game.Combat.CombatEntity as CombatEntity
 import PotatoCactus.Game.Combat.Hit (Hit)
 import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemId)
@@ -126,10 +126,6 @@ setAnimation anim player =
     { animation = Anim.setAnimation (animation player) anim,
       updateMask = updateMask player .|. animationFlag
     }
-
-clearTargetIfEngagedWithNpc :: NpcIndex -> Player -> Player
-clearTargetIfEngagedWithNpc npcId p =
-  p {combat = clearTargetIfEngagedWith (NpcTarget npcId) (combat p)}
 
 sendChatboxMessage :: Player -> String -> Player
 sendChatboxMessage p msg =

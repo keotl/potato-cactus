@@ -22,6 +22,8 @@ import MobListTests (testMobList)
 import Test.HUnit
 import Game.Player.ClosestInteractableTileCalcTests (closestInteractableTileCalcTests)
 import Game.ApplyActions.RemoveGroundItemActionTests (removeGroundItemActionTests)
+import Game.Combat.LocateCombatTargetTests (locateCombatTargetTests)
+import Game.Combat.AdvanceCombatEntityTests (advanceCombatEntityTests)
 
 tests =
   TestList
@@ -55,7 +57,9 @@ tests =
       locateInteractionTargetTests,
       closestInteractableTileCalcTests,
       canInteractWithEntityTests,
-      removeGroundItemActionTests
+      removeGroundItemActionTests,
+      locateCombatTargetTests,
+      advanceCombatEntityTests
     ]
 
 main :: IO ()

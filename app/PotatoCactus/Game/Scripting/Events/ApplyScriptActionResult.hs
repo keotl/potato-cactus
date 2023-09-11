@@ -9,7 +9,6 @@ import qualified PotatoCactus.Game.Entity.GroundItem.GroundItemCollection as Gro
 import PotatoCactus.Game.Entity.Interaction.Interaction (create)
 import qualified PotatoCactus.Game.Entity.Interaction.Interaction as Interaction
 import qualified PotatoCactus.Game.Entity.Interaction.State as InteractionState
-import PotatoCactus.Game.Entity.Npc.Npc (Npc (respawn))
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Npc.NpcMovement (immediatelyQueueMovement)
 import qualified PotatoCactus.Game.Entity.Npc.NpcMovement as NM
@@ -18,7 +17,7 @@ import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (addDynamicObject
 import qualified PotatoCactus.Game.ItemContainer as ItemContainer
 import qualified PotatoCactus.Game.Movement.MovementEntity as PM
 import PotatoCactus.Game.Movement.PathPlanner (findPath, findPathNaive)
-import PotatoCactus.Game.Player (Player (interaction), clearTargetIfEngagedWithNpc)
+import PotatoCactus.Game.Player (Player (interaction))
 import qualified PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions as PAnim
 import PotatoCactus.Game.PlayerUpdate.VarpSet (Varp (varpId))

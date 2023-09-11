@@ -101,8 +101,11 @@ executable potato-cactus
                    PotatoCactus.Network.Binary
                    PotatoCactus.Login.LoginHandler
                    PotatoCactus.Login.Models
+                   PotatoCactus.Game.Combat.AdvanceCombatEntity
+                   PotatoCactus.Game.Combat.AdvanceCombatEntityDeps
                    PotatoCactus.Game.Combat.CombatEntity
                    PotatoCactus.Game.Combat.Hit
+                   PotatoCactus.Game.Combat.LocateCombatTarget
                    PotatoCactus.Game.Entity.Animation.Animation
                    PotatoCactus.Game.Entity.EntityData
                    PotatoCactus.Game.Entity.GroundItem.GroundItem
