@@ -2,7 +2,7 @@ module Game.Combat.AdvanceCombatEntityTests where
 
 import PotatoCactus.Game.Combat.AdvanceCombatEntity (advanceCombatEntity)
 import PotatoCactus.Game.Combat.AdvanceCombatEntityDeps (AdvanceCombatEntityDeps (AdvanceCombatEntityDeps))
-import PotatoCactus.Game.Combat.CombatEntity (CombatAction (MoveTowardsTarget), CombatEntity (..), CombatState (Dead, Dying), CombatTarget (None, NpcTarget), CombatTargetStatus (InRange, ShouldDisengage, ShouldPathTo), create, setTarget)
+import PotatoCactus.Game.Combat.CombatEntity (CombatAction (MoveTowardsTarget, AttackTarget), CombatEntity (..), CombatState (Dead, Dying), CombatTarget (None, NpcTarget), CombatTargetStatus (InRange, ShouldDisengage, ShouldPathTo), create, setTarget)
 import PotatoCactus.Utils.Flow ((|>))
 import Test.HUnit
 
@@ -24,7 +24,7 @@ advanceCombatEntityTests =
       TestCase
         ( assertEqual
             "queues attack action when target is in range and cooldown is 0"
-            [MoveTowardsTarget]
+            [AttackTarget]
             (pendingActions $ advanceCombatEntity (deps InRange) combatEntity)
         ),
       TestCase
@@ -47,14 +47,14 @@ advanceCombatEntityTests =
         ),
       TestCase
         ( assertEqual
-            "transitions from Dying to Dead on the next tick to allow the death animation"
+            "transitions from Dying to Dead on the next tick to allow for the death animation to show"
             Dead
             (state $ advanceCombatEntity anyDeps combatEntity {state = Dying})
         )
     ]
 
-deps :: CombatTargetStatus -> AdvanceCombatEntityDeps
-deps desired = AdvanceCombatEntityDeps (const desired)
+deps :: CombatTargetStatus -> CombatTarget -> CombatTargetStatus
+deps desired _ = desired
 
 anyDeps = deps InRange
 

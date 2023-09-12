@@ -1,5 +1,9 @@
 module PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer) where
 
+import PotatoCactus.Config.Constants (npcDisengageDistance)
+import PotatoCactus.Game.Combat.AdvanceCombatEntity (advanceCombatEntity)
+import PotatoCactus.Game.Combat.AdvanceCombatEntityDeps (AdvanceCombatEntityDeps)
+import PotatoCactus.Game.Combat.LocateCombatTarget (LocateTargetArgs (LocateTargetArgs), locateCombatTarget)
 import PotatoCactus.Game.Entity.Interaction.AdvanceInteractionDeps (AdvanceInteractionSelectors, locateInteractionTarget)
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction (state, target), advanceInteraction, create)
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (PendingPathing))
@@ -15,8 +19,8 @@ import PotatoCactus.Game.Position (Position, getPosition)
 import PotatoCactus.Game.Typing (Advance (advance))
 import PotatoCactus.Utils.Flow ((|>))
 
-advancePlayer :: AdvanceInteractionSelectors -> Player -> Player
-advancePlayer advanceInteractionDeps old =
+advancePlayer :: AdvanceInteractionSelectors -> AdvanceCombatEntityDeps -> Player -> Player
+advancePlayer advanceInteractionDeps advanceCombatDeps old =
   if skipUpdate_ old
     then old {skipUpdate_ = False}
     else
@@ -34,7 +38,10 @@ advancePlayer advanceInteractionDeps old =
                   (interaction p),
               inventory = advance . inventory $ p,
               equipment = advance . equipment $ p,
-              combat = advance . combat $ p,
+              combat =
+                advanceCombatEntity
+                  (locateCombatTarget advanceCombatDeps (LocateTargetArgs 1 npcDisengageDistance) (getPosition p))
+                  (combat p),
               interfaces = advance . interfaces $ p,
               pendingUpdates = []
             }

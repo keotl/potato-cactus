@@ -41,4 +41,4 @@ target :: CombatTarget
 target = NpcTarget 1
 
 deps :: LocateTargetArgs
-deps = LocateTargetArgs 1 10 (\_ -> Just targetPos) (\_ -> Just targetPos)
+deps = LocateTargetArgs 1 10 (\_ -> Just targetPos) (\_ -> Just targetPos) (const (1, 1))

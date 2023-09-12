@@ -5,6 +5,7 @@ import Data.IORef (IORef, newIORef, writeIORef)
 import Data.List (find)
 import GHC.IO (unsafePerformIO)
 import PotatoCactus.Config.Constants (maxNpcs, maxPlayers)
+import qualified PotatoCactus.Game.Combat.AdvanceCombatEntityDeps as CombatDeps
 import PotatoCactus.Game.Definitions.GameObjectDefinitions (objectDefinition)
 import qualified PotatoCactus.Game.Definitions.StaticGameObjectSet as StaticObject
 import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectId)
@@ -21,7 +22,7 @@ import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload)
 import PotatoCactus.Game.Player (PlayerIndex)
 import qualified PotatoCactus.Game.Player as P (Player (serverIndex), create, username)
 import PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer)
-import PotatoCactus.Game.Position (Position (Position))
+import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
 import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation)
 import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent))
 import PotatoCactus.Game.Typing (Advance (advance), ShouldDiscard (shouldDiscard))
@@ -80,6 +81,12 @@ invokedScripts_ w =
 createAdvanceInteractionDeps_ :: World -> InteractionDeps.AdvanceInteractionSelectors
 createAdvanceInteractionDeps_ w =
   InteractionDeps.AdvanceInteractionSelectors (findByIndex (npcs w)) (findObjectAt w) objectDefinition
+
+createAdvanceCombatDeps_ :: World -> CombatDeps.AdvanceCombatEntityDeps
+createAdvanceCombatDeps_ w =
+  CombatDeps.AdvanceCombatEntityDeps
+    (fmap getPosition . findByIndex (npcs w))
+    (fmap getPosition . findByIndex (players w))
 
 findObjectAt :: World -> Position -> GameObjectId -> Maybe GameObject
 findObjectAt world pos objectId =
