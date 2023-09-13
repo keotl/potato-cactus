@@ -26,11 +26,6 @@ class ItemOnObjectInteractionTarget(object):
     interfaceId: int
 
 
-class NpcAttackInteractionTarget(object):
-    type: Literal["npcAttack"]
-    npcIndex: int
-
-
 class NpcInteractionTarget(object):
     type: Literal["npc"]
     npcIndex: int

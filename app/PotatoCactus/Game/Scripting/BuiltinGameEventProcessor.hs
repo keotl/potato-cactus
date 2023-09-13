@@ -8,7 +8,7 @@ import PotatoCactus.Game.Entity.Interaction.AdvanceInteractionDeps (findClosestI
 import PotatoCactus.Game.Entity.Interaction.ClosestInteractableTileCalc (selectClosestInteractableTile)
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction (state, target))
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (..))
-import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (NpcTarget, ObjectTarget), NpcInteractionType (NpcAttack))
+import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (NpcTarget, ObjectTarget))
 import PotatoCactus.Game.Entity.Npc.Npc (Npc (definitionId))
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Npc.NpcMovement (doMovement)
@@ -37,14 +37,6 @@ dispatchScriptEvent world (InternalPlayerInteractionPendingPathingEvent player t
         [ InternalSetPlayerInteractionPending (serverIndex player),
           PlayerQueueWalk (serverIndex player) newTargetPos
         ]
-dispatchScriptEvent world (PlayerInteractionEvent player interaction) =
-  case (target interaction, state interaction) of
-    (NpcTarget npcId NpcAttack, InProgress) ->
-      return
-        [ DispatchAttackPlayerToNpc (serverIndex player) npcId (Hit 0 MeleeAttack),
-          ClearPlayerInteraction (serverIndex player)
-        ]
-    _ -> return []
 dispatchScriptEvent world (InternalNpcCannotReachCombatTargetEvent npc destination) =
   case findPathNaive 666 (getPosition npc) destination of
     [] -> return []
@@ -59,9 +51,8 @@ dispatchScriptEvent world (PlayerAttackEvent player target) =
     ( case target of
         Combat.NpcTarget npcId ->
           return
-            [ DispatchAttackPlayerToNpc (serverIndex player) npcId (Hit 1 MeleeAttack)
-            ]
-        _ -> return [ClearPlayerInteraction (serverIndex player)]
+            [DispatchAttackPlayerToNpc (serverIndex player) npcId (Hit 1 MeleeAttack)]
+        _ -> return []
     )
 dispatchScriptEvent world (NpcAttackEvent npc target) =
   trace
@@ -78,7 +69,6 @@ dispatchScriptEvent world (NpcDeadEvent npc) =
   trace
     "dispatched NPC dead event"
     ( return
-        [ NpcSetAnimation (NPC.serverIndex npc) (Animation 2607 0 High)
-        ]
+        [NpcSetAnimation (NPC.serverIndex npc) (Animation 2607 0 High)]
     )
 dispatchScriptEvent _ _ = return []

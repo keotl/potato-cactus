@@ -100,8 +100,6 @@ def _event_key(payload) -> Tuple[Optional[Union[str, int]], ...]:
         return GameEvent.ItemOnObjectInteractionEvent, payload.body.interaction.target.object.id
     if payload.event == GameEvent.NpcInteractionEvent:
         return GameEvent.NpcInteractionEvent, payload.body.interaction.target.npcId
-    if payload.event == GameEvent.NpcAttackInteractionEvent:
-        return GameEvent.NpcAttackInteractionEvent, payload.body.interaction.target.npcId
     if payload.event == GameEvent.PickupItemInteractionEvent:
         return GameEvent.PickupItemInteractionEvent, payload.body.interaction.target.itemId
     if payload.event == GameEvent.NpcAttackEvent:
@@ -131,8 +129,6 @@ def _default_event_handler_key(
         return GameEvent.ItemOnObjectInteractionEvent, "default"
     if payload.event == GameEvent.NpcInteractionEvent:
         return GameEvent.NpcInteractionEvent, "default"
-    if payload.event == GameEvent.NpcAttackInteractionEvent:
-        return GameEvent.NpcAttackInteractionEvent, "default"
     if payload.event == GameEvent.PickupItemInteractionEvent:
         return GameEvent.PickupItemInteractionEvent, "default"
     if payload.event == GameEvent.NpcAttackEvent:
@@ -157,8 +153,6 @@ def _unhandled_event_handler_key(
         return GameEvent.ItemOnObjectInteractionEvent, "unhandled"
     if payload.event == GameEvent.NpcInteractionEvent:
         return GameEvent.NpcInteractionEvent, "unhandled"
-    if payload.event == GameEvent.NpcAttackInteractionEvent:
-        return GameEvent.NpcAttackInteractionEvent, "unhandled"
     if payload.event == GameEvent.PickupItemInteractionEvent:
         return GameEvent.PickupItemInteractionEvent, "unhandled"
     if payload.event == GameEvent.NpcAttackEvent:
@@ -178,10 +172,6 @@ def _unhandled_event_handler_key(
 def _enrich_message(context: ContextImpl, payload):
     if payload.event == GameEvent.NpcInteractionEvent:
         # payload.body: NpcInteractionEventPayload
-        payload.body.interaction.target["npcId"] = _find_npc_id(
-            context, payload.body.interaction.target.npcIndex)
-    if payload.event == GameEvent.NpcAttackInteractionEvent:
-        # payload.body: NpcAttackInteractionEventPayload
         payload.body.interaction.target["npcId"] = _find_npc_id(
             context, payload.body.interaction.target.npcIndex)
     if payload.event == GameEvent.NpcAttackEvent:

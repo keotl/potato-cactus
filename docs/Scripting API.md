@@ -15,7 +15,6 @@ Event names and payload types can be imported from
 | ObjectInteractionEvent       | `objectId` | Sent on the tick when the player triggers the interaction.                                  |
 | ItemOnObjectInteractionEvent | `objectId` | When a player uses an item on a game object.                                                |
 | NpcInteractionEvent          | `npcId`    | Sent on the tick when the player triggers the interaction.                                  |
-| NpcAttackInteractionEvent    | `npcId`    | TODO is this still necessary?                                                               |
 | PickupItemInteractionEvent   | `itemId`   | Sent when a user picks up a ground item. Override to prevent default behaviour.             |
 | PlayerAttackEvent            |            |                                                                                             |
 | PlayerCommandEvent           | `command`  | Sent when a client command is issued. (e.g. `::position`                                    |

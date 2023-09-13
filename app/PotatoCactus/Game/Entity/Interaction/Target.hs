@@ -16,6 +16,6 @@ data InteractionTarget
 
 data ObjectInteractionType = ObjectAction Int | ItemOnObject WidgetId Int ItemId deriving (Show, Eq)
 
-data NpcInteractionType = NpcAttack | NpcAction Int deriving (Show, Eq)
+data NpcInteractionType = NpcAction Int deriving (Show, Eq)
 
 data GroundItemInteractionType = ItemPickup deriving (Show, Eq)
