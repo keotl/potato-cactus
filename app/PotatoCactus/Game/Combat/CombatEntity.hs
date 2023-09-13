@@ -8,9 +8,9 @@ data CombatTarget = PlayerTarget Int | NpcTarget Int | None deriving (Show, Eq)
 
 data CombatState = Alive | Dying | Dead deriving (Show, Eq)
 
-data CombatTargetStatus = InRange | ShouldPathTo | ShouldDisengage deriving (Show, Eq)
+data CombatTargetStatus = InRange | ShouldPathTo Position | ShouldDisengage deriving (Show, Eq)
 
-data CombatAction = MoveTowardsTarget | AttackTarget deriving (Show, Eq)
+data CombatAction = MoveTowardsTarget Position | AttackTarget deriving (Show, Eq)
 
 data CombatEntity = CombatEntity
   { hitpoints :: Int,

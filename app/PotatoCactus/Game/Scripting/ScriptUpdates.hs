@@ -8,6 +8,7 @@ import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemId)
 import PotatoCactus.Game.Entity.Animation.Animation (Animation)
 import PotatoCactus.Game.Entity.GroundItem.GroundItem (GroundItem (GroundItem))
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction)
+import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget)
 import PotatoCactus.Game.Entity.Npc.Npc (Npc, NpcIndex)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject, GameObjectType)
 import PotatoCactus.Game.Player (Player, PlayerIndex)
@@ -16,7 +17,6 @@ import PotatoCactus.Game.Position (Position (Position))
 import PotatoCactus.Game.Scripting.Actions.CreateInterface (CreateInterfaceRequest, WidgetId)
 import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation)
 import PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest (SpawnNpcRequest)
-import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget)
 
 data GameEvent
   = ServerInitEvent
@@ -24,7 +24,8 @@ data GameEvent
   | InternalPlayerInteractionPendingPathingEvent Player InteractionTarget
   | PlayerAttackEvent Player CombatTarget
   | NpcAttackEvent Npc CombatTarget
-  | InternalNpcCannotReachTargetEvent Npc CombatTarget
+  | InternalNpcCannotReachCombatTargetEvent Npc Position
+  | InternalPlayerCannotReachCombatTargetEvent Player Position
   | NpcDeadEvent Npc
   | NpcEntityTickEvent Npc
   | PlayerCommandEvent PlayerIndex String [String]
@@ -40,8 +41,8 @@ data ScriptActionResult
   | DispatchAttackNpcToPlayer NpcIndex PlayerIndex Hit
   | NpcSetAnimation NpcIndex Animation
   | NpcQueueWalk NpcIndex Position
-  | NpcMoveTowardsTarget Npc
-  | NpcSetForcedChat NpcIndex String
+  | -- | InternalNpcMoveTowardsCombatTarget NpcIndex
+    NpcSetForcedChat NpcIndex String
   | SpawnNpc SpawnNpcRequest
   | SendMessage PlayerIndex String
   | SetPlayerPosition PlayerIndex Position
@@ -61,5 +62,6 @@ data ScriptActionResult
   | InternalNoop
   | ServerPrintMessage String -- for testing
   | InternalSetPlayerInteractionPending PlayerIndex
-  | PlayerQueueWalk PlayerIndex Position
+  | -- | InternalPlayerMoveTowardsCombatTarget PlayerIndex
+    PlayerQueueWalk PlayerIndex Position
   deriving (Show)

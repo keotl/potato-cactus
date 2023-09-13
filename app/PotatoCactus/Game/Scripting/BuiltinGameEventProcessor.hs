@@ -5,6 +5,7 @@ import qualified PotatoCactus.Game.Combat.CombatEntity as Combat
 import PotatoCactus.Game.Combat.Hit (DamageType (MeleeAttack), Hit (Hit))
 import PotatoCactus.Game.Entity.Animation.Animation (Animation (Animation), AnimationPriority (High))
 import PotatoCactus.Game.Entity.Interaction.AdvanceInteractionDeps (findClosestInteractableTile)
+import PotatoCactus.Game.Entity.Interaction.ClosestInteractableTileCalc (selectClosestInteractableTile)
 import PotatoCactus.Game.Entity.Interaction.Interaction (Interaction (state, target))
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (..))
 import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (NpcTarget, ObjectTarget), NpcInteractionType (NpcAttack))
@@ -13,10 +14,12 @@ import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Npc.NpcMovement (doMovement)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, facingDirection))
 import PotatoCactus.Game.Message.RegisterClientPayload (RegisterClientPayload (player))
+import PotatoCactus.Game.Movement.PathPlanner (findPathNaive)
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
 import PotatoCactus.Game.Player (Player (serverIndex))
+import qualified PotatoCactus.Game.Player as P
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (x, z))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (DropItemEvent, InternalNpcCannotReachTargetEvent, InternalPlayerInteractionPendingPathingEvent, NpcAttackEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (ClearPlayerInteraction, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, InternalSetPlayerInteractionPending, NpcMoveTowardsTarget, NpcSetAnimation, PlayerQueueWalk, RemoveItemStack, SendMessage))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (DropItemEvent, InternalNpcCannotReachCombatTargetEvent, InternalPlayerCannotReachCombatTargetEvent, InternalPlayerInteractionPendingPathingEvent, NpcAttackEvent, NpcDeadEvent, NpcEntityTickEvent, PlayerAttackEvent, PlayerInteractionEvent), ScriptActionResult (..))
 import PotatoCactus.Game.Typing (key)
 import PotatoCactus.Game.World (World (tick))
 import qualified PotatoCactus.Game.World as W
@@ -42,8 +45,14 @@ dispatchScriptEvent world (PlayerInteractionEvent player interaction) =
           ClearPlayerInteraction (serverIndex player)
         ]
     _ -> return []
-dispatchScriptEvent world (InternalNpcCannotReachTargetEvent npc target) =
-  return [NpcMoveTowardsTarget npc]
+dispatchScriptEvent world (InternalNpcCannotReachCombatTargetEvent npc destination) =
+  case findPathNaive 666 (getPosition npc) destination of
+    [] -> return []
+    firstPathStep : _ -> return [NpcQueueWalk (NPC.serverIndex npc) firstPathStep]
+dispatchScriptEvent world (InternalPlayerCannotReachCombatTargetEvent player destination) =
+  case findPathNaive 666 (getPosition player) destination of
+    [] -> return []
+    firstPathStep : _ -> return [PlayerQueueWalk (P.serverIndex player) firstPathStep]
 dispatchScriptEvent world (PlayerAttackEvent player target) =
   trace
     "dispatched attack event"

@@ -23,7 +23,7 @@ import qualified PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions as PA
 import PotatoCactus.Game.PlayerUpdate.VarpSet (Varp (varpId))
 import PotatoCactus.Game.Position (GetPosition (getPosition))
 import qualified PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest as SpawnReq
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (ClearPlayerInteraction, ClearStandardInterface, CreateInterface, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, GiveItem, InternalNoop, InternalProcessingComplete, InternalSetPlayerInteractionPending, InvokeScript, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, PlayerQueueWalk, RemoveGameObject, RemoveGroundItem, RemoveItemStack, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SetPlayerVarbit, SetPlayerVarp, SpawnGameObject, SpawnGroundItem, SpawnNpc, SubtractItem))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (..))
 import PotatoCactus.Game.World (World (npcs, objects, players), groundItems)
 import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAll, updateAtIndex)
@@ -80,33 +80,6 @@ applyScriptResult world (NpcSetAnimation npcIndex anim) =
   world
     { npcs = updateAtIndex (npcs world) npcIndex (`NPC.setAnimation` anim)
     }
-applyScriptResult world (NpcMoveTowardsTarget npc) =
-  case target . NPC.combat $ npc of
-    PlayerTarget playerId ->
-      case findByIndex (W.players world) playerId of
-        Just p ->
-          case findPathNaive 666 (getPosition npc) (getPosition p) of
-            [] -> world
-            (desiredMove : _) ->
-              if isNpcAt world desiredMove
-                then world
-                else
-                  world
-                    { npcs =
-                        updateAtIndex
-                          (W.npcs world)
-                          (NPC.serverIndex npc)
-                          ( \npc ->
-                              npc
-                                { NPC.movement =
-                                    immediatelyQueueMovement
-                                      (NPC.movement npc)
-                                      [desiredMove]
-                                }
-                          )
-                    }
-        Nothing -> world
-    _ -> world
 applyScriptResult world (SpawnNpc options) =
   let respawn = case SpawnReq.respawnDelay options of
         -1 -> Never

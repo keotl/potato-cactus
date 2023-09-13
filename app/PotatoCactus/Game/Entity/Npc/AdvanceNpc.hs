@@ -13,7 +13,6 @@ import PotatoCactus.Game.Entity.Npc.RespawnStrategy (restart, tryRespawn)
 import PotatoCactus.Game.Movement.PathPlanner (CollisionMap, findPath)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position), faraway, isAdjacent, isWithin)
 import PotatoCactus.Game.Typing (IsEntityActive (isEntityActive), advance)
-import PotatoCactus.Game.World.EntityPositionFinder (CombatTargetPosOrDefault)
 import PotatoCactus.Game.World.MobList (findByIndex)
 import PotatoCactus.Utils.Flow ((|>))
 

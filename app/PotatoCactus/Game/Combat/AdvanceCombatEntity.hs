@@ -25,5 +25,5 @@ updateTargeting_ :: LocateTargetFn -> CombatEntity -> CombatEntity
 updateTargeting_ locateTarget c =
   case locateTarget (target c) of
     ShouldDisengage -> c {target = None}
-    ShouldPathTo -> c {pendingActions = [MoveTowardsTarget]}
+    ShouldPathTo pos -> c {pendingActions = [MoveTowardsTarget pos]}
     InRange -> c {pendingActions = [AttackTarget | cooldown c == 0]}

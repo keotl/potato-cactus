@@ -28,7 +28,6 @@ import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent)
 import PotatoCactus.Game.Typing (Advance (advance), ShouldDiscard (shouldDiscard))
 import PotatoCactus.Game.World.CallbackScheduler (CallbackScheduler)
 import qualified PotatoCactus.Game.World.CallbackScheduler as Scheduler
-import PotatoCactus.Game.World.EntityPositionFinder (combatTargetPosOrDefault)
 import PotatoCactus.Game.World.MobList (MobList, add, create, findByIndex, findByPredicate, remove, removeByPredicate, updateAll, updateAtIndex, updateByPredicate)
 import PotatoCactus.Utils.Flow ((|>))
 import PotatoCactus.Utils.Iterable (replace)
@@ -62,11 +61,10 @@ instance Advance World where
     let newNpcs =
           updateAll
             (npcs w)
-            ( advanceNpc (combatTargetPosOrDefault (players w) (npcs w))
-            )
+            (advanceNpc (createAdvanceCombatDeps_ w))
      in w
           { tick = tick w + 1,
-            players = updateAll (players w) (advancePlayer (createAdvanceInteractionDeps_ w)),
+            players = updateAll (players w) (advancePlayer (createAdvanceInteractionDeps_ w) (createAdvanceCombatDeps_ w)),
             npcs = removeByPredicate newNpcs shouldDiscard,
             groundItems = GroundItemCollection.advanceTime (groundItems w) (tick w + 1),
             triggeredEvents = pendingEvents_ w ++ invokedScripts_ w,
@@ -87,6 +85,7 @@ createAdvanceCombatDeps_ w =
   CombatDeps.AdvanceCombatEntityDeps
     (fmap getPosition . findByIndex (npcs w))
     (fmap getPosition . findByIndex (players w))
+    (const (1, 1)) -- TODO - Lookup npc size from definitions  - keotl 2023-09-12
 
 findObjectAt :: World -> Position -> GameObjectId -> Maybe GameObject
 findObjectAt world pos objectId =

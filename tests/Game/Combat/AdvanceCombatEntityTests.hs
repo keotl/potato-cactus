@@ -2,7 +2,8 @@ module Game.Combat.AdvanceCombatEntityTests where
 
 import PotatoCactus.Game.Combat.AdvanceCombatEntity (advanceCombatEntity)
 import PotatoCactus.Game.Combat.AdvanceCombatEntityDeps (AdvanceCombatEntityDeps (AdvanceCombatEntityDeps))
-import PotatoCactus.Game.Combat.CombatEntity (CombatAction (MoveTowardsTarget, AttackTarget), CombatEntity (..), CombatState (Dead, Dying), CombatTarget (None, NpcTarget), CombatTargetStatus (InRange, ShouldDisengage, ShouldPathTo), create, setTarget)
+import PotatoCactus.Game.Combat.CombatEntity (CombatAction (AttackTarget, MoveTowardsTarget), CombatEntity (..), CombatState (Dead, Dying), CombatTarget (None, NpcTarget), CombatTargetStatus (InRange, ShouldDisengage, ShouldPathTo), create, setTarget)
+import PotatoCactus.Game.Position (Position (Position))
 import PotatoCactus.Utils.Flow ((|>))
 import Test.HUnit
 
@@ -18,8 +19,8 @@ advanceCombatEntityTests =
       TestCase
         ( assertEqual
             "queues pathing action when should path to target"
-            [MoveTowardsTarget]
-            (pendingActions $ advanceCombatEntity (deps ShouldPathTo) combatEntity)
+            [MoveTowardsTarget destinationPos]
+            (pendingActions $ advanceCombatEntity (deps (ShouldPathTo destinationPos)) combatEntity)
         ),
       TestCase
         ( assertEqual
@@ -52,6 +53,9 @@ advanceCombatEntityTests =
             (state $ advanceCombatEntity anyDeps combatEntity {state = Dying})
         )
     ]
+
+destinationPos :: Position
+destinationPos = Position 100 100 0
 
 deps :: CombatTargetStatus -> CombatTarget -> CombatTargetStatus
 deps desired _ = desired

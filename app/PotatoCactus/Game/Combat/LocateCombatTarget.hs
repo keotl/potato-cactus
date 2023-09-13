@@ -4,6 +4,7 @@ module PotatoCactus.Game.Combat.LocateCombatTarget (LocateTargetArgs (..), locat
 
 import PotatoCactus.Game.Combat.AdvanceCombatEntityDeps (AdvanceCombatEntityDeps (..))
 import PotatoCactus.Game.Combat.CombatEntity (CombatTarget (..), CombatTargetStatus (InRange, ShouldDisengage, ShouldPathTo))
+import PotatoCactus.Game.Entity.Interaction.ClosestInteractableTileCalc (selectClosestInteractableTile)
 import PotatoCactus.Game.Entity.Npc.Npc (NpcIndex)
 import PotatoCactus.Game.Player (PlayerIndex)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (..), isWithin)
@@ -40,9 +41,9 @@ locateTargetPos_ args targetSize actorPos targetPos =
    in if
           | z actorPos /= z targetPos -> ShouldDisengage
           | distance >= deAggroRange args -> ShouldDisengage
-          | isInside_ targetSize targetPos actorPos -> ShouldPathTo
+          | isInside_ targetSize targetPos actorPos -> ShouldPathTo (selectClosestInteractableTile targetSize targetPos actorPos)
           | distance <= attackRange args -> InRange
-          | otherwise -> ShouldPathTo
+          | otherwise -> ShouldPathTo (selectClosestInteractableTile targetSize targetPos actorPos)
 
 manhattanDistance_ :: Position -> Position -> Int
 manhattanDistance_ a b =
