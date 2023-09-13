@@ -34,16 +34,9 @@ create pos =
       walkingDirection = None
     }
 
--- for scripts, set new position instantly
-doMovement :: NpcMovement -> Position -> NpcMovement
-doMovement m target =
-  m
-    { position_ = target,
-      queue_ = [],
-      walkingDirection = directionBetween (toXY (position_ m)) (toXY target)
-    }
-
--- for scripts, set new position instantly
+-- for scripts, start pathing immediately if has not already moved on this tick
 immediatelyQueueMovement :: NpcMovement -> [Position] -> NpcMovement
 immediatelyQueueMovement m path =
-  advance m {queue_ = path}
+  case walkingDirection m of
+    None ->  advance m {queue_ = path}
+    _ -> m { queue_ = path}

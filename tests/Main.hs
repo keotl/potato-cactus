@@ -24,6 +24,7 @@ import Game.Player.ClosestInteractableTileCalcTests (closestInteractableTileCalc
 import Game.ApplyActions.RemoveGroundItemActionTests (removeGroundItemActionTests)
 import Game.Combat.LocateCombatTargetTests (locateCombatTargetTests)
 import Game.Combat.AdvanceCombatEntityTests (advanceCombatEntityTests)
+import Game.Entity.Npc.NpcMovementTests (npcMovementTests)
 
 tests =
   TestList
@@ -59,7 +60,8 @@ tests =
       canInteractWithEntityTests,
       removeGroundItemActionTests,
       locateCombatTargetTests,
-      advanceCombatEntityTests
+      advanceCombatEntityTests,
+      npcMovementTests
     ]
 
 main :: IO ()
