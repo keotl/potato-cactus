@@ -1,4 +1,4 @@
-module PotatoCactus.Game.Movement.PlayerWalkMovement where
+module PotatoCactus.Game.Movement.PlayerMovement where
 
 import PotatoCactus.Game.Movement.Direction (Direction (None), directionBetween)
 import PotatoCactus.Game.Movement.InterpolatePath (interpolatePath)
@@ -7,7 +7,7 @@ import PotatoCactus.Game.Movement.WalkingStep (WalkingStep, toPosition)
 import PotatoCactus.Game.Position (GetPosition, Position (x), chunkX, chunkY, getPosition, y)
 import PotatoCactus.Game.Typing (Advance (advance))
 
-data PlayerWalkMovement = PlayerWalkMovement
+data PlayerMovement = PlayerMovement
   { position_ :: Position,
     queue_ :: [Position],
     isTeleporting :: Bool,
@@ -15,19 +15,19 @@ data PlayerWalkMovement = PlayerWalkMovement
     runEnergy :: Int,
     walkingDirection :: Direction,
     runningDirection :: Direction,
-    shouldUpdateRegion :: Bool,
+    hasChangedRegion :: Bool,
     lastRegionUpdate_ :: Position
   }
   deriving (Show)
 
-instance GetPosition PlayerWalkMovement where
+instance GetPosition PlayerMovement where
   getPosition = position_
 
 -- Running does two steps
-instance Advance PlayerWalkMovement where
+instance Advance PlayerMovement where
   advance m =
     case (queue_ m, isRunning m) of
-      ([], _) -> m {walkingDirection = None, runningDirection = None, isTeleporting = False, shouldUpdateRegion = False}
+      ([], _) -> m {walkingDirection = None, runningDirection = None, isTeleporting = False, hasChangedRegion = False}
       (x : xs, False) ->
         m
           { position_ = x,
@@ -35,7 +35,7 @@ instance Advance PlayerWalkMovement where
             isTeleporting = False,
             walkingDirection = directionBetween (toXY (position_ m)) (toXY x),
             runningDirection = None,
-            shouldUpdateRegion = shouldUpdateRegion_ (lastRegionUpdate_ m) x,
+            hasChangedRegion = shouldUpdateRegion_ (lastRegionUpdate_ m) x,
             lastRegionUpdate_ = if shouldUpdateRegion_ (lastRegionUpdate_ m) x then x else lastRegionUpdate_ m
           }
       (x : xs, True) ->
@@ -51,24 +51,24 @@ instance Advance PlayerWalkMovement where
             runningDirection = case xs of
               [] -> None
               (y : ys) -> directionBetween (toXY x) (toXY y),
-            shouldUpdateRegion = shouldUpdateRegion_ (lastRegionUpdate_ m) x,
+            hasChangedRegion = shouldUpdateRegion_ (lastRegionUpdate_ m) x,
             lastRegionUpdate_ = if shouldUpdateRegion_ (lastRegionUpdate_ m) x then x else lastRegionUpdate_ m
           }
 
-queueWalk :: PlayerWalkMovement -> PositionXY -> [WalkingStep] -> PlayerWalkMovement
+queueWalk :: PlayerMovement -> PositionXY -> [WalkingStep] -> PlayerMovement
 queueWalk current (PositionXY startX startY) steps =
   let start = (position_ current) {x = startX, y = startY}
    in current {queue_ = interpolatePath (position_ current : start : map (toPosition start) steps)}
 
-create :: Position -> PlayerWalkMovement
+create :: Position -> PlayerMovement
 create pos =
-  PlayerWalkMovement
+  PlayerMovement
     { position_ = pos,
       queue_ = [],
       isRunning = True,
       isTeleporting = True,
       runEnergy = 100,
-      shouldUpdateRegion = True,
+      hasChangedRegion = True,
       walkingDirection = None,
       runningDirection = None,
       lastRegionUpdate_ = pos
@@ -79,9 +79,19 @@ shouldUpdateRegion_ lastUpdate currentPos =
   let (deltaX, deltaY) = (x currentPos - chunkX lastUpdate * 8, y currentPos - chunkY lastUpdate * 8)
    in deltaX < 16 || deltaX >= 88 || deltaY < 16 || deltaY > 88
 
-isStopped :: PlayerWalkMovement -> Bool
+isStopped :: PlayerMovement -> Bool
 isStopped = null . queue_
 
-setPosition :: PlayerWalkMovement -> Position -> PlayerWalkMovement
+setPosition :: PlayerMovement -> Position -> PlayerMovement
 setPosition m pos =
-  m {position_ = pos, isTeleporting = True, shouldUpdateRegion = True, lastRegionUpdate_ = pos}
+  m {position_ = pos, isTeleporting = True, hasChangedRegion = True, lastRegionUpdate_ = pos}
+
+
+setRunning :: PlayerMovement -> Bool -> PlayerMovement
+setRunning m running =
+  m {isRunning = running}
+
+-- for scripts, set new position instantly
+immediatelyQueueMovement :: PlayerMovement -> [Position] -> PlayerMovement
+immediatelyQueueMovement m path =
+  m {queue_ = path}

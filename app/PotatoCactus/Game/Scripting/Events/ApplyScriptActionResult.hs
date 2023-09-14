@@ -15,7 +15,6 @@ import qualified PotatoCactus.Game.Entity.Npc.NpcMovement as NM
 import PotatoCactus.Game.Entity.Npc.RespawnStrategy (RespawnStrategy (Never), respawning)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (addDynamicObject, removeDynamicObject)
 import qualified PotatoCactus.Game.ItemContainer as ItemContainer
-import qualified PotatoCactus.Game.Movement.MovementEntity as PM
 import PotatoCactus.Game.Movement.PathPlanner (findPath, findPathNaive)
 import PotatoCactus.Game.Player (Player (interaction))
 import qualified PotatoCactus.Game.Player as P
@@ -29,6 +28,7 @@ import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAll, updateAtIndex)
 import PotatoCactus.Game.World.Selectors (isNpcAt)
 import PotatoCactus.Utils.Flow ((|>))
+import qualified PotatoCactus.Game.Movement.PlayerMovement as PM
 
 applyScriptResult :: World -> ScriptActionResult -> World
 applyScriptResult world (SpawnGameObject obj) =

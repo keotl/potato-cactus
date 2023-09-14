@@ -11,7 +11,6 @@ import PotatoCactus.Game.Entity.Interaction.State (InteractionState (..))
 import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (NpcTarget, ObjectTarget))
 import PotatoCactus.Game.Entity.Npc.Npc (Npc (definitionId))
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
-import PotatoCactus.Game.Entity.Npc.NpcMovement (doMovement)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, facingDirection))
 import PotatoCactus.Game.Message.RegisterClientPayload (RegisterClientPayload (player))
 import PotatoCactus.Game.Movement.PathPlanner (findPathNaive)
@@ -44,7 +43,8 @@ dispatchScriptEvent world (InternalNpcCannotReachCombatTargetEvent npc destinati
 dispatchScriptEvent world (InternalPlayerCannotReachCombatTargetEvent player destination) =
   case findPathNaive 666 (getPosition player) destination of
     [] -> return []
-    firstPathStep : _ -> return [PlayerQueueWalk (P.serverIndex player) firstPathStep]
+    firstPathStep : _ -> trace "should be trying to path" return []
+-- firstPathStep : _ -> return [PlayerQueueWalk (P.serverIndex player) firstPathStep]
 dispatchScriptEvent world (PlayerAttackEvent player target) =
   trace
     "dispatched attack event"

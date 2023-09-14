@@ -7,7 +7,6 @@ import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (findByChunkXY)
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as Object
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (objectType), gameObjectHash)
-import PotatoCactus.Game.Movement.MovementEntity (hasChangedRegion)
 import PotatoCactus.Game.Player (Player (movement))
 import PotatoCactus.Game.Position (GetPosition (getPosition), chunkX, chunkY)
 import qualified PotatoCactus.Game.Position as Pos
@@ -17,6 +16,7 @@ import PotatoCactus.Network.Packets.Out.ClearChunkObjectsPacket (clearChunksArou
 import PotatoCactus.Network.Packets.Out.RemoveObjectPacket (removeObjectPacket)
 import PotatoCactus.Network.Packets.Out.SetPlacementReferencePacket (setPlacementReferencePacket)
 import PotatoCactus.Utils.Flow ((|>))
+import PotatoCactus.Game.Movement.PlayerMovement (hasChangedRegion)
 
 encodeGameObjectUpdate :: [DynamicObject] -> World -> Player -> ([DynamicObject], ByteString)
 encodeGameObjectUpdate oldObjects world player =

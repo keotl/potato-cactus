@@ -20,8 +20,6 @@ import PotatoCactus.Game.Entity.Npc.Npc (Npc)
 import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject))
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload (ObjectClickPayload))
-import PotatoCactus.Game.Movement.MovementEntity (MovementEntity (PlayerWalkMovement_), hasChangedRegion)
-import PotatoCactus.Game.Movement.PlayerWalkMovement (PlayerWalkMovement (lastRegionUpdate_))
 import PotatoCactus.Game.Movement.PositionXY (fromXY, toXY)
 import PotatoCactus.Game.Player (Player (Player, equipment, interfaces, inventory, movement, serverIndex, username, varps))
 import qualified PotatoCactus.Game.Player as P
@@ -43,6 +41,7 @@ import PotatoCactus.Network.Packets.Out.SetVarpPacket (encodeVarps)
 import PotatoCactus.Network.Packets.Out.UpdateItemContainerPacket (updateItemContainerPacket)
 import PotatoCactus.Network.Packets.Out.UpdateRunEnergyPacket (updateRunEnergyPacket)
 import PotatoCactus.Utils.Logging (LogLevel (Error, Info), logger)
+import PotatoCactus.Game.Movement.PlayerMovement (hasChangedRegion)
 
 data ClientLocalState_ = ClientLocalState_
   { localPlayers :: LocalEntityList Player,

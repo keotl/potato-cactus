@@ -9,7 +9,6 @@ import qualified PotatoCactus.Game.Entity.Interaction.Target as InteractionTarge
 import qualified PotatoCactus.Game.Entity.Object.GameObject as GameObject
 import qualified PotatoCactus.Game.ItemContainer as ItemContainer
 import PotatoCactus.Game.Message.ItemOnObjectPayload (ItemOnObjectPayload (ItemOnObjectPayload))
-import qualified PotatoCactus.Game.Movement.MovementEntity as PM
 import PotatoCactus.Game.Player (Player (droppedItemIndices, interaction, movement, skipUpdate_), create)
 import qualified PotatoCactus.Game.Player as P
 import PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer)
@@ -17,6 +16,7 @@ import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (DropItem, Inte
 import PotatoCactus.Game.Position (Position (Position))
 import PotatoCactus.Utils.Flow ((|>))
 import Test.HUnit
+import qualified PotatoCactus.Game.Movement.PlayerMovement as PM
 
 advancePlayerTests :: Test
 advancePlayerTests =

@@ -33,7 +33,7 @@ initializeNpcDb = do
         foldl
           (\a e -> e a)
           db
-          [ addMockNpc_ 100 5 1
+          [ addMockNpc_ 100 20 1
           ]
   writeIORef npcDb updated
   return $ length updated

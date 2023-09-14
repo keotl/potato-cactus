@@ -1,10 +1,10 @@
 module PotatoCactus.Game.Interface.InterfaceButtonDispatch where
 
 import PotatoCactus.Game.Interface.InterfaceController (dispatchButtonClick)
-import qualified PotatoCactus.Game.Movement.MovementEntity as PM
 import PotatoCactus.Game.Player (PlayerIndex)
 import qualified PotatoCactus.Game.Player as P
 import PotatoCactus.Game.World (World, updatePlayerByIndex)
+import qualified PotatoCactus.Game.Movement.PlayerMovement as PM
 
 dispatchInterfaceButtonClick :: World -> PlayerIndex -> Int -> World
 dispatchInterfaceButtonClick world playerIndex 152 =
