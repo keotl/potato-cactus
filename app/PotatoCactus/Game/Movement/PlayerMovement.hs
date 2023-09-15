@@ -33,37 +33,8 @@ instance Advance PlayerMovement where
         isTeleporting = False,
         hasChangedRegion = False
       }
-      |> doStep_ False
-      |> if isRunning m then doStep_ True else id
-
--- case (queue_ m, isRunning m) of
---   ([], _) -> m {walkingDirection = None, runningDirection = None, isTeleporting = False, hasChangedRegion = False}
---   (x : xs, False) ->
---     m
---       { position_ = x,
---         queue_ = xs,
---         isTeleporting = False,
---         walkingDirection = directionBetween (toXY (position_ m)) (toXY x),
---         runningDirection = None,
---         hasChangedRegion = shouldUpdateRegion_ (lastRegionUpdate_ m) x,
---         lastRegionUpdate_ = if shouldUpdateRegion_ (lastRegionUpdate_ m) x then x else lastRegionUpdate_ m
---       }
---   (x : xs, True) ->
---     m
---       { position_ = case xs of
---           [] -> x
---           (y : ys) -> y,
---         queue_ = case xs of
---           [] -> []
---           (y : ys) -> ys,
---         isTeleporting = False,
---         walkingDirection = directionBetween (toXY (position_ m)) (toXY x),
---         runningDirection = case xs of
---           [] -> None
---           (y : ys) -> directionBetween (toXY x) (toXY y),
---         hasChangedRegion = shouldUpdateRegion_ (lastRegionUpdate_ m) x,
---         lastRegionUpdate_ = if shouldUpdateRegion_ (lastRegionUpdate_ m) x then x else lastRegionUpdate_ m
---       }
+      |> doStep_ (isRunning m)
+      |> doStep_ (isRunning m)
 
 doStep_ :: Bool -> PlayerMovement -> PlayerMovement
 doStep_ False m =
@@ -73,19 +44,19 @@ doStep_ False m =
         { position_ = x,
           queue_ = xs,
           walkingDirection = directionBetween (toXY (position_ m)) (toXY x),
-          hasChangedRegion = shouldUpdateRegion_ (lastRegionUpdate_ m) x,
+          hasChangedRegion = hasChangedRegion m || shouldUpdateRegion_ (lastRegionUpdate_ m) x,
           lastRegionUpdate_ = if shouldUpdateRegion_ (lastRegionUpdate_ m) x then x else lastRegionUpdate_ m
         }
     _ -> m
 doStep_ True m =
   case (walkingDirection m, runningDirection m, queue_ m) of
-    (None, _, _) -> doStep_ False m
+    (None, _, _) -> m |> doStep_ False
     (_, None, x : xs) ->
       m
         { position_ = x,
           queue_ = xs,
           runningDirection = directionBetween (toXY (position_ m)) (toXY x),
-          hasChangedRegion = shouldUpdateRegion_ (lastRegionUpdate_ m) x,
+          hasChangedRegion = hasChangedRegion m || shouldUpdateRegion_ (lastRegionUpdate_ m) x,
           lastRegionUpdate_ = if shouldUpdateRegion_ (lastRegionUpdate_ m) x then x else lastRegionUpdate_ m
         }
     _ -> m
@@ -135,8 +106,8 @@ immediatelyQueueMovement current path =
   if isValidPath_ (position_ current : path)
     then
       current {queue_ = path}
-        |> (\m -> if canMoveThisTick_ m then doStep_ (isRunning m) m else m)
-        |> (\m -> if canMoveThisTick_ m then doStep_ (isRunning m) m else m)
+        |> (\m -> doStep_ (isRunning m) m)
+        |> (\m -> doStep_ (isRunning m) m)
     else current
 
 isValidPath_ :: [Position] -> Bool
@@ -148,8 +119,3 @@ isValidPath_ (firstPos : otherPos) =
        in let dy = (y secondPos - y firstPos)
            in abs dx <= 1 && abs dy <= 1
 
-canMoveThisTick_ :: PlayerMovement -> Bool
-canMoveThisTick_ PlayerMovement {isRunning = False, walkingDirection = None} = True
-canMoveThisTick_ PlayerMovement {isRunning = True, walkingDirection = None} = True
-canMoveThisTick_ PlayerMovement {isRunning = True, runningDirection = None} = True
-canMoveThisTick_ _ = False

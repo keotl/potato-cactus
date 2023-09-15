@@ -106,12 +106,12 @@ playerMovementTests =
         ),
       TestCase
         ( assertEqual
-            "queueWalk corrects walking steps with a dx or dy larger than 1"
-            (pos {x = 101})
-            ( movement
-                |> (\m -> queueWalk m (PositionXY 100 100) [WalkingStep 10 0])
+            "queueWalk interpolates paths with large walking step"
+            (pos {x = 102}, [pos {x = 103}, pos {x = 104}, pos {x = 105}])
+            ( movement {isRunning = True}
+                |> (\m -> queueWalk m (PositionXY 100 100) [WalkingStep 5 0])
                 |> advance
-                |> getPosition
+                |> (\m -> (getPosition m, queue_ m))
             )
         )
     ]
