@@ -25,6 +25,7 @@ import Game.ApplyActions.RemoveGroundItemActionTests (removeGroundItemActionTest
 import Game.Combat.LocateCombatTargetTests (locateCombatTargetTests)
 import Game.Combat.AdvanceCombatEntityTests (advanceCombatEntityTests)
 import Game.Entity.Npc.NpcMovementTests (npcMovementTests)
+import Game.Player.PlayerMovementTests (playerMovementTests)
 
 tests =
   TestList
@@ -61,7 +62,8 @@ tests =
       removeGroundItemActionTests,
       locateCombatTargetTests,
       advanceCombatEntityTests,
-      npcMovementTests
+      npcMovementTests,
+      playerMovementTests
     ]
 
 main :: IO ()
