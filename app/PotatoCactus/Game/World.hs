@@ -64,7 +64,7 @@ instance Advance World where
             (advanceNpc (createAdvanceCombatDeps_ w))
      in w
           { tick = tick w + 1,
-            players = updateAll (players w) (advancePlayer (createAdvanceInteractionDeps_ w) (createAdvanceCombatDeps_ w)),
+            players = updateAll (players w) (advancePlayer (createAdvanceInteractionDeps_ w {npcs = newNpcs}) (createAdvanceCombatDeps_ w {npcs = newNpcs})),
             npcs = removeByPredicate newNpcs shouldDiscard,
             groundItems = GroundItemCollection.advanceTime (groundItems w) (tick w + 1),
             triggeredEvents = pendingEvents_ w ++ invokedScripts_ w,

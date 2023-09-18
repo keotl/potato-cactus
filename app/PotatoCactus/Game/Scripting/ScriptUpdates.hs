@@ -62,6 +62,6 @@ data ScriptActionResult
   | InternalNoop
   | ServerPrintMessage String -- for testing
   | InternalSetPlayerInteractionPending PlayerIndex
-  | -- | InternalPlayerMoveTowardsCombatTarget PlayerIndex
-    PlayerQueueWalk PlayerIndex Position
+  | PlayerQueueWalk PlayerIndex Position
+  | InternalPlayerQueueWalkPath PlayerIndex [Position]
   deriving (Show)

@@ -16,6 +16,7 @@ import PotatoCactus.Game.Entity.Npc.RespawnStrategy (RespawnStrategy (Never), re
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (addDynamicObject, removeDynamicObject)
 import qualified PotatoCactus.Game.ItemContainer as ItemContainer
 import PotatoCactus.Game.Movement.PathPlanner (findPath, findPathNaive)
+import qualified PotatoCactus.Game.Movement.PlayerMovement as PM
 import PotatoCactus.Game.Player (Player (interaction))
 import qualified PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions as PAnim
@@ -28,7 +29,6 @@ import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAll, updateAtIndex)
 import PotatoCactus.Game.World.Selectors (isNpcAt)
 import PotatoCactus.Utils.Flow ((|>))
-import qualified PotatoCactus.Game.Movement.PlayerMovement as PM
 
 applyScriptResult :: World -> ScriptActionResult -> World
 applyScriptResult world (SpawnGameObject obj) =
@@ -223,6 +223,21 @@ applyScriptResult world (PlayerQueueWalk playerIndex targetPos) =
                     PM.immediatelyQueueMovement
                       (P.movement player)
                       (findPath 666 (getPosition player) targetPos)
+                }
+          )
+    }
+applyScriptResult world (InternalPlayerQueueWalkPath playerIndex path) =
+  world
+    { players =
+        updateAtIndex
+          (W.players world)
+          playerIndex
+          ( \player ->
+              player
+                { P.movement =
+                    PM.immediatelyQueueMovement
+                      (P.movement player)
+                      path
                 }
           )
     }

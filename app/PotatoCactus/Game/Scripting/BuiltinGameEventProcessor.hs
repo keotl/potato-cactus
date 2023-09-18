@@ -42,9 +42,12 @@ dispatchScriptEvent world (InternalNpcCannotReachCombatTargetEvent npc destinati
     firstPathStep : _ -> return [NpcQueueWalk (NPC.serverIndex npc) firstPathStep]
 dispatchScriptEvent world (InternalPlayerCannotReachCombatTargetEvent player destination) =
   case findPathNaive 666 (getPosition player) destination of
-    [] -> return []
-    firstPathStep : _ -> trace "should be trying to path" return []
--- firstPathStep : _ -> return [PlayerQueueWalk (P.serverIndex player) firstPathStep]
+    [] ->
+      return
+        [ ClearPlayerInteraction (serverIndex player),
+          SendMessage (serverIndex player) "I can't reach that."
+        ]
+    path -> return [InternalPlayerQueueWalkPath (P.serverIndex player) path]
 dispatchScriptEvent world (PlayerAttackEvent player target) =
   trace
     "dispatched attack event"
