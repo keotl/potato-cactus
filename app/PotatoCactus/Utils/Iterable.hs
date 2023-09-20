@@ -9,6 +9,11 @@ replace predicate replacement (x : xs) =
 
 replaceAtIndex :: Int -> t -> [t] -> [t]
 replaceAtIndex _ _ [] = []
-replaceAtIndex 0 a (x : xs) = a : xs
-replaceAtIndex i a (x : xs) =
-  x : replaceAtIndex (i - 1) a xs
+replaceAtIndex index replacement old =
+  let (x, _ : ys) = splitAt index old
+   in x ++ replacement : ys
+
+alterAtIndex :: Int -> (t -> t) -> [t] -> [t]
+alterAtIndex index transform old =
+  let (x, oldValue : ys) = splitAt index old
+   in x ++ transform oldValue : ys

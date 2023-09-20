@@ -1,4 +1,4 @@
-module PotatoCactus.Game.Movement.PathPlanner (findPath, findPathNaive, CollisionMap) where
+module PotatoCactus.Game.Movement.Pathing.PathPlanner (findPath, findPathNaive, CollisionMap) where
 
 import PotatoCactus.Game.Movement.InterpolatePath (interpolatePath)
 import PotatoCactus.Game.Position (Position (Position, x, y, z))

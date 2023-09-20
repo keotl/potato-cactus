@@ -150,7 +150,9 @@ executable potato-cactus
                    PotatoCactus.Game.Movement.Direction
                    PotatoCactus.Game.Movement.InterpolatePath
                    PotatoCactus.Game.Movement.PlayerMovement
-                   PotatoCactus.Game.Movement.PathPlanner
+                   PotatoCactus.Game.Movement.Pathing.CollisionMap
+                   PotatoCactus.Game.Movement.Pathing.MovementFlags
+                   PotatoCactus.Game.Movement.Pathing.PathPlanner
                    PotatoCactus.Game.Movement.PositionXY
                    PotatoCactus.Game.Movement.StaticMovement
                    PotatoCactus.Game.Movement.WalkingStep

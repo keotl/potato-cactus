@@ -26,6 +26,7 @@ import Game.Combat.LocateCombatTargetTests (locateCombatTargetTests)
 import Game.Combat.AdvanceCombatEntityTests (advanceCombatEntityTests)
 import Game.Entity.Npc.NpcMovementTests (npcMovementTests)
 import Game.Player.PlayerMovementTests (playerMovementTests)
+import Game.Movement.Pathing.CollisionMapTests (collisionMapTests)
 
 tests =
   TestList
@@ -63,7 +64,8 @@ tests =
       locateCombatTargetTests,
       advanceCombatEntityTests,
       npcMovementTests,
-      playerMovementTests
+      playerMovementTests,
+      collisionMapTests
     ]
 
 main :: IO ()

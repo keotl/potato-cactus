@@ -10,7 +10,7 @@ import PotatoCactus.Game.Entity.Npc.Npc (Npc (..))
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Npc.NpcMovement (create, immediatelyQueueMovement)
 import PotatoCactus.Game.Entity.Npc.RespawnStrategy (restart, tryRespawn)
-import PotatoCactus.Game.Movement.PathPlanner (CollisionMap, findPath)
+import PotatoCactus.Game.Movement.Pathing.PathPlanner (CollisionMap, findPath)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position), faraway, isAdjacent, isWithin)
 import PotatoCactus.Game.Typing (IsEntityActive (isEntityActive), advance)
 import PotatoCactus.Game.World.MobList (findByIndex)

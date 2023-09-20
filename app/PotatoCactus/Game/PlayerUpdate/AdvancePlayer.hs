@@ -10,7 +10,7 @@ import PotatoCactus.Game.Entity.Interaction.State (InteractionState (PendingPath
 import PotatoCactus.Game.Entity.Interaction.Target (InteractionTarget (NpcTarget))
 import PotatoCactus.Game.Entity.Npc.Npc (Npc, NpcIndex)
 import PotatoCactus.Game.ItemContainer (ItemContainer (updated))
-import PotatoCactus.Game.Movement.PathPlanner (findPathNaive)
+import PotatoCactus.Game.Movement.Pathing.PathPlanner (findPathNaive)
 import PotatoCactus.Game.Movement.PlayerMovement (isStopped)
 import PotatoCactus.Game.Player (Player (..))
 import PotatoCactus.Game.PlayerUpdate.ProcessPlayerUpdate (processPlayerUpdate)
