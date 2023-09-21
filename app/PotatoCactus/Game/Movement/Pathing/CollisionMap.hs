@@ -1,79 +1,38 @@
-module PotatoCactus.Game.Movement.Pathing.CollisionMap (CollisionMap, create, getTileFlags, setTileFlags) where
+module PotatoCactus.Game.Movement.Pathing.CollisionMap (CollisionMap, create, markSolidOccupant) where
 
-import Data.Binary (Word64, Word8)
-import Data.Bits (Bits (complement, shiftR, (.&.), (.|.)), shiftL)
-import qualified Data.IntMap as IntMap
-import Data.Maybe (fromMaybe)
-import PotatoCactus.Game.Position (Position (x, y, z))
-import PotatoCactus.Utils.Iterable (alterAtIndex, replaceAtIndex)
-
-type TileFlags = Word8
-
-type TileContainer = Word64
-
-type RegionMap = [TileContainer]
+import PotatoCactus.Game.Movement.Pathing.MovementFlags (blocksAllMovement)
+import qualified PotatoCactus.Game.Movement.Pathing.TileFlagsMap as TileFlagsMap
+import PotatoCactus.Game.Position (Position (Position, x, y, z))
 
 data CollisionMap = CollisionMap
-  { regions :: IntMap.IntMap (RegionMap)
+  { tiles_ :: TileFlagsMap.TileFlagsMap
   }
-  deriving (Show, Eq)
 
 create :: CollisionMap
-create = CollisionMap IntMap.empty
+create = CollisionMap TileFlagsMap.create
 
-getTileFlags :: Position -> CollisionMap -> TileFlags
-getTileFlags pos collisionMap =
-  case regions collisionMap IntMap.!? regionKey pos of
-    Nothing -> 0
-    Just regionMap -> getTileInContainer pos (regionMap !! regionMapOffset (x pos) (y pos))
+markSolidOccupant :: (Position, (Int, Int), Int) -> CollisionMap -> CollisionMap
+markSolidOccupant obj collisionMap =
+  foldl
+    (flip markSolidTile)
+    collisionMap
+    (occupiedTiles obj)
 
-setTileFlags :: TileFlags -> Position -> CollisionMap -> CollisionMap
-setTileFlags flags pos collisionMap =
-  collisionMap
-    { regions =
-        IntMap.alter
-          ( Just
-              . alterAtIndex
-                (regionMapOffset (x pos) (y pos))
-                (setTileInContainer flags pos)
-              . fromMaybe emptyRegionMap
-          )
-          (regionKey pos)
-          (regions collisionMap)
-    }
+occupiedTiles :: (Position, (Int, Int), Int) -> [Position]
+occupiedTiles (pos, dimensions, facing) =
+  [Position i j (z pos) | i <- xRange pos dimensions facing, j <- yRange pos dimensions facing]
 
-regionKey :: Position -> Int
-regionKey pos =
-  (x pos `div` 64) + ((y pos `div` 64) * 1000) + (z pos * 1000000)
+xRange :: Position -> (Int, Int) -> Int -> [Int]
+xRange originPos (width, height) 0 = [x originPos .. x originPos + width - 1]
+xRange originPos (width, height) 1 = [x originPos .. x originPos + height - 1]
+xRange originPos (width, height) facing = xRange originPos (width, height) (facing `mod` 2)
 
-setTileInContainer :: TileFlags -> Position -> TileContainer -> TileContainer
-setTileInContainer updated pos old =
-  let offset = tileContainerOffset (x pos) (y pos)
-   in let withZeroed = old .&. complement (tileContainerMask offset)
-       in old .|. (toWord64 updated `shiftL` (offset * 8))
+yRange :: Position -> (Int, Int) -> Int -> [Int]
+yRange originPos (width, height) 0 = [y originPos .. y originPos + height - 1]
+yRange originPos (width, height) 1 = [y originPos .. y originPos + width - 1]
+yRange originPos (width, height) facing = yRange originPos (width, height) (facing `mod` 2)
 
-getTileInContainer :: Position -> TileContainer -> TileFlags
-getTileInContainer pos container =
-  let offset = tileContainerOffset (x pos) (y pos)
-   in toWord8 ((container .&. tileContainerMask offset) `shiftR` (offset * 8))
+markSolidTile :: Position -> CollisionMap -> CollisionMap
+markSolidTile pos CollisionMap {tiles_ = tiles} =
+  CollisionMap {tiles_ = TileFlagsMap.setTileFlags blocksAllMovement pos tiles}
 
-emptyRegionMap :: RegionMap
-emptyRegionMap = [0 | i <- [1 .. 512]]
-
-regionMapOffset :: Int -> Int -> Int
-regionMapOffset posX posY =
-  ((posX `mod` 64) * 64 + (posY `mod` 64)) `div` 8
-
-tileContainerOffset :: Int -> Int -> Int
-tileContainerOffset posX posY =
-  ((posX `mod` 64) * 64 + (posY `mod` 64)) `mod` 8
-
-tileContainerMask :: Int -> Word64
-tileContainerMask offset =
-  255 `shiftL` (8 * offset)
-
-toWord64 :: Word8 -> Word64
-toWord64 = fromIntegral
-
-toWord8 :: Word64 -> Word8
-toWord8 = fromIntegral

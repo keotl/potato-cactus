@@ -28,3 +28,6 @@ blocksMovementSW = 7
 
 blocksMovementW :: Word8
 blocksMovementW = 8
+
+blocksAllMovement :: Word8
+blocksAllMovement = 255
