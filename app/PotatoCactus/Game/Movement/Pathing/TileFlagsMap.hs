@@ -1,4 +1,4 @@
-module PotatoCactus.Game.Movement.Pathing.TileFlagsMap (TileFlagsMap, create, getTileFlags, setTileFlags) where
+module PotatoCactus.Game.Movement.Pathing.TileFlagsMap (TileFlagsMap, create, getTileFlags, setTileFlags, alterTileFlags) where
 
 import Data.Binary (Word64, Word8)
 import Data.Bits (Bits (complement, shiftR, (.&.), (.|.)), shiftL)
@@ -41,6 +41,11 @@ setTileFlags flags pos collisionMap =
           (regionKey pos)
           (regions collisionMap)
     }
+
+alterTileFlags :: (TileFlags -> TileFlags) -> Position -> TileFlagsMap -> TileFlagsMap
+alterTileFlags transform pos collisionMap =
+  let old = getTileFlags pos collisionMap
+   in setTileFlags (transform old) pos collisionMap
 
 regionKey :: Position -> Int
 regionKey pos =
