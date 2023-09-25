@@ -49,7 +49,7 @@ collisionMapTests =
       TestCase
         ( assertEqual
             "marks flat wall tile blocking direction and diagonals"
-            -- x x x   tiles blocked by wall
+            -- \ x /   tiles blocked by wall
             -- . - .   wall facing N
             [
               {- first row -}  blocksMovementSE, blocksMovementSW .|. blocksMovementS .|. blocksMovementSE, blocksMovementSW,

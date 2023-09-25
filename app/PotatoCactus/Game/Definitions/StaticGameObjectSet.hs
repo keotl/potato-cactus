@@ -58,7 +58,6 @@ objectAt collection pos objType =
 
 allEntries :: StaticGameObjectSet -> [GameObject]
 allEntries staticObjects =
-  -- TODO - Probably worth removing  - keotl 2023-09-04
   concatMap snd (IntMap.toList . elements_ $ staticObjects)
 
 type FindStaticObjectById = Position -> GameObjectId -> Maybe GameObject

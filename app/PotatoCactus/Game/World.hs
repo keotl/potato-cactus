@@ -19,6 +19,8 @@ import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCol
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as DynamicObjectCollection
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload)
+import qualified PotatoCactus.Game.Movement.Pathing.CollisionMap as CollisionMap
+import qualified PotatoCactus.Game.Movement.Pathing.TileFlagsMap as TileFlagsMap
 import PotatoCactus.Game.Player (PlayerIndex)
 import qualified PotatoCactus.Game.Player as P (Player (serverIndex), create, username)
 import PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer)
@@ -52,6 +54,7 @@ data World = World
     triggeredEvents :: [GameEvent], -- Additional events to dispatch on this tick. For events not tied to a specific entity.
     pendingEvents_ :: [GameEvent], -- Additional events to dispatch on the next tick.
     scheduler :: CallbackScheduler,
+    collisionMap :: CollisionMap.CollisionMap,
     staticObjectLookup_ :: StaticObject.FindStaticObjectById
   }
   deriving (Show)
@@ -107,6 +110,7 @@ defaultWorldValue =
       triggeredEvents = [],
       pendingEvents_ = [],
       scheduler = Scheduler.create,
+      collisionMap = TileFlagsMap.create,
       staticObjectLookup_ = \_ _ -> Nothing
     }
 
