@@ -1,6 +1,6 @@
 module PotatoCactus.Game.Scripting.BuiltinGameEventProcessor where
 
-import Data.Maybe (isJust, fromJust)
+import Data.Maybe (fromJust, isJust)
 import Debug.Trace (trace)
 import qualified PotatoCactus.Game.Combat.CombatEntity as Combat
 import PotatoCactus.Game.Combat.Hit (DamageType (MeleeAttack), Hit (Hit))
@@ -40,11 +40,11 @@ dispatchScriptEvent world (InternalPlayerInteractionPendingPathingEvent player t
           PlayerQueueWalk (serverIndex player) newTargetPos
         ]
 dispatchScriptEvent world (InternalNpcCannotReachCombatTargetEvent npc destination) =
-  case findPathNaive 666 (getPosition npc) destination of
+  trace "pathing for npc" $ case findPathNaive (W.collisionMap world) (getPosition npc) destination of
     [] -> return []
-    firstPathStep : _ -> return [NpcQueueWalk (NPC.serverIndex npc) firstPathStep]
+    path -> return [InternalNpcQueueWalkPath (NPC.serverIndex npc) path]
 dispatchScriptEvent world (InternalPlayerCannotReachCombatTargetEvent player destination) =
-  case findPathNaive 666 (getPosition player) destination of
+  case findPathNaive (W.collisionMap world) (getPosition player) destination of
     [] ->
       return
         [ ClearPlayerInteraction (serverIndex player),

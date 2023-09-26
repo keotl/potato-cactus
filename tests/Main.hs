@@ -28,6 +28,7 @@ import IterableTests (testReplaceAt)
 import MobListTests (testMobList)
 import Test.HUnit
 import Game.Movement.Pathing.CollisionMapTests (collisionMapTests)
+import Game.Movement.Pathing.PathPlannerTests (pathPlannerTests)
 
 tests =
   TestList
@@ -67,7 +68,8 @@ tests =
       npcMovementTests,
       playerMovementTests,
       tileFlagsMapTests,
-      collisionMapTests
+      collisionMapTests,
+      pathPlannerTests
     ]
 
 main :: IO ()

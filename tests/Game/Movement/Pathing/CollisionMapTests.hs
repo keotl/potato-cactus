@@ -1,12 +1,12 @@
 module Game.Movement.Pathing.CollisionMapTests where
 
-import PotatoCactus.Game.Movement.Pathing.CollisionMap (CollisionMap, markSolidOccupant, markFlatWall)
-import PotatoCactus.Game.Movement.Pathing.MovementFlags (allowsFullMovement, blocksAllMovement, blocksMovementSE, blocksMovementS, blocksMovementSW, blocksMovementNW, blocksMovementN, blocksMovementNE)
+import Data.Bits ((.|.))
+import PotatoCactus.Game.Movement.Pathing.CollisionMap (CollisionMap, allowsMovementBetween, markFlatWall, markSolidOccupant)
+import PotatoCactus.Game.Movement.Pathing.MovementFlags (allowsFullMovement, blocksAllMovement, blocksMovementN, blocksMovementNE, blocksMovementNW, blocksMovementS, blocksMovementSE, blocksMovementSW)
 import qualified PotatoCactus.Game.Movement.Pathing.TileFlagsMap as TileFlagsMap
 import PotatoCactus.Game.Position (Position (Position), x, y)
 import PotatoCactus.Utils.Flow ((|>))
 import Test.HUnit
-import Data.Bits ((.|.))
 
 collisionMapTests :: Test
 collisionMapTests =
@@ -51,20 +51,30 @@ collisionMapTests =
             "marks flat wall tile blocking direction and diagonals"
             -- \ x /   tiles blocked by wall
             -- . - .   wall facing N
-            [
-              {- first row -}  blocksMovementSE, blocksMovementSW .|. blocksMovementS .|. blocksMovementSE, blocksMovementSW,
-              {- second row -} blocksMovementNE, blocksMovementNW .|. blocksMovementN .|. blocksMovementNE, blocksMovementNW
-            ]
+            [ {- first row -} blocksMovementSE, blocksMovementSW .|. blocksMovementS .|. blocksMovementSE,blocksMovementSW,
+              {- second row -} blocksMovementNE, blocksMovementNW .|. blocksMovementN .|. blocksMovementNE, blocksMovementNW]
             ( collisionMap
                 |> markFlatWall pos 1
                 |> ( \colMap ->
                        map
                          (`TileFlagsMap.getTileFlags` colMap)
-                         [
-                           pos {x = 99, y = 101}, pos { y = 101}, pos {x = 101, y = 101},
-                           pos {x = 99}, pos, pos {x = 101}
+                         [ pos {x = 99, y = 101},
+                           pos {y = 101},
+                           pos {x = 101, y = 101},
+                           pos {x = 99},
+                           pos,
+                           pos {x = 101}
                          ]
                    )
+            )
+        ),
+      TestCase
+        ( assertEqual
+            "allowsMovementBetween checks movement flags between two positions"
+            False
+            ( collisionMap
+                |> markFlatWall pos 1
+                |> allowsMovementBetween pos (pos {y = 101})
             )
         )
     ]

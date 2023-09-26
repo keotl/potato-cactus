@@ -64,4 +64,5 @@ data ScriptActionResult
   | InternalSetPlayerInteractionPending PlayerIndex
   | PlayerQueueWalk PlayerIndex Position
   | InternalPlayerQueueWalkPath PlayerIndex [Position]
+  | InternalNpcQueueWalkPath NpcIndex [Position]
   deriving (Show)

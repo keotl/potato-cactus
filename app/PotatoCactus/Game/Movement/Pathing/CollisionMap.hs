@@ -1,8 +1,13 @@
-module PotatoCactus.Game.Movement.Pathing.CollisionMap (CollisionMap, markSolidOccupant, markSolidTile, markFlatWall) where
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
-import Data.Bits ((.|.))
+module PotatoCactus.Game.Movement.Pathing.CollisionMap (CollisionMap, markSolidOccupant, markSolidTile, markFlatWall, allowsMovementBetween) where
+
+import Data.Binary (Word8)
+import Data.Bits (Bits ((.&.)), (.|.))
+import qualified PotatoCactus.Game.Movement.Direction as Direction
 import PotatoCactus.Game.Movement.Pathing.MovementFlags (blocksAllMovement, blocksMovementE, blocksMovementN, blocksMovementNE, blocksMovementNW, blocksMovementS, blocksMovementSE, blocksMovementSW, blocksMovementW)
 import qualified PotatoCactus.Game.Movement.Pathing.TileFlagsMap as TileFlagsMap
+import PotatoCactus.Game.Movement.PositionXY (toXY)
 import PotatoCactus.Game.Position (Position (Position, x, y, z))
 import PotatoCactus.Utils.Flow ((|>))
 
@@ -91,3 +96,35 @@ markFlatWall pos 3 collisionMap =
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementNW) pos {y = y pos - 1}
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementSE) pos {x = x pos - 1}
 markFlatWall _ _ c = c
+
+allowsMovementBetween :: Position -> Position -> CollisionMap -> Bool
+allowsMovementBetween origin destination collisionMap =
+  let originTileFlags = TileFlagsMap.getTileFlags origin collisionMap
+   in let destinationTileFlags = TileFlagsMap.getTileFlags destination collisionMap
+       in (originTileFlags .&. directionFlag_ origin destination) == 0
+            && (destinationTileFlags .&. directionFlag_ destination origin) == 0
+            && not (isDiagonalAcrossSolidObject_ origin destination collisionMap) -- TODO - We should instead mark all neighbouring tiles of solid occupant for consistency  - keotl 2023-09-25
+
+isDiagonalAcrossSolidObject_ :: Position -> Position -> CollisionMap -> Bool
+isDiagonalAcrossSolidObject_ a b collisionMap =
+  any
+    ((== blocksAllMovement) . (`TileFlagsMap.getTileFlags` collisionMap))
+    (traversedDiagonalTiles_ a b)
+
+traversedDiagonalTiles_ :: Position -> Position -> [Position]
+traversedDiagonalTiles_ a b =
+  let (dx, dy) = (x b - x a, y b - y a)
+   in [a {x = x a + dx}, a {y = y a + dy}]
+
+directionFlag_ :: Position -> Position -> Word8
+directionFlag_ a b =
+  case Direction.directionBetween (toXY a) (toXY b) of
+    Direction.NorthWest -> blocksMovementNW
+    Direction.North -> blocksMovementN
+    Direction.NorthEast -> blocksMovementNE
+    Direction.West -> blocksMovementW
+    Direction.East -> blocksMovementE
+    Direction.SouthWest -> blocksMovementSW
+    Direction.South -> blocksMovementS
+    Direction.SouthEast -> blocksMovementSE
+    _ -> blocksAllMovement

@@ -96,7 +96,7 @@ applyScriptResult world (NpcQueueWalk npcIndex pos) =
                 { NPC.movement =
                     NM.immediatelyQueueMovement
                       (NPC.movement npc)
-                      (findPath 666 (getPosition npc) pos)
+                      (findPathNaive (W.collisionMap world) (getPosition npc) pos)
                 }
           )
     }
@@ -222,7 +222,7 @@ applyScriptResult world (PlayerQueueWalk playerIndex targetPos) =
                 { P.movement =
                     PM.immediatelyQueueMovement
                       (P.movement player)
-                      (findPath 666 (getPosition player) targetPos)
+                      (findPath (W.collisionMap world) (getPosition player) targetPos)
                 }
           )
     }
@@ -237,6 +237,21 @@ applyScriptResult world (InternalPlayerQueueWalkPath playerIndex path) =
                 { P.movement =
                     PM.immediatelyQueueMovement
                       (P.movement player)
+                      path
+                }
+          )
+    }
+applyScriptResult world (InternalNpcQueueWalkPath npcIndex path) =
+  world
+    { npcs =
+        updateAtIndex
+          (W.npcs world)
+          npcIndex
+          ( \npc ->
+              npc
+                { NPC.movement =
+                    NM.immediatelyQueueMovement
+                      (NPC.movement npc)
                       path
                 }
           )
