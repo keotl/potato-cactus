@@ -17,3 +17,10 @@ xdg-open potato-cactus.pdf
 ```
 
 https://downloads.haskell.org/~ghc/7.2.1/docs/html/users_guide/prof-heap.html
+
+## With CPU profiling
+```
+cabal run potato-cactus -- +RTS -pj
+```
+
+load the .prof file into https://www.speedscope.app/

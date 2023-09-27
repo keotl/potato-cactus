@@ -224,7 +224,8 @@ executable potato-cactus
       -Werror
       -fwarn-incomplete-patterns
       -O3
-      -threaded
+      -- -threaded
+      -- -rtsopts
 
 test-suite tests
     type: exitcode-stdio-1.0
