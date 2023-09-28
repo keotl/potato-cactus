@@ -1,6 +1,5 @@
 module PotatoCactus.Game.Movement.Pathing.PathPlanner (findPath, findPathNaive, CollisionMap) where
 
-import Debug.Trace (trace)
 import PotatoCactus.Game.Movement.InterpolatePath (interpolatePath)
 import PotatoCactus.Game.Movement.Pathing.CollisionMap (CollisionMap)
 import qualified PotatoCactus.Game.Movement.Pathing.CollisionMap as CollisionMap
@@ -24,7 +23,7 @@ findPathNaive collisionMap a b =
 
 pickWhilePathingIsAllowed_ :: CollisionMap -> Position -> Position -> [Position]
 pickWhilePathingIsAllowed_ collisionMap a b =
-  case pickAllowedStep_ collisionMap a (trace (show (preferredStepAlongDominantDirection_ a b)) (preferredStepAlongDominantDirection_ a b)) of
+  case pickAllowedStep_ collisionMap a (preferredStepAlongDominantDirection_ a b) of
     Nothing -> []
     Just step -> step : pickWhilePathingIsAllowed_ collisionMap step b
 

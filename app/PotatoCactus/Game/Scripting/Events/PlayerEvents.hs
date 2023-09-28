@@ -8,8 +8,10 @@ import qualified PotatoCactus.Game.Entity.Interaction.Interaction as Interaction
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (InProgress, PendingPathing))
 import qualified PotatoCactus.Game.Interface.InterfaceController as IC
 import qualified PotatoCactus.Game.ItemContainer as ItemContainer
+import qualified PotatoCactus.Game.Movement.PlayerMovement as PM
 import PotatoCactus.Game.Player (Player (Player, combat, interaction, interfaces))
 import qualified PotatoCactus.Game.Player as P
+import PotatoCactus.Game.Position (GetPosition (getPosition))
 import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (DropItemEvent, InternalPlayerCannotReachCombatTargetEvent, InternalPlayerInteractionPendingPathingEvent, PlayerAttackEvent, PlayerInteractionEvent, ScriptInvokedEvent), ScriptActionResult (InternalNoop))
 
 createPlayerEvents :: Player -> [GameEvent]
@@ -33,11 +35,14 @@ interactionEvent_ p =
 
 combatEvents_ :: Player -> [GameEvent]
 combatEvents_ player =
-  map (mapCombatAction_ player) (Combat.pendingActions . combat $ player)
+  mapMaybe (mapCombatAction_ player) (Combat.pendingActions . combat $ player)
 
-mapCombatAction_ :: Player -> Combat.CombatAction -> GameEvent
-mapCombatAction_ player (Combat.MoveTowardsTarget destination) = InternalPlayerCannotReachCombatTargetEvent player destination
-mapCombatAction_ player Combat.AttackTarget = PlayerAttackEvent player (Combat.target . combat $ player)
+mapCombatAction_ :: Player -> Combat.CombatAction -> Maybe GameEvent
+mapCombatAction_ player (Combat.MoveTowardsTarget destination) =
+  if (PM.isStopped . P.movement $ player) && getPosition player /= destination
+    then Just $ InternalPlayerCannotReachCombatTargetEvent player destination
+    else Nothing
+mapCombatAction_ player Combat.AttackTarget = Just $ PlayerAttackEvent player (Combat.target . combat $ player)
 
 interfaceEvents_ :: Player -> [GameEvent]
 interfaceEvents_ Player {interfaces = ic} =
