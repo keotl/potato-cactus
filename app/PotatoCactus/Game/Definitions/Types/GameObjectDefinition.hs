@@ -9,6 +9,7 @@ data GameObjectDefinition = GameObjectDefinition
     wall :: Bool,
     walkable :: Bool,
     solid :: Bool,
-    face :: Int
+    face :: Int,
+    hasActions :: Bool
   }
   deriving (Show)

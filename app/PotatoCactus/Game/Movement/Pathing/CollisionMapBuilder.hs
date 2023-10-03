@@ -14,12 +14,27 @@ buildCollisionMap = foldl processObject_ TileFlagsMap.create
 processObject_ :: CollisionMap -> GameObject -> CollisionMap
 processObject_ collisionMap obj =
   case GameObject.objectType obj of
-    0 -> markFlatWall (getPosition obj) (facingDirection obj) collisionMap
-    10 -> markSolidOccupant (getPosition obj, dimensions_ obj, facingDirection obj) collisionMap
+    0 -> processFlatWall_ collisionMap obj
+    10 -> processInteractable_ collisionMap obj
     _ -> collisionMap
 
-dimensions_ :: GameObject -> (Int, Int)
-dimensions_ obj =
+processFlatWall_ :: CollisionMap -> GameObject -> CollisionMap
+processFlatWall_ collisionMap obj =
   case objectDefinition (GameObject.id obj) of
-    Nothing -> (1, 1)
-    Just def -> (ObjDef.sizeX def, ObjDef.sizeY def)
+    Nothing -> collisionMap
+    Just def ->
+      if ObjDef.wall def -- Should we also check for solid?
+        then markFlatWall (getPosition obj) (facingDirection obj) collisionMap
+        else collisionMap
+
+processInteractable_ :: CollisionMap -> GameObject -> CollisionMap
+processInteractable_ collisionMap obj =
+  case objectDefinition (GameObject.id obj) of
+    Nothing -> collisionMap
+    Just def ->
+      if ObjDef.solid def && ObjDef.hasActions def
+        then
+          markSolidOccupant
+            (getPosition obj, (ObjDef.sizeX def, ObjDef.sizeY def), facingDirection obj)
+            collisionMap
+        else collisionMap
