@@ -16,7 +16,7 @@ processObject_ collisionMap obj =
   case GameObject.objectType obj of
     0 -> processFlatWall_ collisionMap obj
     10 -> processInteractable_ collisionMap obj
-    _ -> collisionMap
+    _ -> collisionMap -- TODO - add other object types, e.g. wall corners  - keotl 2023-11-03
 
 processFlatWall_ :: CollisionMap -> GameObject -> CollisionMap
 processFlatWall_ collisionMap obj =

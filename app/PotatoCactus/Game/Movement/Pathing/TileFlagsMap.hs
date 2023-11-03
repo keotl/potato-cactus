@@ -4,6 +4,7 @@ import Data.Binary (Word64, Word8)
 import Data.Bits (Bits (complement, shiftR, (.&.), (.|.)), shiftL)
 import qualified Data.IntMap as IntMap
 import Data.Maybe (fromMaybe)
+import PotatoCactus.Game.Movement.Pathing.TileFlagsUtils (mapRegionKey)
 import PotatoCactus.Game.Position (Position (x, y, z))
 import PotatoCactus.Utils.Iterable (alterAtIndex, replaceAtIndex)
 
@@ -14,16 +15,22 @@ type TileContainer = Word64
 type RegionMap = [TileContainer]
 
 data TileFlagsMap = TileFlagsMap
-  { regions :: IntMap.IntMap (RegionMap)
+  { regionKey_ :: Position -> Int,
+    regions :: IntMap.IntMap RegionMap
   }
-  deriving (Show, Eq)
+
+instance Show TileFlagsMap where
+  show = show . regions
+
+instance Eq TileFlagsMap where
+  a == b = regions a == regions b
 
 create :: TileFlagsMap
-create = TileFlagsMap IntMap.empty
+create = TileFlagsMap mapRegionKey IntMap.empty
 
 getTileFlags :: Position -> TileFlagsMap -> TileFlags
 getTileFlags pos collisionMap =
-  case regions collisionMap IntMap.!? regionKey pos of
+  case regions collisionMap IntMap.!? regionKey_ collisionMap pos of
     Nothing -> 0
     Just regionMap -> getTileInContainer pos (regionMap !! regionMapOffset (x pos) (y pos))
 
@@ -38,7 +45,7 @@ setTileFlags flags pos collisionMap =
                 (setTileInContainer flags pos)
               . fromMaybe emptyRegionMap
           )
-          (regionKey pos)
+          (regionKey_ collisionMap pos)
           (regions collisionMap)
     }
 
@@ -46,10 +53,6 @@ alterTileFlags :: (TileFlags -> TileFlags) -> Position -> TileFlagsMap -> TileFl
 alterTileFlags transform pos collisionMap =
   let old = getTileFlags pos collisionMap
    in setTileFlags (transform old) pos collisionMap
-
-regionKey :: Position -> Int
-regionKey pos =
-  (x pos `div` 64) + ((y pos `div` 64) * 1000) + (z pos * 1000000)
 
 setTileInContainer :: TileFlags -> Position -> TileContainer -> TileContainer
 setTileInContainer updated pos old =

@@ -1,7 +1,9 @@
 module Game.World.SelectorsTests where
 
 import qualified Data.IntMap as IntMap
-import PotatoCactus.Game.Definitions.StaticGameObjectSet (StaticGameObjectSet (StaticGameObjectSet), findObjectById, objectAt)
+import Debug.Trace (trace)
+import PotatoCactus.Game.Definitions.StaticGameObjectSet (StaticGameObjectSet (StaticGameObjectSet), createStaticObjectSet, findObjectById, objectAt)
+import qualified PotatoCactus.Game.Definitions.StaticGameObjectSet as StaticObjectSet
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as DynamicObjectCollection
 import PotatoCactus.Game.Entity.Object.GameObject (hashObject)
 import qualified PotatoCactus.Game.Entity.Object.GameObject as GameObject
@@ -40,7 +42,9 @@ staticObj :: GameObject.GameObject
 staticObj = GameObject.GameObject 2 staticObjectPos 10 0
 
 staticSet :: StaticGameObjectSet
-staticSet = StaticGameObjectSet (IntMap.fromList [(hashObject staticObj, [staticObj])])
+staticSet =
+  createStaticObjectSet
+    |> StaticObjectSet.addObject_ staticObj
 
 world :: World
 world =

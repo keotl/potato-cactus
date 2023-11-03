@@ -29,6 +29,7 @@ import MobListTests (testMobList)
 import Test.HUnit
 import Game.Movement.Pathing.CollisionMapTests (collisionMapTests)
 import Game.Movement.Pathing.PathPlannerTests (pathPlannerTests)
+import Game.Definitions.StaticGameObjectSetTests (staticGameObjectSetTests)
 
 tests =
   TestList
@@ -69,7 +70,8 @@ tests =
       playerMovementTests,
       tileFlagsMapTests,
       collisionMapTests,
-      pathPlannerTests
+      pathPlannerTests,
+      staticGameObjectSetTests
     ]
 
 main :: IO ()

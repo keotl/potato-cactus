@@ -87,7 +87,7 @@ object :: GameObject
 object = GameObject 123 targetPos 10 1
 
 objDef :: GameObjectDefinition
-objDef = GameObjectDefinition 123 1 1 False False True 0
+objDef = GameObjectDefinition 123 1 1 False False True 0 True
 
 largeObjDef :: GameObjectDefinition
 largeObjDef = objDef {ObjDef.sizeX = 2, ObjDef.sizeY = 2}

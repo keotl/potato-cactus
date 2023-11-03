@@ -155,6 +155,7 @@ executable potato-cactus
                    PotatoCactus.Game.Movement.Pathing.MovementFlags
                    PotatoCactus.Game.Movement.Pathing.PathPlanner
                    PotatoCactus.Game.Movement.Pathing.TileFlagsMap
+                   PotatoCactus.Game.Movement.Pathing.TileFlagsUtils
                    PotatoCactus.Game.Movement.PositionXY
                    PotatoCactus.Game.Movement.StaticMovement
                    PotatoCactus.Game.Movement.WalkingStep
