@@ -168,9 +168,7 @@ applyScriptResult world (RemoveGroundItem itemId quantity position removedByPlay
        in case (removedByPlayer, removed) of
             (_, ItemContainer.Empty) -> world
             (Nothing, _) ->
-              world
-                { groundItems = updated
-                }
+              world {groundItems = updated}
             (Just playerIndex, item) ->
               case findByIndex (players world) playerIndex of
                 Nothing -> world
