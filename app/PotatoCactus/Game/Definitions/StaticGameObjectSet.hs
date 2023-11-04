@@ -14,7 +14,7 @@ import GHC.IO (unsafePerformIO)
 import PotatoCactus.Game.Definitions.Parser.GameObjectPlacementParser (parseObjectPlacementFile)
 import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectId)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, id, objectType), GameObjectType, gameObjectHash, hashObject)
-import PotatoCactus.Game.Movement.Pathing.TileFlagsUtils (mapRegionKey)
+import PotatoCactus.Game.Movement.Pathing.TileFlagsUtils (mapChunkKey)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
 import PotatoCactus.Utils.Flow ((|>))
 import System.Directory (getDirectoryContents)
@@ -34,7 +34,7 @@ createStaticObjectSet :: StaticGameObjectSet
 createStaticObjectSet = StaticGameObjectSet IntMap.empty defaultRegionKeyFunction_
 
 defaultRegionKeyFunction_ :: Position -> Int
-defaultRegionKeyFunction_ = mapRegionKey
+defaultRegionKeyFunction_ = mapChunkKey
 
 instance_ :: IORef StaticGameObjectSet
 {-# NOINLINE instance_ #-}

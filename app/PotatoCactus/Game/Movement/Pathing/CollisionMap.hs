@@ -1,4 +1,4 @@
-module PotatoCactus.Game.Movement.Pathing.CollisionMap (CollisionMap, markSolidOccupant, markSolidTile, markFlatWall, allowsMovementBetween) where
+module PotatoCactus.Game.Movement.Pathing.CollisionMap (CollisionMap, markSolidOccupant, markSolidTile, markFlatWall, allowsMovementBetween, create) where
 
 import Data.Binary (Word8)
 import Data.Bits (Bits ((.&.)), (.|.))
@@ -9,7 +9,16 @@ import PotatoCactus.Game.Movement.PositionXY (toXY)
 import PotatoCactus.Game.Position (Position (Position, x, y, z))
 import PotatoCactus.Utils.Flow ((|>))
 
-type CollisionMap = TileFlagsMap.TileFlagsMap
+type RegionKey = Int
+
+data CollisionMap = CollisionMap
+  { tileFlags :: TileFlagsMap.TileFlagsMap,
+    dirtyRegions :: [RegionKey]
+  }
+  deriving (Show)
+
+create :: CollisionMap
+create = CollisionMap TileFlagsMap.create []
 
 markSolidOccupant :: (Position, (Int, Int), Int) -> CollisionMap -> CollisionMap
 markSolidOccupant obj collisionMap =
@@ -33,11 +42,18 @@ yRange originPos (width, height) 1 = [y originPos .. y originPos + width - 1]
 yRange originPos (width, height) facing = yRange originPos (width, height) (facing `mod` 2)
 
 markSolidTile :: Position -> CollisionMap -> CollisionMap
-markSolidTile = TileFlagsMap.setTileFlags blocksAllMovement
+markSolidTile pos collisionMap =
+  collisionMap
+    { tileFlags = TileFlagsMap.setTileFlags blocksAllMovement pos (tileFlags collisionMap)
+    }
+
+markFlatWall :: Position -> Int -> CollisionMap -> CollisionMap
+markFlatWall pos objType collisionMap =
+  collisionMap {tileFlags = markFlatWall_ pos objType (tileFlags collisionMap)}
 
 -- Flat Wall i.e. objType = 0
-markFlatWall :: Position -> Int -> CollisionMap -> CollisionMap
-markFlatWall pos 0 collisionMap =
+markFlatWall_ :: Position -> Int -> TileFlagsMap.TileFlagsMap -> TileFlagsMap.TileFlagsMap
+markFlatWall_ pos 0 collisionMap =
   -- Wall on W edge
   collisionMap
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementW) pos
@@ -51,7 +67,7 @@ markFlatWall pos 0 collisionMap =
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementNW) pos {y = y pos - 1}
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementNE) pos {x = x pos - 1}
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementSW) pos {y = y pos + 1}
-markFlatWall pos 1 collisionMap =
+markFlatWall_ pos 1 collisionMap =
   -- Wall on N edge
   collisionMap
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementN) pos
@@ -65,7 +81,7 @@ markFlatWall pos 1 collisionMap =
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementNE) pos {x = x pos - 1}
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementSE) pos {y = y pos + 1}
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementNW) pos {x = x pos + 1}
-markFlatWall pos 2 collisionMap =
+markFlatWall_ pos 2 collisionMap =
   -- Wall on E edge
   collisionMap
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementE) pos
@@ -79,7 +95,7 @@ markFlatWall pos 2 collisionMap =
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementSE) pos {y = y pos + 1}
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementSW) pos {x = x pos + 1}
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementNE) pos {y = y pos - 1}
-markFlatWall pos 3 collisionMap =
+markFlatWall_ pos 3 collisionMap =
   -- Wall on S edge
   collisionMap
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementS) pos
@@ -93,12 +109,12 @@ markFlatWall pos 3 collisionMap =
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementSW) pos {x = x pos + 1}
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementNW) pos {y = y pos - 1}
     |> TileFlagsMap.alterTileFlags (.|. blocksMovementSE) pos {x = x pos - 1}
-markFlatWall _ _ c = c
+markFlatWall_ _ _ c = c
 
 allowsMovementBetween :: Position -> Position -> CollisionMap -> Bool
 allowsMovementBetween origin destination collisionMap =
-  let originTileFlags = TileFlagsMap.getTileFlags origin collisionMap
-   in let destinationTileFlags = TileFlagsMap.getTileFlags destination collisionMap
+  let originTileFlags = TileFlagsMap.getTileFlags origin (tileFlags collisionMap)
+   in let destinationTileFlags = TileFlagsMap.getTileFlags destination (tileFlags collisionMap)
        in (originTileFlags .&. directionFlag_ origin destination) == 0
             && (destinationTileFlags .&. directionFlag_ destination origin) == 0
             && not (isDiagonalAcrossSolidObject_ origin destination collisionMap) -- TODO - We should instead mark all neighbouring tiles of solid occupant for consistency  - keotl 2023-09-25
@@ -106,7 +122,7 @@ allowsMovementBetween origin destination collisionMap =
 isDiagonalAcrossSolidObject_ :: Position -> Position -> CollisionMap -> Bool
 isDiagonalAcrossSolidObject_ a b collisionMap =
   any
-    ((== blocksAllMovement) . (`TileFlagsMap.getTileFlags` collisionMap))
+    ((== blocksAllMovement) . (`TileFlagsMap.getTileFlags` tileFlags collisionMap))
     (traversedDiagonalTiles_ a b)
 
 traversedDiagonalTiles_ :: Position -> Position -> [Position]

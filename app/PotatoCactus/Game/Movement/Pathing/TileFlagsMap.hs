@@ -4,7 +4,7 @@ import Data.Binary (Word64, Word8)
 import Data.Bits (Bits (complement, shiftR, (.&.), (.|.)), shiftL)
 import qualified Data.IntMap as IntMap
 import Data.Maybe (fromMaybe)
-import PotatoCactus.Game.Movement.Pathing.TileFlagsUtils (mapRegionKey)
+import PotatoCactus.Game.Movement.Pathing.TileFlagsUtils (mapChunkKey)
 import PotatoCactus.Game.Position (Position (x, y, z))
 import PotatoCactus.Utils.Iterable (alterAtIndex, replaceAtIndex)
 
@@ -26,7 +26,7 @@ instance Eq TileFlagsMap where
   a == b = regions a == regions b
 
 create :: TileFlagsMap
-create = TileFlagsMap mapRegionKey IntMap.empty
+create = TileFlagsMap mapChunkKey IntMap.empty
 
 getTileFlags :: Position -> TileFlagsMap -> TileFlags
 getTileFlags pos collisionMap =

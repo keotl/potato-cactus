@@ -20,7 +20,6 @@ import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as Dyna
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload)
 import qualified PotatoCactus.Game.Movement.Pathing.CollisionMap as CollisionMap
-import qualified PotatoCactus.Game.Movement.Pathing.TileFlagsMap as TileFlagsMap
 import PotatoCactus.Game.Player (PlayerIndex)
 import qualified PotatoCactus.Game.Player as P (Player (serverIndex), create, username)
 import PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer)
@@ -110,7 +109,7 @@ defaultWorldValue =
       triggeredEvents = [],
       pendingEvents_ = [],
       scheduler = Scheduler.create,
-      collisionMap = TileFlagsMap.create,
+      collisionMap = CollisionMap.create,
       staticObjectLookup_ = \_ _ -> Nothing
     }
 

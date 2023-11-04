@@ -3,7 +3,7 @@ module Game.Definitions.StaticGameObjectSetTests where
 import PotatoCactus.Game.Definitions.StaticGameObjectSet (StaticGameObjectSet, createStaticObjectSet, objectsInRegion)
 import qualified PotatoCactus.Game.Definitions.StaticGameObjectSet as StaticObjectSet
 import qualified PotatoCactus.Game.Entity.Object.GameObject as GameObject
-import PotatoCactus.Game.Movement.Pathing.TileFlagsUtils (mapRegionKey)
+import PotatoCactus.Game.Movement.Pathing.TileFlagsUtils (mapChunkKey, mapRegionKey)
 import qualified PotatoCactus.Game.Position as Pos
 import PotatoCactus.Utils.Flow ((|>))
 import Test.HUnit
@@ -13,9 +13,9 @@ staticGameObjectSetTests =
   TestList
     [ TestCase
         ( assertEqual
-            "looks up objects per region"
+            "looks up objects per chunk"
             [staticObj]
-            (objectsInRegion staticSet (mapRegionKey staticObjectPos))
+            (objectsInRegion staticSet (mapChunkKey staticObjectPos))
         )
     ]
 

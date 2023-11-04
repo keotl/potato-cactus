@@ -5,11 +5,11 @@ import qualified PotatoCactus.Game.Definitions.Types.GameObjectDefinition as Obj
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, facingDirection))
 import qualified PotatoCactus.Game.Entity.Object.GameObject as GameObject
 import PotatoCactus.Game.Movement.Pathing.CollisionMap (CollisionMap, markFlatWall, markSolidOccupant)
-import qualified PotatoCactus.Game.Movement.Pathing.TileFlagsMap as TileFlagsMap
+import qualified PotatoCactus.Game.Movement.Pathing.CollisionMap as CollisionMap
 import PotatoCactus.Game.Position (getPosition)
 
 buildCollisionMap :: [GameObject] -> CollisionMap
-buildCollisionMap = foldl processObject_ TileFlagsMap.create
+buildCollisionMap = foldl processObject_ CollisionMap.create
 
 processObject_ :: CollisionMap -> GameObject -> CollisionMap
 processObject_ collisionMap obj =
