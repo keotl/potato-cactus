@@ -2,13 +2,13 @@ module Game.World.SelectorsTests where
 
 import qualified Data.IntMap as IntMap
 import Debug.Trace (trace)
-import PotatoCactus.Game.Definitions.StaticGameObjectSet (StaticGameObjectSet (StaticGameObjectSet), createStaticObjectSet, findObjectById, objectAt)
+import PotatoCactus.Game.Definitions.StaticGameObjectSet (StaticGameObjectSet (StaticGameObjectSet), createStaticObjectSet, objectAt)
 import qualified PotatoCactus.Game.Definitions.StaticGameObjectSet as StaticObjectSet
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as DynamicObjectCollection
 import PotatoCactus.Game.Entity.Object.GameObject (hashObject)
 import qualified PotatoCactus.Game.Entity.Object.GameObject as GameObject
 import qualified PotatoCactus.Game.Position as Pos
-import PotatoCactus.Game.World (World (World, objects, staticObjectLookup_), defaultWorldValue, findObjectAt)
+import PotatoCactus.Game.World (World (World, objects, staticObjectSet), defaultWorldValue, findObjectAt)
 import PotatoCactus.Utils.Flow ((|>))
 import Test.HUnit
 
@@ -57,5 +57,5 @@ world =
                 else Nothing
           )
           |> DynamicObjectCollection.addDynamicObject obj,
-      staticObjectLookup_ = findObjectById staticSet
+      staticObjectSet = staticSet
     }

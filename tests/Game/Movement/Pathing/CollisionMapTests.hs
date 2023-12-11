@@ -2,6 +2,7 @@ module Game.Movement.Pathing.CollisionMapTests where
 
 import Data.Bits ((.|.))
 import PotatoCactus.Game.Movement.Pathing.CollisionMap (CollisionMap, allowsMovementBetween, markFlatWall, markSolidOccupant)
+import qualified PotatoCactus.Game.Movement.Pathing.CollisionMap as CollisionMap
 import PotatoCactus.Game.Movement.Pathing.MovementFlags (allowsFullMovement, blocksAllMovement, blocksMovementN, blocksMovementNE, blocksMovementNW, blocksMovementS, blocksMovementSE, blocksMovementSW)
 import qualified PotatoCactus.Game.Movement.Pathing.TileFlagsMap as TileFlagsMap
 import PotatoCactus.Game.Position (Position (Position), x, y)
@@ -17,6 +18,7 @@ collisionMapTests =
             blocksAllMovement
             ( collisionMap
                 |> markSolidOccupant (pos, (1, 1), 0)
+                |> CollisionMap.tileFlags
                 |> TileFlagsMap.getTileFlags pos
             )
         ),
@@ -28,7 +30,7 @@ collisionMapTests =
                 |> markSolidOccupant (pos, (1, 2), 0)
                 |> ( \colMap ->
                        map
-                         (`TileFlagsMap.getTileFlags` colMap)
+                         (`TileFlagsMap.getTileFlags` CollisionMap.tileFlags colMap)
                          [pos {y = 99}, pos, pos {y = 101}, pos {y = 102}]
                    )
             )
@@ -41,7 +43,7 @@ collisionMapTests =
                 |> markSolidOccupant (pos, (1, 2), 3)
                 |> ( \colMap ->
                        map
-                         (`TileFlagsMap.getTileFlags` colMap)
+                         (`TileFlagsMap.getTileFlags` CollisionMap.tileFlags colMap)
                          [pos {x = 99}, pos, pos {x = 101}, pos {x = 102}]
                    )
             )
@@ -51,13 +53,18 @@ collisionMapTests =
             "marks flat wall tile blocking direction and diagonals"
             -- \ x /   tiles blocked by wall
             -- . - .   wall facing N
-            [ {- first row -} blocksMovementSE, blocksMovementSW .|. blocksMovementS .|. blocksMovementSE,blocksMovementSW,
-              {- second row -} blocksMovementNE, blocksMovementNW .|. blocksMovementN .|. blocksMovementNE, blocksMovementNW]
+            [ {- first row -} blocksMovementSE,
+              blocksMovementSW .|. blocksMovementS .|. blocksMovementSE,
+              blocksMovementSW,
+              {- second row -} blocksMovementNE,
+              blocksMovementNW .|. blocksMovementN .|. blocksMovementNE,
+              blocksMovementNW
+            ]
             ( collisionMap
                 |> markFlatWall pos 1
                 |> ( \colMap ->
                        map
-                         (`TileFlagsMap.getTileFlags` colMap)
+                         (`TileFlagsMap.getTileFlags` CollisionMap.tileFlags colMap)
                          [ pos {x = 99, y = 101},
                            pos {y = 101},
                            pos {x = 101, y = 101},
@@ -83,4 +90,4 @@ pos :: Position
 pos = Position 100 100 0
 
 collisionMap :: CollisionMap
-collisionMap = TileFlagsMap.create
+collisionMap = CollisionMap.create

@@ -15,6 +15,7 @@ import qualified PotatoCactus.Game.Entity.Npc.NpcMovement as NM
 import PotatoCactus.Game.Entity.Npc.RespawnStrategy (RespawnStrategy (Never), respawning)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (addDynamicObject, removeDynamicObject)
 import qualified PotatoCactus.Game.ItemContainer as ItemContainer
+import qualified PotatoCactus.Game.Movement.Pathing.CollisionMap as CollisionMap
 import PotatoCactus.Game.Movement.Pathing.PathPlanner (findPath, findPathNaive)
 import qualified PotatoCactus.Game.Movement.PlayerMovement as PM
 import PotatoCactus.Game.Player (Player (interaction))
@@ -33,11 +34,13 @@ import PotatoCactus.Utils.Flow ((|>))
 applyScriptResult :: World -> ScriptActionResult -> World
 applyScriptResult world (SpawnGameObject obj) =
   world
-    { objects = addDynamicObject obj (objects world)
+    { objects = addDynamicObject obj (objects world),
+      W.collisionMap = CollisionMap.markSurroundingRegionDirty (getPosition obj) (W.collisionMap world)
     }
 applyScriptResult world (RemoveGameObject obj) =
   world
-    { objects = removeDynamicObject obj (objects world)
+    { objects = removeDynamicObject obj (objects world),
+      W.collisionMap = CollisionMap.markSurroundingRegionDirty (fst obj) (W.collisionMap world)
     }
 applyScriptResult world (ClearPlayerInteraction playerId) =
   world

@@ -6,6 +6,7 @@ import DecodeChatTests (decodeChatTests, encodeChatTests, testNibbles)
 import Game.ApplyActions.RemoveGroundItemActionTests (removeGroundItemActionTests)
 import Game.Combat.AdvanceCombatEntityTests (advanceCombatEntityTests)
 import Game.Combat.LocateCombatTargetTests (locateCombatTargetTests)
+import Game.Definitions.StaticGameObjectSetTests (staticGameObjectSetTests)
 import Game.DynamicObjectCollectionTests (testDynamicObjectCollection)
 import Game.Entity.Npc.NpcMovementTests (npcMovementTests)
 import Game.GameObjectUpdateDiffTests (testObjectDiff)
@@ -13,6 +14,9 @@ import Game.GameObjectUpdateOperationsTests (testGameObjectUpdateOperations)
 import Game.GroudItemCollectionTests (testGroundItemCollection)
 import Game.GroundItemsUpdateDiffTests (groundItemsUpdateDiffTests)
 import Game.InterpolatePathTests (interpolatePathTests)
+import Game.Movement.Pathing.CollisionMapBuilderTests (collisionMapBuilderTests)
+import Game.Movement.Pathing.CollisionMapTests (collisionMapTests)
+import Game.Movement.Pathing.PathPlannerTests (pathPlannerTests)
 import Game.Movement.Pathing.TileFlagsMapTests (tileFlagsMapTests)
 import Game.Objects.TileObjectsTests (testTileObjects)
 import Game.Player.AdvancePlayerTests (advancePlayerTests)
@@ -27,9 +31,6 @@ import GetMonadTests (getTests)
 import IterableTests (testReplaceAt)
 import MobListTests (testMobList)
 import Test.HUnit
-import Game.Movement.Pathing.CollisionMapTests (collisionMapTests)
-import Game.Movement.Pathing.PathPlannerTests (pathPlannerTests)
-import Game.Definitions.StaticGameObjectSetTests (staticGameObjectSetTests)
 
 tests =
   TestList
@@ -71,7 +72,8 @@ tests =
       tileFlagsMapTests,
       collisionMapTests,
       pathPlannerTests,
-      staticGameObjectSetTests
+      staticGameObjectSetTests,
+      collisionMapBuilderTests
     ]
 
 main :: IO ()

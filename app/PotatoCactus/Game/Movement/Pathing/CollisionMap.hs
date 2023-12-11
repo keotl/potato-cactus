@@ -1,10 +1,14 @@
-module PotatoCactus.Game.Movement.Pathing.CollisionMap (CollisionMap, markSolidOccupant, markSolidTile, markFlatWall, allowsMovementBetween, create) where
+{-# LANGUAGE FlexibleInstances #-}
+
+module PotatoCactus.Game.Movement.Pathing.CollisionMap (CollisionMap, markSolidOccupant, markSolidTile, markFlatWall, allowsMovementBetween, create, markSurroundingRegionDirty, alterForDirtyRegions, tileFlags) where
 
 import Data.Binary (Word8)
 import Data.Bits (Bits ((.&.)), (.|.))
+import qualified Data.IntSet as IntSet
 import qualified PotatoCactus.Game.Movement.Direction as Direction
 import PotatoCactus.Game.Movement.Pathing.MovementFlags (blocksAllMovement, blocksMovementE, blocksMovementN, blocksMovementNE, blocksMovementNW, blocksMovementS, blocksMovementSE, blocksMovementSW, blocksMovementW)
 import qualified PotatoCactus.Game.Movement.Pathing.TileFlagsMap as TileFlagsMap
+import PotatoCactus.Game.Movement.Pathing.TileFlagsUtils (mapChunkKey)
 import PotatoCactus.Game.Movement.PositionXY (toXY)
 import PotatoCactus.Game.Position (Position (Position, x, y, z))
 import PotatoCactus.Utils.Flow ((|>))
@@ -13,12 +17,33 @@ type RegionKey = Int
 
 data CollisionMap = CollisionMap
   { tileFlags :: TileFlagsMap.TileFlagsMap,
-    dirtyRegions :: [RegionKey]
+    dirtyRegions :: IntSet.IntSet,
+    regionKey_ :: Position -> RegionKey
   }
-  deriving (Show)
+  deriving (Show, Eq)
+
+instance Show (Position -> RegionKey) where
+  show x = "<fn>"
+
+instance Eq (Position -> RegionKey) where
+  a == b = True
 
 create :: CollisionMap
-create = CollisionMap TileFlagsMap.create []
+create = CollisionMap TileFlagsMap.create IntSet.empty mapChunkKey
+
+markSurroundingRegionDirty :: Position -> CollisionMap -> CollisionMap
+markSurroundingRegionDirty pos collisionMap =
+  collisionMap
+    { dirtyRegions =
+        IntSet.insert
+          (regionKey_ collisionMap pos)
+          (dirtyRegions collisionMap)
+    }
+
+alterForDirtyRegions :: ([RegionKey] -> CollisionMap -> CollisionMap) -> CollisionMap -> CollisionMap
+alterForDirtyRegions transform collisionMap =
+  let dirty = dirtyRegions collisionMap
+   in transform (IntSet.toList dirty) collisionMap {dirtyRegions = IntSet.empty}
 
 markSolidOccupant :: (Position, (Int, Int), Int) -> CollisionMap -> CollisionMap
 markSolidOccupant obj collisionMap =

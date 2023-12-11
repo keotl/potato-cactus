@@ -1,7 +1,4 @@
 {-# LANGUAGE FlexibleInstances #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-
-{-# HLINT ignore "Use lambda-case" #-}
 
 module PotatoCactus.Game.Definitions.StaticGameObjectSet (StaticGameObjectSet (StaticGameObjectSet), initializeStaticGameSet, objectAt, getStaticObjectSetInstance, allEntries, FindStaticObjectById, findObjectById, createStaticObjectSet, objectsInRegion, addObject_) where
 

@@ -1,8 +1,8 @@
 module Game.Movement.Pathing.PathPlannerTests where
 
 import PotatoCactus.Game.Movement.Pathing.CollisionMap (CollisionMap, markSolidOccupant)
+import qualified PotatoCactus.Game.Movement.Pathing.CollisionMap as CollisionMap
 import PotatoCactus.Game.Movement.Pathing.PathPlanner (findPathNaive)
-import qualified PotatoCactus.Game.Movement.Pathing.TileFlagsMap as TileFlagsMap
 import PotatoCactus.Game.Position
 import PotatoCactus.Utils.Flow ((|>))
 import Test.HUnit
@@ -34,5 +34,5 @@ pathPlannerTests =
 
 collisionMap :: CollisionMap
 collisionMap =
-  TileFlagsMap.create
+  CollisionMap.create
     |> markSolidOccupant (Position 100 100 0, (2, 2), 0)

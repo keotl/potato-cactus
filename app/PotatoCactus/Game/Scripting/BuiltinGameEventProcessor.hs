@@ -44,7 +44,7 @@ dispatchScriptEvent world (InternalNpcCannotReachCombatTargetEvent npc destinati
     [] -> return []
     path -> return [InternalNpcQueueWalkPath (NPC.serverIndex npc) path]
 dispatchScriptEvent world (InternalPlayerCannotReachCombatTargetEvent player destination) =
-  case findPathNaive (W.collisionMap world) (getPosition player) destination of
+  trace "pathing for player" $ case findPathNaive (W.collisionMap world) (getPosition player) destination of
     [] ->
       return
         [ ClearPlayerInteraction (serverIndex player),

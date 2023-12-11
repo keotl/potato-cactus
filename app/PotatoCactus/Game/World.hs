@@ -20,6 +20,7 @@ import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as Dyna
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload)
 import qualified PotatoCactus.Game.Movement.Pathing.CollisionMap as CollisionMap
+import qualified PotatoCactus.Game.Movement.Pathing.CollisionMapBuilder as CollisionMapBuilder
 import PotatoCactus.Game.Player (PlayerIndex)
 import qualified PotatoCactus.Game.Player as P (Player (serverIndex), create, username)
 import PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer)
@@ -54,7 +55,7 @@ data World = World
     pendingEvents_ :: [GameEvent], -- Additional events to dispatch on the next tick.
     scheduler :: CallbackScheduler,
     collisionMap :: CollisionMap.CollisionMap,
-    staticObjectLookup_ :: StaticObject.FindStaticObjectById
+    staticObjectSet :: StaticObject.StaticGameObjectSet
   }
   deriving (Show)
 
@@ -95,7 +96,7 @@ findObjectAt world pos objectId =
     |> DynamicObjectCollection.findVisibleObjectById pos objectId of
     VisibleObject.Visible obj -> Just obj
     VisibleObject.Hidden -> Nothing
-    VisibleObject.None -> staticObjectLookup_ world pos objectId
+    VisibleObject.None -> StaticObject.findObjectById (staticObjectSet world) pos objectId
 
 defaultWorldValue :: World
 defaultWorldValue =
@@ -110,7 +111,7 @@ defaultWorldValue =
       pendingEvents_ = [],
       scheduler = Scheduler.create,
       collisionMap = CollisionMap.create,
-      staticObjectLookup_ = \_ _ -> Nothing
+      staticObjectSet = StaticObject.createStaticObjectSet
     }
 
 worldInstance :: IORef World
@@ -166,3 +167,4 @@ scheduleCallback w script tick =
   w
     { scheduler = Scheduler.queueCallback (scheduler w) script tick
     }
+

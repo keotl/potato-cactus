@@ -9,7 +9,7 @@ import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as Dyna
 import qualified PotatoCactus.Game.Movement.Pathing.CollisionMap as CollisionMap
 import qualified PotatoCactus.Game.Movement.Pathing.CollisionMapBuilder as CollisionMapBuilder
 import PotatoCactus.Game.Position (Position (Position))
-import PotatoCactus.Game.World (World (collisionMap, objects, staticObjectLookup_), addNpc, worldInstance)
+import PotatoCactus.Game.World (World (collisionMap, objects, staticObjectSet), addNpc, worldInstance)
 
 initializeWorld :: IO ()
 initializeWorld = do
@@ -19,7 +19,7 @@ initializeWorld = do
         defaultWorld
           { objects = DynamicObjectCollection.create (objectAt staticObjectSet),
             collisionMap = CollisionMapBuilder.buildCollisionMap (StaticSet.allEntries staticObjectSet),
-            staticObjectLookup_ = StaticSet.findObjectById staticObjectSet
+            staticObjectSet = staticObjectSet
           }
 
   -- Force strict evaluation of the collision map expression before the game thread starts
