@@ -31,6 +31,7 @@ import GetMonadTests (getTests)
 import IterableTests (testReplaceAt)
 import MobListTests (testMobList)
 import Test.HUnit
+import Game.Objects.HierarchicalObjectReconciliation (hierarchicalObjectReconciliationTests)
 
 tests =
   TestList
@@ -73,7 +74,8 @@ tests =
       collisionMapTests,
       pathPlannerTests,
       staticGameObjectSetTests,
-      collisionMapBuilderTests
+      collisionMapBuilderTests,
+      hierarchicalObjectReconciliationTests
     ]
 
 main :: IO ()

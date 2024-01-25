@@ -56,6 +56,7 @@ world =
                 then Just staticObj
                 else Nothing
           )
+          (\_ -> [])
           |> DynamicObjectCollection.addDynamicObject obj,
       staticObjectSet = staticSet
     }

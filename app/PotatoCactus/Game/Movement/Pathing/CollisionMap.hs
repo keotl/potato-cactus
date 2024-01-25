@@ -43,7 +43,18 @@ markSurroundingRegionDirty pos collisionMap =
 alterForDirtyRegions :: ([RegionKey] -> CollisionMap -> CollisionMap) -> CollisionMap -> CollisionMap
 alterForDirtyRegions transform collisionMap =
   let dirty = dirtyRegions collisionMap
-   in transform (IntSet.toList dirty) collisionMap {dirtyRegions = IntSet.empty}
+   in transform (IntSet.toList dirty) (resetDirtyRegions collisionMap)
+
+resetDirtyRegions :: CollisionMap -> CollisionMap
+resetDirtyRegions collisionMap =
+  collisionMap
+    { tileFlags =
+        foldl
+          TileFlagsMap.resetRegion
+          (tileFlags collisionMap)
+          (IntSet.toList . dirtyRegions $ collisionMap),
+      dirtyRegions = IntSet.empty
+    }
 
 markSolidOccupant :: (Position, (Int, Int), Int) -> CollisionMap -> CollisionMap
 markSolidOccupant obj collisionMap =

@@ -17,8 +17,13 @@ initializeWorld = do
   defaultWorld <- readIORef worldInstance
   let world =
         defaultWorld
-          { objects = DynamicObjectCollection.create (objectAt staticObjectSet),
-            collisionMap = CollisionMapBuilder.buildCollisionMap (StaticSet.allEntries staticObjectSet),
+          { objects =
+              DynamicObjectCollection.create
+                (objectAt staticObjectSet)
+                (StaticSet.objectsInRegion staticObjectSet),
+            collisionMap =
+              CollisionMapBuilder.buildCollisionMap
+                (StaticSet.allEntries staticObjectSet),
             staticObjectSet = staticObjectSet
           }
 

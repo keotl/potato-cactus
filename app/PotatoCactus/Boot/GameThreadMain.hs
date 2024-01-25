@@ -31,13 +31,14 @@ mainLoop = do
   world <- readIORef worldInstance
   newWorld <- reduceUntilNextTick_ world gameChannel
   newWorld2 <- dispatchScriptEvents newWorld
+  let newWorld3 = W.advanceCollisionMap newWorld2
 
-  -- logger_ Info $ (show newWorld2)
+  -- logger_ Info $ (show newWorld3)
 
-  writeIORef worldInstance newWorld2
+  writeIORef worldInstance newWorld3
   -- TODO - Investigate blocking IO for freeze on player disconnect bug  - keotl 2023-03-27
   -- appears to be fixed with -threaded flag
-  notifyClients_ WorldUpdatedMessage (clients newWorld2)
+  notifyClients_ WorldUpdatedMessage (clients newWorld3)
   mainLoop
 
 worldTickThread_ :: Int -> Chan GameChannelMessage -> IO ()

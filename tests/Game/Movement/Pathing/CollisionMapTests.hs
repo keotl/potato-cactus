@@ -83,6 +83,17 @@ collisionMapTests =
                 |> markFlatWall pos 1
                 |> allowsMovementBetween pos (pos {y = 101})
             )
+        ),
+      TestCase
+        ( assertEqual
+            "resets dirty regions when recomputing"
+            0
+            ( collisionMap
+                |> markSolidOccupant (pos, (1, 1), 0)
+                |> CollisionMap.markSurroundingRegionDirty pos
+                |> CollisionMap.alterForDirtyRegions (const id)
+                |> TileFlagsMap.getTileFlags pos . CollisionMap.tileFlags
+            )
         )
     ]
 

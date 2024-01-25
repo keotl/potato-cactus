@@ -105,7 +105,10 @@ defaultWorldValue =
       players = PotatoCactus.Game.World.MobList.create maxPlayers,
       npcs = PotatoCactus.Game.World.MobList.create maxNpcs,
       clients = [],
-      objects = PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create (\_ _ -> Nothing),
+      objects =
+        PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create
+          (\_ _ -> Nothing)
+          (const []),
       groundItems = GroundItemCollection.create,
       triggeredEvents = [],
       pendingEvents_ = [],
@@ -168,3 +171,11 @@ scheduleCallback w script tick =
     { scheduler = Scheduler.queueCallback (scheduler w) script tick
     }
 
+advanceCollisionMap :: World -> World
+advanceCollisionMap w =
+  w
+    { collisionMap =
+        CollisionMapBuilder.recomputeDirtyRegions
+          (DynamicObjectCollection.objectsInRegion (objects w))
+          (collisionMap w)
+    }
