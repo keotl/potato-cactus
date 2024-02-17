@@ -25,11 +25,12 @@ Takes some inspiration from
 - [x] Scripts can set VarP/Varbit variables to control client
       behaviour such as instanced game objects or NPCs.
 - [x] Scripts can access accurate game object placement information
+- [x] Game Objects are added to a collision map for pathing calculations
 
 ## Priorities
 - [x] Game data loading
   - [x] Item, NPC, Object definitions
-  - [ ] Collision map and pathing
+  - [x] Collision map and pathing
   - [x] Static object set
 - [ ] Persistence mechanism
 
