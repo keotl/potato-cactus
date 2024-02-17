@@ -1,9 +1,10 @@
 module PotatoCactus.Game.Reducer where
 
 import qualified PotatoCactus.Boot.GameChannel as C
+import qualified PotatoCactus.Game.Combat.CombatEntity as Combat
 import qualified PotatoCactus.Game.Entity.GroundItem.GroundItem as GroundItem
 import qualified PotatoCactus.Game.Entity.GroundItem.GroundItemCollection as GroundItemCollection
-import PotatoCactus.Game.Entity.Interaction.Target (NpcInteractionType (NpcAction, NpcAttack))
+import PotatoCactus.Game.Entity.Interaction.Target (NpcInteractionType (NpcAction))
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject))
 import PotatoCactus.Game.Interface.InterfaceButtonDispatch (dispatchInterfaceButtonClick)
 import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (..))
@@ -13,7 +14,7 @@ import qualified PotatoCactus.Game.Message.RegisterClientPayload as C
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
 import qualified PotatoCactus.Game.Movement.PositionXY as Position
 import qualified PotatoCactus.Game.Player as P
-import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (ContinueDialogue, DropItem, EquipItem, InteractWithGroundItem, InteractWithNpc, InteractWithObject, InteractWithObjectWithItem, SayChatMessage, UnequipItem))
+import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (ContinueDialogue, DropItem, EquipItem, InteractWithGroundItem, InteractWithNpc, InteractWithObject, InteractWithObjectWithItem, SayChatMessage, SetCombatTarget, UnequipItem))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (z))
 import qualified PotatoCactus.Game.Position as Position
 import PotatoCactus.Game.Scripting.Actions.CreateInterface (InterfaceType (Standard))
@@ -49,7 +50,7 @@ reduceWorld world (ObjectClickMessage playerId objectId positionXY actionIndex) 
           Just obj -> P.queueUpdate p (InteractWithObject (ObjectClickPayload obj actionIndex))
     )
 reduceWorld world (NpcAttackMessage playerId npcIndex) =
-  updatePlayerByIndex world playerId (\p -> P.queueUpdate p (InteractWithNpc npcIndex NpcAttack))
+  updatePlayerByIndex world playerId (`P.queueUpdate` SetCombatTarget (Combat.NpcTarget npcIndex))
 reduceWorld world (NpcClickMessage playerId npcIndex actionIndex) =
   updatePlayerByIndex world playerId (\p -> P.queueUpdate p (InteractWithNpc npcIndex (NpcAction actionIndex)))
 reduceWorld world (PickupGroundItemMessage playerId itemId pos) =

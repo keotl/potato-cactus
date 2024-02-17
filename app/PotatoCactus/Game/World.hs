@@ -5,6 +5,7 @@ import Data.IORef (IORef, newIORef, writeIORef)
 import Data.List (find)
 import GHC.IO (unsafePerformIO)
 import PotatoCactus.Config.Constants (maxNpcs, maxPlayers)
+import qualified PotatoCactus.Game.Combat.AdvanceCombatEntityDeps as CombatDeps
 import PotatoCactus.Game.Definitions.GameObjectDefinitions (objectDefinition)
 import qualified PotatoCactus.Game.Definitions.StaticGameObjectSet as StaticObject
 import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectId)
@@ -18,16 +19,17 @@ import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCol
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as DynamicObjectCollection
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject)
 import PotatoCactus.Game.Message.ObjectClickPayload (ObjectClickPayload)
+import qualified PotatoCactus.Game.Movement.Pathing.CollisionMap as CollisionMap
+import qualified PotatoCactus.Game.Movement.Pathing.CollisionMapBuilder as CollisionMapBuilder
 import PotatoCactus.Game.Player (PlayerIndex)
 import qualified PotatoCactus.Game.Player as P (Player (serverIndex), create, username)
 import PotatoCactus.Game.PlayerUpdate.AdvancePlayer (advancePlayer)
-import PotatoCactus.Game.Position (Position (Position))
+import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
 import PotatoCactus.Game.Scripting.Actions.ScriptInvocation (ScriptInvocation)
 import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent))
 import PotatoCactus.Game.Typing (Advance (advance), ShouldDiscard (shouldDiscard))
 import PotatoCactus.Game.World.CallbackScheduler (CallbackScheduler)
 import qualified PotatoCactus.Game.World.CallbackScheduler as Scheduler
-import PotatoCactus.Game.World.EntityPositionFinder (combatTargetPosOrDefault)
 import PotatoCactus.Game.World.MobList (MobList, add, create, findByIndex, findByPredicate, remove, removeByPredicate, updateAll, updateAtIndex, updateByPredicate)
 import PotatoCactus.Utils.Flow ((|>))
 import PotatoCactus.Utils.Iterable (replace)
@@ -52,7 +54,8 @@ data World = World
     triggeredEvents :: [GameEvent], -- Additional events to dispatch on this tick. For events not tied to a specific entity.
     pendingEvents_ :: [GameEvent], -- Additional events to dispatch on the next tick.
     scheduler :: CallbackScheduler,
-    staticObjectLookup_ :: StaticObject.FindStaticObjectById
+    collisionMap :: CollisionMap.CollisionMap,
+    staticObjectSet :: StaticObject.StaticGameObjectSet
   }
   deriving (Show)
 
@@ -61,11 +64,10 @@ instance Advance World where
     let newNpcs =
           updateAll
             (npcs w)
-            ( advanceNpc (combatTargetPosOrDefault (players w) (npcs w))
-            )
+            (advanceNpc (createAdvanceCombatDeps_ w))
      in w
           { tick = tick w + 1,
-            players = updateAll (players w) (advancePlayer (createAdvanceInteractionDeps_ w)),
+            players = updateAll (players w) (advancePlayer (createAdvanceInteractionDeps_ w {npcs = newNpcs}) (createAdvanceCombatDeps_ w {npcs = newNpcs})),
             npcs = removeByPredicate newNpcs shouldDiscard,
             groundItems = GroundItemCollection.advanceTime (groundItems w) (tick w + 1),
             triggeredEvents = pendingEvents_ w ++ invokedScripts_ w,
@@ -81,13 +83,20 @@ createAdvanceInteractionDeps_ :: World -> InteractionDeps.AdvanceInteractionSele
 createAdvanceInteractionDeps_ w =
   InteractionDeps.AdvanceInteractionSelectors (findByIndex (npcs w)) (findObjectAt w) objectDefinition
 
+createAdvanceCombatDeps_ :: World -> CombatDeps.AdvanceCombatEntityDeps
+createAdvanceCombatDeps_ w =
+  CombatDeps.AdvanceCombatEntityDeps
+    (fmap getPosition . findByIndex (npcs w))
+    (fmap getPosition . findByIndex (players w))
+    (const (1, 1)) -- TODO - Lookup npc size from definitions  - keotl 2023-09-12
+
 findObjectAt :: World -> Position -> GameObjectId -> Maybe GameObject
 findObjectAt world pos objectId =
   case objects world
     |> DynamicObjectCollection.findVisibleObjectById pos objectId of
     VisibleObject.Visible obj -> Just obj
     VisibleObject.Hidden -> Nothing
-    VisibleObject.None -> staticObjectLookup_ world pos objectId
+    VisibleObject.None -> StaticObject.findObjectById (staticObjectSet world) pos objectId
 
 defaultWorldValue :: World
 defaultWorldValue =
@@ -96,12 +105,16 @@ defaultWorldValue =
       players = PotatoCactus.Game.World.MobList.create maxPlayers,
       npcs = PotatoCactus.Game.World.MobList.create maxNpcs,
       clients = [],
-      objects = PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create (\_ _ -> Nothing),
+      objects =
+        PotatoCactus.Game.Entity.Object.DynamicObjectCollection.create
+          (\_ _ -> Nothing)
+          (const []),
       groundItems = GroundItemCollection.create,
       triggeredEvents = [],
       pendingEvents_ = [],
       scheduler = Scheduler.create,
-      staticObjectLookup_ = \_ _ -> Nothing
+      collisionMap = CollisionMap.create,
+      staticObjectSet = StaticObject.createStaticObjectSet
     }
 
 worldInstance :: IORef World
@@ -156,4 +169,13 @@ scheduleCallback :: World -> ScriptInvocation -> Int -> World
 scheduleCallback w script tick =
   w
     { scheduler = Scheduler.queueCallback (scheduler w) script tick
+    }
+
+advanceCollisionMap :: World -> World
+advanceCollisionMap w =
+  w
+    { collisionMap =
+        CollisionMapBuilder.recomputeDirtyRegions
+          (DynamicObjectCollection.objectsInRegion (objects w))
+          (collisionMap w)
     }

@@ -8,6 +8,15 @@ import PotatoCactus.Game.Typing (ToNumeric (toNumeric))
 
 type GameObjectType = Int
 
+-- 0 -> Regular wall
+-- 1 -> Triangle wall column
+-- 2 -> Wall corner (L-shape)
+-- 3 -> Square wall column
+-- 4 -> Wall decoration (no interaction?)
+-- 5 -> Wall decoration (with interaction?)
+-- 9 -> Diagonal wall (tile fully blocked)
+-- 10 -> Standard game object (i.e. interactable)
+
 data GameObject = GameObject
   { id :: GameObjectId,
     position :: Position,

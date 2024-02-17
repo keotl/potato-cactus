@@ -1,8 +1,8 @@
 module PotatoCactus.Game.Movement.Direction where
 
-import PotatoCactus.Game.Movement.PositionXY (PositionXY (x, y))
+import PotatoCactus.Game.Movement.PositionXY (PositionXY (PositionXY, x, y))
 
-data Direction = None | NorthWest | North | NorthEast | West | East | SouthWest | South | SouthEast deriving (Show)
+data Direction = None | NorthWest | North | NorthEast | West | East | SouthWest | South | SouthEast deriving (Show, Eq)
 
 directionId :: Direction -> Int
 directionId None = -1

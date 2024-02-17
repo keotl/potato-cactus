@@ -2,7 +2,6 @@ module PotatoCactus.Persistence.PlayerRepository where
 
 import PotatoCactus.Game.Definitions.EquipmentDefinitions (chestSlot, legsSlot)
 import PotatoCactus.Game.ItemContainer (ItemContainer (ItemContainer), ItemStack (ItemStack), addItems, playerInventory)
-import PotatoCactus.Game.Movement.MovementEntity (playerWalkMovement)
 import PotatoCactus.Game.Player (Player (Player, inventory, movement, username))
 import qualified PotatoCactus.Game.Player as Player
 import PotatoCactus.Game.Position (Position (Position))

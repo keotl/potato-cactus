@@ -1,6 +1,5 @@
 from potato_cactus.api.context import Context
 from potato_cactus.api.dto.world import World
-from potato_cactus.internal.impl.static_object_set import StaticObjectSet
 
 
 class ContextImpl(Context):
@@ -10,7 +9,6 @@ class ContextImpl(Context):
         if self.INSTANCE is not None:
             raise Exception("Context already initialized")
         self._world = None
-        self._static_objects = StaticObjectSet()
         ContextImpl.INSTANCE = self
 
     @property

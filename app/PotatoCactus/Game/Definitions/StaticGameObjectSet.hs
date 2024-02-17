@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 
-module PotatoCactus.Game.Definitions.StaticGameObjectSet (StaticGameObjectSet (StaticGameObjectSet), initializeStaticGameSet, objectAt, getStaticObjectSetInstance, allEntries, FindStaticObjectById, findObjectById) where
+module PotatoCactus.Game.Definitions.StaticGameObjectSet (StaticGameObjectSet (StaticGameObjectSet), initializeStaticGameSet, objectAt, getStaticObjectSetInstance, allEntries, FindStaticObjectById, findObjectById, createStaticObjectSet, objectsInRegion, addObject_) where
 
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.IntMap (IntMap)
@@ -11,18 +11,31 @@ import GHC.IO (unsafePerformIO)
 import PotatoCactus.Game.Definitions.Parser.GameObjectPlacementParser (parseObjectPlacementFile)
 import PotatoCactus.Game.Definitions.Types.GameObjectDefinition (GameObjectId)
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, id, objectType), GameObjectType, gameObjectHash, hashObject)
+import PotatoCactus.Game.Movement.Pathing.TileFlagsUtils (mapChunkKey)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position))
 import PotatoCactus.Utils.Flow ((|>))
 import System.Directory (getDirectoryContents)
 import Prelude hiding (id)
 
+type RegionKey = Int
+
 data StaticGameObjectSet = StaticGameObjectSet
-  { elements_ :: IntMap [GameObject]
+  { regions_ :: IntMap (IntMap [GameObject]), -- RegionKey -> PositionKey -> [Objects]
+    regionKey_ :: Position -> RegionKey
   }
+
+instance Show StaticGameObjectSet where
+  show = show . regions_
+
+createStaticObjectSet :: StaticGameObjectSet
+createStaticObjectSet = StaticGameObjectSet IntMap.empty defaultRegionKeyFunction_
+
+defaultRegionKeyFunction_ :: Position -> Int
+defaultRegionKeyFunction_ = mapChunkKey
 
 instance_ :: IORef StaticGameObjectSet
 {-# NOINLINE instance_ #-}
-instance_ = unsafePerformIO $ newIORef $ StaticGameObjectSet IntMap.empty
+instance_ = unsafePerformIO $ newIORef createStaticObjectSet
 
 getStaticObjectSetInstance :: IO StaticGameObjectSet
 getStaticObjectSetInstance =
@@ -38,18 +51,47 @@ initializeStaticGameSet mapDirectory objectFileSuffix = do
       |> mapM parseObjectPlacementFile
 
   let i =
-        StaticGameObjectSet $
-          IntMap.fromList $
-            map
-              (\obj -> (hashObject obj, [obj]))
-              (concat parsedObjects)
+        foldl
+          (flip addObject_)
+          (StaticGameObjectSet IntMap.empty defaultRegionKeyFunction_)
+          (concat parsedObjects)
+
   writeIORef instance_ i
 
-  return (length . elements_ $ i)
+  return (length . concat $ parsedObjects)
+
+addObject_ :: GameObject -> StaticGameObjectSet -> StaticGameObjectSet
+addObject_ obj objectSet =
+  objectSet
+    { regions_ =
+        IntMap.alter
+          (Just . addObjectToRegion_ obj . fromMaybe IntMap.empty)
+          (regionKey_ objectSet . getPosition $ obj)
+          (regions_ objectSet)
+    }
+
+addObjectToRegion_ :: GameObject -> IntMap [GameObject] -> IntMap [GameObject]
+addObjectToRegion_ obj =
+  IntMap.alter
+    (Just . (obj :) . fromMaybe [])
+    (hashObject obj)
 
 objectAt :: StaticGameObjectSet -> Position -> GameObjectType -> Maybe GameObject
 objectAt collection pos objType =
-  case fromMaybe [] (elements_ collection IntMap.!? gameObjectHash (pos, objType)) of
+  let regionMap = regions_ collection IntMap.!? regionKey_ collection pos
+   in findObjectInRegion_ pos objType regionMap
+
+objectsInRegion :: StaticGameObjectSet -> RegionKey -> [GameObject]
+objectsInRegion collection regionKey =
+  regions_ collection IntMap.!? regionKey
+    |> fromMaybe IntMap.empty
+    |> IntMap.elems
+    |> concat
+
+findObjectInRegion_ :: Position -> GameObjectType -> Maybe (IntMap [GameObject]) -> Maybe GameObject
+findObjectInRegion_ _ _ Nothing = Nothing
+findObjectInRegion_ pos objType (Just elements) =
+  case fromMaybe [] (elements IntMap.!? gameObjectHash (pos, objType)) of
     [] -> Nothing
     x : xs -> Just x
 
@@ -58,8 +100,7 @@ objectAt collection pos objType =
 
 allEntries :: StaticGameObjectSet -> [GameObject]
 allEntries staticObjects =
-  -- TODO - Probably worth removing  - keotl 2023-09-04
-  concatMap snd (IntMap.toList . elements_ $ staticObjects)
+  (concat . concatMap IntMap.elems . IntMap.elems) (regions_ staticObjects)
 
 type FindStaticObjectById = Position -> GameObjectId -> Maybe GameObject
 

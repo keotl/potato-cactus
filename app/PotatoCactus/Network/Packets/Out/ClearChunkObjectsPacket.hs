@@ -2,8 +2,7 @@ module PotatoCactus.Network.Packets.Out.ClearChunkObjectsPacket where
 
 import Data.Binary.Put (putInt8, putWord8)
 import Data.ByteString (ByteString, concat)
-import PotatoCactus.Game.Movement.MovementEntity (MovementEntity (PlayerWalkMovement_))
-import PotatoCactus.Game.Movement.PlayerWalkMovement (PlayerWalkMovement (lastRegionUpdate_))
+import PotatoCactus.Game.Movement.PlayerMovement (lastRegionUpdate_)
 import PotatoCactus.Game.Player (Player (Player, movement))
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position, z), chunkX, chunkY, localToRefX, localToRefY)
 import PotatoCactus.Network.Packets.Packet (fixedPacket2)
@@ -13,13 +12,10 @@ clearChunkObjectsPacket chunkPos p =
   fixedPacket2
     64
     ( do
-        case movement p of
-          PlayerWalkMovement_ m ->
-            let region = lastRegionUpdate_ m
-             in do
-                  putInt8 $ fromIntegral (- localToRefX region chunkPos)
-                  putInt8 $ fromIntegral $ 128 - localToRefY region chunkPos
-          _ -> pure ()
+        let region = lastRegionUpdate_ (movement p)
+         in do
+              putInt8 $ fromIntegral (- localToRefX region chunkPos)
+              putInt8 $ fromIntegral $ 128 - localToRefY region chunkPos
     )
 
 clearChunksAroundPlayer :: Player -> ByteString

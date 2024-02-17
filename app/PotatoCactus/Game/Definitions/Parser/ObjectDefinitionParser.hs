@@ -31,7 +31,8 @@ assembleDefinition_ extracted =
       Def.wall = wall extracted,
       Def.walkable = walkable extracted,
       Def.solid = solid extracted,
-      Def.face = face extracted
+      Def.face = face extracted,
+      Def.hasActions = hasActions extracted
     }
 
 data ExtractedGameObjectDefinition = ExtractedGameObjectDefinition

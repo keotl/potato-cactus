@@ -101,8 +101,11 @@ executable potato-cactus
                    PotatoCactus.Network.Binary
                    PotatoCactus.Login.LoginHandler
                    PotatoCactus.Login.Models
+                   PotatoCactus.Game.Combat.AdvanceCombatEntity
+                   PotatoCactus.Game.Combat.AdvanceCombatEntityDeps
                    PotatoCactus.Game.Combat.CombatEntity
                    PotatoCactus.Game.Combat.Hit
+                   PotatoCactus.Game.Combat.LocateCombatTarget
                    PotatoCactus.Game.Entity.Animation.Animation
                    PotatoCactus.Game.Entity.EntityData
                    PotatoCactus.Game.Entity.GroundItem.GroundItem
@@ -121,6 +124,7 @@ executable potato-cactus
                    PotatoCactus.Game.Entity.Object.DynamicObject
                    PotatoCactus.Game.Entity.Object.DynamicObjectCollection
                    PotatoCactus.Game.Entity.Object.GameObject
+                   PotatoCactus.Game.Entity.Object.HierarchicalObjectReconciliation
                    PotatoCactus.Game.Entity.Object.TileObjects
                    PotatoCactus.Game.Definitions.EquipmentDefinitions
                    PotatoCactus.Game.Definitions.GameObjectDefinitions
@@ -146,9 +150,13 @@ executable potato-cactus
                    PotatoCactus.Game.Message.RegisterClientPayload
                    PotatoCactus.Game.Movement.Direction
                    PotatoCactus.Game.Movement.InterpolatePath
-                   PotatoCactus.Game.Movement.MovementEntity
-                   PotatoCactus.Game.Movement.PlayerWalkMovement
-                   PotatoCactus.Game.Movement.PathPlanner
+                   PotatoCactus.Game.Movement.PlayerMovement
+                   PotatoCactus.Game.Movement.Pathing.CollisionMap
+                   PotatoCactus.Game.Movement.Pathing.CollisionMapBuilder
+                   PotatoCactus.Game.Movement.Pathing.MovementFlags
+                   PotatoCactus.Game.Movement.Pathing.PathPlanner
+                   PotatoCactus.Game.Movement.Pathing.TileFlagsMap
+                   PotatoCactus.Game.Movement.Pathing.TileFlagsUtils
                    PotatoCactus.Game.Movement.PositionXY
                    PotatoCactus.Game.Movement.StaticMovement
                    PotatoCactus.Game.Movement.WalkingStep
@@ -200,7 +208,6 @@ executable potato-cactus
                    PotatoCactus.Game.Typing
                    PotatoCactus.Game.World
                    PotatoCactus.Game.World.CallbackScheduler
-                   PotatoCactus.Game.World.EntityPositionFinder
                    PotatoCactus.Game.World.MobList
                    PotatoCactus.Game.World.Selectors
                    PotatoCactus.Game.Reducer
@@ -219,7 +226,8 @@ executable potato-cactus
       -Werror
       -fwarn-incomplete-patterns
       -O3
-      -threaded
+      -- -threaded
+      -- -rtsopts
 
 test-suite tests
     type: exitcode-stdio-1.0

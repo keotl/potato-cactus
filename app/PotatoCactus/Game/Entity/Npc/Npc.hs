@@ -23,8 +23,7 @@ data Npc = Npc
     animation :: Maybe Anim.Animation,
     forcedChat :: Maybe String,
     combat :: CombatEntity,
-    respawn :: RespawnStrategy,
-    canReachTarget :: Bool -- whether to send script event for pathing
+    respawn :: RespawnStrategy
   }
   deriving (Show)
 
@@ -45,8 +44,7 @@ create definitionId pos respawnStrategy =
             combat = CombatEntity.create 1,
             animation = Nothing,
             forcedChat = Nothing,
-            respawn = respawnStrategy,
-            canReachTarget = True
+            respawn = respawnStrategy
           }
    in case npcDefinition definitionId of
         Just def ->

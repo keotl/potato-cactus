@@ -4,7 +4,6 @@ import Data.ByteString (pack)
 import Data.ByteString.UTF8 as BSU
 import Network.Socket (Socket)
 import Network.Socket.ByteString (recv, sendAll)
-import PotatoCactus.Game.Movement.MovementEntity (playerWalkMovement)
 import PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.Position as Pos
 import PotatoCactus.Login.Models as L

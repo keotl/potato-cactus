@@ -8,7 +8,7 @@ import Data.Aeson.Types (Value (String))
 import GHC.Generics (Generic)
 import qualified PotatoCactus.Game.Entity.Interaction.Interaction as I
 import PotatoCactus.Game.Entity.Interaction.State (InteractionState (InProgress, Pending, PendingPathing))
-import PotatoCactus.Game.Entity.Interaction.Target (GroundItemInteractionType (ItemPickup), InteractionTarget (GroundItemTarget, None, NpcTarget, ObjectTarget), NpcInteractionType (NpcAction, NpcAttack), ObjectInteractionType (ItemOnObject, ObjectAction))
+import PotatoCactus.Game.Entity.Interaction.Target (GroundItemInteractionType (ItemPickup), InteractionTarget (GroundItemTarget, None, NpcTarget, ObjectTarget), NpcInteractionType (NpcAction), ObjectInteractionType (ItemOnObject, ObjectAction))
 import PotatoCactus.Game.Entity.Npc.Npc (Npc (definitionId))
 import qualified PotatoCactus.Game.Entity.Object.GameObject as GameObject
 import PotatoCactus.Game.Player (Player)
@@ -29,7 +29,6 @@ eventName :: I.Interaction -> String
 eventName I.Interaction {I.target = None} = "Noop"
 eventName I.Interaction {I.target = (ObjectTarget _ (ObjectAction _))} = "ObjectInteractionEvent"
 eventName I.Interaction {I.target = (ObjectTarget _ ItemOnObject {})} = "ItemOnObjectInteractionEvent"
-eventName I.Interaction {I.target = (NpcTarget _ NpcAttack)} = "NpcAttackInteractionEvent" -- TODO - Can this be consolidated with NpcAttackEvent?  - keotl 2023-04-27
 eventName I.Interaction {I.target = (NpcTarget _ _)} = "NpcInteractionEvent"
 eventName I.Interaction {I.target = (GroundItemTarget _ _ _ ItemPickup)} = "PickupItemInteractionEvent"
 
@@ -58,15 +57,6 @@ interactionToDto I.Interaction {I.target = (ObjectTarget obj (ItemOnObject inter
             "itemId" .= itemId,
             "itemIndex" .= itemIndex,
             "interfaceId" .= interfaceId
-          ],
-      "state" .= mapState s
-    ]
-interactionToDto I.Interaction {I.target = (NpcTarget npcIndex NpcAttack), I.state = s} =
-  object
-    [ "target"
-        .= object
-          [ "type" .= String "npcAttack",
-            "npcIndex" .= npcIndex
           ],
       "state" .= mapState s
     ]

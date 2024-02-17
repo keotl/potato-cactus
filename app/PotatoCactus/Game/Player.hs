@@ -3,7 +3,7 @@ module PotatoCactus.Game.Player where
 import Data.Binary (Word32, Word8)
 import Data.Bits ((.&.), (.|.))
 import Data.Foldable (fold)
-import PotatoCactus.Game.Combat.CombatEntity (CombatEntity, CombatTarget (NpcTarget), clearTargetIfEngagedWith)
+import PotatoCactus.Game.Combat.CombatEntity (CombatEntity, CombatTarget (NpcTarget))
 import qualified PotatoCactus.Game.Combat.CombatEntity as CombatEntity
 import PotatoCactus.Game.Combat.Hit (Hit)
 import PotatoCactus.Game.Definitions.Types.ItemDefinition (ItemId)
@@ -16,8 +16,7 @@ import PotatoCactus.Game.Interface.InterfaceController (InterfaceController, cle
 import qualified PotatoCactus.Game.Interface.InterfaceController as IC
 import PotatoCactus.Game.ItemContainer (ItemContainer, playerEquipmentContainer, playerInventory)
 import qualified PotatoCactus.Game.ItemContainer as Container
-import PotatoCactus.Game.Movement.MovementEntity (immediatelySetPosition, playerWalkMovement)
-import qualified PotatoCactus.Game.Movement.MovementEntity as M (MovementEntity, issueWalkCommand)
+import qualified PotatoCactus.Game.Movement.PlayerMovement as M
 import PotatoCactus.Game.Movement.PositionXY (PositionXY)
 import PotatoCactus.Game.Movement.WalkingStep (WalkingStep)
 import PotatoCactus.Game.PlayerUpdate.Appearance (PlayerAppearance, defaultPlayerAppearance)
@@ -37,7 +36,7 @@ data Player = Player
   { serverIndex :: PlayerIndex,
     username :: String,
     appearance :: PlayerAppearance,
-    movement :: M.MovementEntity,
+    movement :: M.PlayerMovement,
     updateMask :: PlayerUpdateMask,
     pendingUpdates :: [PlayerUpdate],
     chatMessage :: Maybe ChatMessage, -- Overhead text
@@ -64,7 +63,7 @@ instance Keyable Player where
 issueWalkCommand :: (PositionXY, Bool, [WalkingStep]) -> Player -> Player
 issueWalkCommand (startPos, isRunning, steps) p =
   p
-    { movement = M.issueWalkCommand (movement p) startPos steps,
+    { movement = M.queueWalk (movement p) startPos steps,
       combat = CombatEntity.clearTarget . combat $ p,
       interaction = Interaction.create,
       interfaces = clearStandardInterfaces . interfaces $ p
@@ -76,7 +75,7 @@ create username position =
     { serverIndex = -1,
       username = username,
       appearance = defaultPlayerAppearance,
-      movement = playerWalkMovement position,
+      movement = M.create position,
       updateMask = appearanceFlag,
       pendingUpdates = [],
       chatMessage = Nothing,
@@ -127,10 +126,6 @@ setAnimation anim player =
       updateMask = updateMask player .|. animationFlag
     }
 
-clearTargetIfEngagedWithNpc :: NpcIndex -> Player -> Player
-clearTargetIfEngagedWithNpc npcId p =
-  p {combat = clearTargetIfEngagedWith (NpcTarget npcId) (combat p)}
-
 sendChatboxMessage :: Player -> String -> Player
 sendChatboxMessage p msg =
   p {chatboxMessages = chatboxMessages p ++ [msg]}
@@ -138,7 +133,7 @@ sendChatboxMessage p msg =
 setPosition :: Player -> Position -> Player
 setPosition p pos =
   p
-    { movement = immediatelySetPosition (movement p) pos
+    { movement = M.setPosition (movement p) pos
     }
 
 createInterface :: Player -> CreateInterfaceRequest -> Player

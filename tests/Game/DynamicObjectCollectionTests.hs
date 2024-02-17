@@ -5,6 +5,7 @@ import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (DynamicObjectCol
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as ObjectCollection
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (GameObject, objectType, position), GameObjectType)
 import PotatoCactus.Game.Entity.Object.TileObjects (findVisibleObjectById)
+import PotatoCactus.Game.Movement.Pathing.TileFlagsUtils (mapChunkKey)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (Position), chunkX, chunkY)
 import PotatoCactus.Utils.Flow ((|>))
 import Test.HUnit
@@ -49,7 +50,7 @@ testDynamicObjectCollection =
             "adding over Removed object should remove that entry"
             []
             ( ObjectCollection.iter
-                ( ObjectCollection.create populatedStaticSet
+                ( ObjectCollection.create populatedStaticSet emptyStaticSetRegionLookup
                     |> ObjectCollection.removeDynamicObject (position staticObj, objectType staticObj)
                     |> ObjectCollection.addDynamicObject staticObj
                 )
@@ -59,14 +60,14 @@ testDynamicObjectCollection =
         ( assertEqual
             "findByChunkXY"
             [Added obj]
-            (ObjectCollection.findByChunkXY (chunkX . getPosition $ obj) (chunkY . getPosition $ obj) 0 collection)
+            (ObjectCollection.findByChunkXY (chunkX . getPosition $ obj, chunkY . getPosition $ obj, 0) collection)
         ),
       TestCase
         ( assertEqual
             "addDynamicObject with replaced object in static set, should mark static object as Replaced"
             [Replacing obj staticObj]
             ( ObjectCollection.iter
-                ( ObjectCollection.create populatedStaticSet
+                ( ObjectCollection.create populatedStaticSet emptyStaticSetRegionLookup
                     |> ObjectCollection.addDynamicObject obj
                 )
             )
@@ -76,7 +77,7 @@ testDynamicObjectCollection =
             "re-adding a replaced static object resets to initial state"
             []
             ( ObjectCollection.iter
-                ( ObjectCollection.create populatedStaticSet
+                ( ObjectCollection.create populatedStaticSet emptyStaticSetRegionLookup
                     |> ObjectCollection.addDynamicObject obj
                     |> ObjectCollection.addDynamicObject staticObj
                 )
@@ -89,7 +90,7 @@ testDynamicObjectCollection =
             -- Either revert to default state (i.e. static object) or with static object removed
             [Removed staticObj]
             ( ObjectCollection.iter
-                ( ObjectCollection.create populatedStaticSet
+                ( ObjectCollection.create populatedStaticSet emptyStaticSetRegionLookup
                     |> ObjectCollection.addDynamicObject obj
                     |> ObjectCollection.removeDynamicObject (position obj, objectType obj)
                 )
@@ -102,7 +103,7 @@ testDynamicObjectCollection =
             ( ObjectCollection.findVisibleObjectById
                 pos
                 123
-                ( ObjectCollection.create emptyStaticSet
+                ( ObjectCollection.create emptyStaticSet emptyStaticSetRegionLookup
                     |> ObjectCollection.addDynamicObject obj
                 )
             )
@@ -114,13 +115,20 @@ testDynamicObjectCollection =
             ( ObjectCollection.findVisibleObjectById
                 pos
                 123
-                (ObjectCollection.create emptyStaticSet)
+                (ObjectCollection.create emptyStaticSet emptyStaticSetRegionLookup)
+            )
+        ),
+      TestCase
+        ( assertEqual
+            "objectsObjectsInRegion lists objects associated with region key"
+            [obj]
+            ( ObjectCollection.objectsInRegion collection (mapChunkKey pos)
             )
         )
     ]
 
 emptyCollection :: DynamicObjectCollection
-emptyCollection = ObjectCollection.create emptyStaticSet
+emptyCollection = ObjectCollection.create emptyStaticSet emptyStaticSetRegionLookup
 
 collection :: DynamicObjectCollection
 collection =
@@ -140,6 +148,9 @@ staticObj = GameObject 456 pos 0 0
 
 emptyStaticSet :: Position -> GameObjectType -> Maybe GameObject
 emptyStaticSet _ _ = Nothing
+
+emptyStaticSetRegionLookup :: Int -> [GameObject]
+emptyStaticSetRegionLookup _ = []
 
 populatedStaticSet :: Position -> GameObjectType -> Maybe GameObject
 populatedStaticSet _ _ = Just staticObj

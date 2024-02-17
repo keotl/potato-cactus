@@ -1,5 +1,6 @@
 module PotatoCactus.Network.InboundPacketMapper where
 
+import Debug.Trace (trace)
 import PotatoCactus.Game.Message.GameChannelMessage (GameChannelMessage (UnregisterClientMessage))
 import PotatoCactus.Game.Player (PlayerIndex)
 import PotatoCactus.Network.Packets.In.ButtonClickPacket (buttonClickMessage)

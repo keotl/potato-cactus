@@ -28,8 +28,6 @@ mapEvent (PlayerAttackEvent p t) =
   Just $ bridgeMessage "gameEvent" $ GameEventDto "PlayerAttackEvent" (playerAttackToDto p t)
 mapEvent (NpcAttackEvent npc t) =
   Just $ bridgeMessage "gameEvent" $ GameEventDto "NpcAttackEvent" (npcAttackDto npc t)
-mapEvent (InternalNpcCannotReachTargetEvent npc t) =
-  Nothing
 mapEvent (NpcDeadEvent npc) =
   Just $ bridgeMessage "gameEvent" $ GameEventDto "NpcDeadEvent" (npcReferenceDto npc)
 mapEvent (NpcEntityTickEvent npc) =
@@ -40,8 +38,9 @@ mapEvent (DropItemEvent playerId widgetId itemId index) =
   Just $ bridgeMessage "gameEvent" $ GameEventDto "DropItemEvent" (dropItemDto playerId widgetId itemId index)
 mapEvent (ScriptInvokedEvent (ScriptInvocation functionName args)) =
   Just $ bridgeMessage "invokeScript" $ GameEventDto functionName (listValue id args)
-mapEvent (InternalPlayerInteractionPendingPathingEvent _ _) =
-  Nothing
+mapEvent (InternalPlayerInteractionPendingPathingEvent _ _) = Nothing
+mapEvent (InternalNpcCannotReachCombatTargetEvent npc t) = Nothing
+mapEvent (InternalPlayerCannotReachCombatTargetEvent _ _) = Nothing
 
 data GameEventDto b = GameEventDto
   { event :: String,

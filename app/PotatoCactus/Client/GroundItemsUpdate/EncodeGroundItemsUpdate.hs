@@ -4,7 +4,7 @@ import Data.ByteString (ByteString, concat, empty)
 import PotatoCactus.Client.GroundItemsUpdate.GroundItemsUpdateDiff (GroundItemClientView, GroundItemDiff (Added, Removed, Retained), computeDiff, fromGroundItem)
 import PotatoCactus.Game.Entity.GroundItem.GroundItem (GroundItem)
 import PotatoCactus.Game.Entity.GroundItem.GroundItemCollection (findByChunkXYForPlayer)
-import PotatoCactus.Game.Movement.MovementEntity (hasChangedRegion)
+import PotatoCactus.Game.Movement.PlayerMovement (hasChangedRegion)
 import PotatoCactus.Game.Player (Player)
 import qualified PotatoCactus.Game.Player as P
 import PotatoCactus.Game.Position (GetPosition (getPosition), chunkX, chunkY)

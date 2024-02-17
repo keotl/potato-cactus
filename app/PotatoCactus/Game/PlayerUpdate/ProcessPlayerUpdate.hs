@@ -1,6 +1,7 @@
 module PotatoCactus.Game.PlayerUpdate.ProcessPlayerUpdate where
 
 import Data.Bits ((.|.))
+import qualified PotatoCactus.Game.Combat.CombatEntity as Combat
 import PotatoCactus.Game.Definitions.EquipmentDefinitions (EquipmentDefinition (slot), equipmentDefinition)
 import PotatoCactus.Game.Entity.Interaction.Interaction (createForTarget)
 import qualified PotatoCactus.Game.Entity.Interaction.Target as ITarget
@@ -14,9 +15,9 @@ import qualified PotatoCactus.Game.Message.ItemOnObjectPayload as IonO
 import qualified PotatoCactus.Game.Message.ItemOnObjectPayload as ItemOnObject
 import qualified PotatoCactus.Game.Message.ObjectClickPayload as ObjectClick
 import PotatoCactus.Game.Movement.PositionXY (fromXY)
-import PotatoCactus.Game.Player (Player (chatMessage, droppedItemIndices, equipment, interaction, interfaces, inventory, updateMask))
+import PotatoCactus.Game.Player (Player (chatMessage, combat, droppedItemIndices, equipment, interaction, interfaces, inventory, updateMask))
 import PotatoCactus.Game.PlayerUpdate.Equipment (Equipment (container), equipItem, unequipItem)
-import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (ContinueDialogue, DropItem, EquipItem, InteractWithGroundItem, InteractWithNpc, InteractWithObject, InteractWithObjectWithItem, SayChatMessage, UnequipItem))
+import PotatoCactus.Game.PlayerUpdate.PlayerUpdate (PlayerUpdate (ContinueDialogue, DropItem, EquipItem, InteractWithGroundItem, InteractWithNpc, InteractWithObject, InteractWithObjectWithItem, SayChatMessage, SetCombatTarget, UnequipItem))
 import PotatoCactus.Game.PlayerUpdate.UpdateMask (appearanceFlag, chatFlag)
 import PotatoCactus.Game.Position (GetPosition (getPosition), Position (z))
 import qualified PotatoCactus.Game.Scripting.Actions.CreateInterface as I
@@ -101,6 +102,11 @@ processPlayerUpdate p (InteractWithNpc npcId interactionType) =
 processPlayerUpdate p (InteractWithGroundItem itemId quantity pos) =
   p
     { interaction = createForTarget (ITarget.GroundItemTarget itemId quantity pos ITarget.ItemPickup),
+      interfaces = clearStandardInterfaces . interfaces $ p
+    }
+processPlayerUpdate p (SetCombatTarget target) =
+  p
+    { combat = Combat.setTarget (combat p) target,
       interfaces = clearStandardInterfaces . interfaces $ p
     }
 processPlayerUpdate p ContinueDialogue =

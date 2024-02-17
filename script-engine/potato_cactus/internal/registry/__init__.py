@@ -46,8 +46,6 @@ class Registry(object):
             return event, options.get("objectId")
         elif event == GameEvent.NpcInteractionEvent:
             return event, options.get("npcId")
-        elif event == GameEvent.NpcAttackInteractionEvent:
-            return event, options.get("npcId")
         elif event == GameEvent.PickupItemInteractionEvent:
             return event, options.get("itemId")
         elif event == GameEvent.PlayerAttackEvent:

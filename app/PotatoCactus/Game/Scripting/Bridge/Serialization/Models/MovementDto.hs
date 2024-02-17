@@ -5,8 +5,7 @@ module PotatoCactus.Game.Scripting.Bridge.Serialization.Models.MovementDto (Move
 import Data.Aeson (ToJSON)
 import GHC.Generics (Generic)
 import qualified PotatoCactus.Game.Entity.Npc.NpcMovement as N
-import PotatoCactus.Game.Movement.MovementEntity (MovementEntity (PlayerWalkMovement_, StaticMovement_))
-import qualified PotatoCactus.Game.Movement.PlayerWalkMovement as P
+import qualified PotatoCactus.Game.Movement.PlayerMovement as P
 import PotatoCactus.Game.Position (getPosition)
 import PotatoCactus.Game.Scripting.Bridge.Serialization.Models.PositionDto (PositionDto (PositionDto), toDto)
 
@@ -27,16 +26,10 @@ npcMovementDto n =
       isRunning = False
     }
 
-playerMovementDto :: MovementEntity -> MovementDto
-playerMovementDto (PlayerWalkMovement_ m) =
+playerMovementDto :: P.PlayerMovement -> MovementDto
+playerMovementDto m =
   MovementDto
     { position = toDto . getPosition $ m,
       queue = map toDto $ P.queue_ m,
       isRunning = P.isRunning m
-    }
-playerMovementDto (StaticMovement_ m) =
-  MovementDto
-    { position = toDto . getPosition $ m,
-      queue = [],
-      isRunning = False
     }

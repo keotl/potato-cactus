@@ -7,7 +7,7 @@ import PotatoCactus.Game.Entity.Object.DynamicObject (DynamicObject)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (findByChunkXY)
 import qualified PotatoCactus.Game.Entity.Object.DynamicObjectCollection as Object
 import PotatoCactus.Game.Entity.Object.GameObject (GameObject (objectType), gameObjectHash)
-import PotatoCactus.Game.Movement.MovementEntity (hasChangedRegion)
+import PotatoCactus.Game.Movement.PlayerMovement (hasChangedRegion)
 import PotatoCactus.Game.Player (Player (movement))
 import PotatoCactus.Game.Position (GetPosition (getPosition), chunkX, chunkY)
 import qualified PotatoCactus.Game.Position as Pos
@@ -44,7 +44,7 @@ findObjectsAround :: (GetPosition a) => a -> World -> [DynamicObject]
 findObjectsAround player world =
   let refPos = getPosition player
    in Prelude.concat
-        [ findByChunkXY (x + chunkX refPos) (y + chunkY refPos) (Pos.z refPos) (objects world)
+        [ findByChunkXY (x + chunkX refPos, y + chunkY refPos, Pos.z refPos) (objects world)
           | x <- [-2 .. 1],
             y <- [-2 .. 1]
         ]

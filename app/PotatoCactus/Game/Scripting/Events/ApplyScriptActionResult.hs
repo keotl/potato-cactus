@@ -9,22 +9,22 @@ import qualified PotatoCactus.Game.Entity.GroundItem.GroundItemCollection as Gro
 import PotatoCactus.Game.Entity.Interaction.Interaction (create)
 import qualified PotatoCactus.Game.Entity.Interaction.Interaction as Interaction
 import qualified PotatoCactus.Game.Entity.Interaction.State as InteractionState
-import PotatoCactus.Game.Entity.Npc.Npc (Npc (respawn))
 import qualified PotatoCactus.Game.Entity.Npc.Npc as NPC
 import PotatoCactus.Game.Entity.Npc.NpcMovement (immediatelyQueueMovement)
 import qualified PotatoCactus.Game.Entity.Npc.NpcMovement as NM
 import PotatoCactus.Game.Entity.Npc.RespawnStrategy (RespawnStrategy (Never), respawning)
 import PotatoCactus.Game.Entity.Object.DynamicObjectCollection (addDynamicObject, removeDynamicObject)
 import qualified PotatoCactus.Game.ItemContainer as ItemContainer
-import qualified PotatoCactus.Game.Movement.MovementEntity as PM
-import PotatoCactus.Game.Movement.PathPlanner (findPath, findPathNaive)
-import PotatoCactus.Game.Player (Player (interaction), clearTargetIfEngagedWithNpc)
+import qualified PotatoCactus.Game.Movement.Pathing.CollisionMap as CollisionMap
+import PotatoCactus.Game.Movement.Pathing.PathPlanner (findPath, findPathNaive)
+import qualified PotatoCactus.Game.Movement.PlayerMovement as PM
+import PotatoCactus.Game.Player (Player (interaction))
 import qualified PotatoCactus.Game.Player as P
 import qualified PotatoCactus.Game.PlayerUpdate.PlayerAnimationDefinitions as PAnim
 import PotatoCactus.Game.PlayerUpdate.VarpSet (Varp (varpId))
 import PotatoCactus.Game.Position (GetPosition (getPosition))
 import qualified PotatoCactus.Game.Scripting.Actions.SpawnNpcRequest as SpawnReq
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (ClearPlayerInteraction, ClearStandardInterface, CreateInterface, DispatchAttackNpcToPlayer, DispatchAttackPlayerToNpc, GiveItem, InternalNoop, InternalProcessingComplete, InternalSetPlayerInteractionPending, InvokeScript, NpcMoveTowardsTarget, NpcQueueWalk, NpcSetAnimation, NpcSetForcedChat, PlayerQueueWalk, RemoveGameObject, RemoveGroundItem, RemoveItemStack, SendMessage, ServerPrintMessage, SetPlayerAnimation, SetPlayerEntityData, SetPlayerPosition, SetPlayerVarbit, SetPlayerVarp, SpawnGameObject, SpawnGroundItem, SpawnNpc, SubtractItem))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (ScriptInvokedEvent), ScriptActionResult (..))
 import PotatoCactus.Game.World (World (npcs, objects, players), groundItems)
 import qualified PotatoCactus.Game.World as W
 import PotatoCactus.Game.World.MobList (findByIndex, remove, updateAll, updateAtIndex)
@@ -34,11 +34,13 @@ import PotatoCactus.Utils.Flow ((|>))
 applyScriptResult :: World -> ScriptActionResult -> World
 applyScriptResult world (SpawnGameObject obj) =
   world
-    { objects = addDynamicObject obj (objects world)
+    { objects = addDynamicObject obj (objects world),
+      W.collisionMap = CollisionMap.markSurroundingRegionDirty (getPosition obj) (W.collisionMap world)
     }
 applyScriptResult world (RemoveGameObject obj) =
   world
-    { objects = removeDynamicObject obj (objects world)
+    { objects = removeDynamicObject obj (objects world),
+      W.collisionMap = CollisionMap.markSurroundingRegionDirty (fst obj) (W.collisionMap world)
     }
 applyScriptResult world (ClearPlayerInteraction playerId) =
   world
@@ -81,33 +83,6 @@ applyScriptResult world (NpcSetAnimation npcIndex anim) =
   world
     { npcs = updateAtIndex (npcs world) npcIndex (`NPC.setAnimation` anim)
     }
-applyScriptResult world (NpcMoveTowardsTarget npc) =
-  case target . NPC.combat $ npc of
-    PlayerTarget playerId ->
-      case findByIndex (W.players world) playerId of
-        Just p ->
-          case findPathNaive 666 (getPosition npc) (getPosition p) of
-            [] -> world
-            (desiredMove : _) ->
-              if isNpcAt world desiredMove
-                then world
-                else
-                  world
-                    { npcs =
-                        updateAtIndex
-                          (W.npcs world)
-                          (NPC.serverIndex npc)
-                          ( \npc ->
-                              npc
-                                { NPC.movement =
-                                    immediatelyQueueMovement
-                                      (NPC.movement npc)
-                                      [desiredMove]
-                                }
-                          )
-                    }
-        Nothing -> world
-    _ -> world
 applyScriptResult world (SpawnNpc options) =
   let respawn = case SpawnReq.respawnDelay options of
         -1 -> Never
@@ -124,7 +99,7 @@ applyScriptResult world (NpcQueueWalk npcIndex pos) =
                 { NPC.movement =
                     NM.immediatelyQueueMovement
                       (NPC.movement npc)
-                      (findPath 666 (getPosition npc) pos)
+                      (findPathNaive (W.collisionMap world) (getPosition npc) pos)
                 }
           )
     }
@@ -196,9 +171,7 @@ applyScriptResult world (RemoveGroundItem itemId quantity position removedByPlay
        in case (removedByPlayer, removed) of
             (_, ItemContainer.Empty) -> world
             (Nothing, _) ->
-              world
-                { groundItems = updated
-                }
+              world {groundItems = updated}
             (Just playerIndex, item) ->
               case findByIndex (players world) playerIndex of
                 Nothing -> world
@@ -250,7 +223,37 @@ applyScriptResult world (PlayerQueueWalk playerIndex targetPos) =
                 { P.movement =
                     PM.immediatelyQueueMovement
                       (P.movement player)
-                      (findPath 666 (getPosition player) targetPos)
+                      (findPath (W.collisionMap world) (getPosition player) targetPos)
+                }
+          )
+    }
+applyScriptResult world (InternalPlayerQueueWalkPath playerIndex path) =
+  world
+    { players =
+        updateAtIndex
+          (W.players world)
+          playerIndex
+          ( \player ->
+              player
+                { P.movement =
+                    PM.immediatelyQueueMovement
+                      (P.movement player)
+                      path
+                }
+          )
+    }
+applyScriptResult world (InternalNpcQueueWalkPath npcIndex path) =
+  world
+    { npcs =
+        updateAtIndex
+          (W.npcs world)
+          npcIndex
+          ( \npc ->
+              npc
+                { NPC.movement =
+                    NM.immediatelyQueueMovement
+                      (NPC.movement npc)
+                      path
                 }
           )
     }

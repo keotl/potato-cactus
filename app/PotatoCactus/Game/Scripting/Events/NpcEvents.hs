@@ -3,34 +3,23 @@ module PotatoCactus.Game.Scripting.Events.NpcEvents (createNpcEvents) where
 import Data.Maybe (catMaybes)
 import PotatoCactus.Game.Combat.CombatEntity (CombatTarget (None), cooldown)
 import qualified PotatoCactus.Game.Combat.CombatEntity as Combat
-import PotatoCactus.Game.Entity.Npc.Npc (Npc (canReachTarget, combat))
-import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (InternalNpcCannotReachTargetEvent, NpcAttackEvent, NpcDeadEvent, NpcEntityTickEvent))
+import PotatoCactus.Game.Entity.Npc.Npc (Npc (combat))
+import PotatoCactus.Game.Scripting.ScriptUpdates (GameEvent (InternalNpcCannotReachCombatTargetEvent, NpcAttackEvent, NpcDeadEvent, NpcEntityTickEvent))
 import PotatoCactus.Utils.Flow ((|>))
 
 createNpcEvents :: Npc -> [GameEvent]
 createNpcEvents npc =
-  NpcEntityTickEvent npc :
-  catMaybes
-    [ attackEvent_ npc,
-      cannotReachEvent_ npc,
-      npcDeadEvent_ npc
-    ]
+  [NpcEntityTickEvent npc]
+    ++ catMaybes [npcDeadEvent_ npc]
+    ++ combatEvents_ npc
 
-attackEvent_ :: Npc -> Maybe GameEvent
-attackEvent_ npc =
-  case (Combat.target . combat $ npc, canReachTarget npc) of
-    (None, _) -> Nothing
-    (target, True) ->
-      if 0 == (cooldown . combat $ npc)
-        then Just $ NpcAttackEvent npc target
-        else Nothing
-    (_, _) -> Nothing
+combatEvents_ :: Npc -> [GameEvent]
+combatEvents_ npc =
+  map (mapCombatAction_ npc) (Combat.pendingActions . combat $ npc)
 
-cannotReachEvent_ :: Npc -> Maybe GameEvent
-cannotReachEvent_ npc =
-  if canReachTarget npc
-    then Nothing
-    else Just $ InternalNpcCannotReachTargetEvent npc (Combat.target . combat $ npc)
+mapCombatAction_ :: Npc -> Combat.CombatAction -> GameEvent
+mapCombatAction_ npc (Combat.MoveTowardsTarget destination) = InternalNpcCannotReachCombatTargetEvent npc destination
+mapCombatAction_ npc Combat.AttackTarget = NpcAttackEvent npc (Combat.target . combat $ npc)
 
 npcDeadEvent_ :: Npc -> Maybe GameEvent
 npcDeadEvent_ npc =
